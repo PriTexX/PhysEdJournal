@@ -6,14 +6,14 @@ namespace PhysEdJournal.Core.Entities.DTO;
 public record struct PointsDto
 {
     [Required]
-    public int Value { get; set; }
+    public int Value { get; init; }
     
     [Required]
-    public DateOnly WorkDate { get; set; }
+    public DateOnly WorkDate { get; init; }
     
-    public SportType SportType { get; set; }
+    public SportType SportType { get; init; }
     
-    public WorkType WorkType { get; set; }
+    public WorkType WorkType { get; init; }
     
-    public string? Comment { get; set; }
+    public string? Comment { get; init; }
 }
