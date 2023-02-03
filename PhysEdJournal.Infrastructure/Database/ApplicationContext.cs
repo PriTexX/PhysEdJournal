@@ -9,6 +9,7 @@ public class ApplicationContext : DbContext
     public DbSet<StudentPointsHistoryEntity> StudentsPointsHistory { get; set; }
     public DbSet<StudentVisitsHistoryEntity> StudentsVisitsHistory { get; set; }
     public DbSet<StudentEntity> Students { get; set; }
+    public DbSet<TeacherEntity> Teachers { get; set; }
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {
