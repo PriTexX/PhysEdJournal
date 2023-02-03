@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
@@ -13,7 +14,10 @@ public class StudentEntity
     public string FullName { get; set; }
     
     [Required]
-    public string Group { get; set; }
+    public string GroupNumber { get; set; }
+    
+    [ForeignKey("GroupNumber")]
+    public GroupEntity Group { get; set; }
 
     [DefaultValue(0)]
     public int Visits { get; set; }
