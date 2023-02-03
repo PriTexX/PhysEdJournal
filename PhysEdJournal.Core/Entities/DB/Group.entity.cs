@@ -13,4 +13,9 @@ public class GroupEntity
     public double VisitValue { get; set; }
     
     public string? Curator { get; set; }
+    
+    [ForeignKey("Curator")]
+    public TeacherEntity? Teacher { get; set; }
+    
+    public ICollection<StudentEntity> Students { get; set; }
 }
