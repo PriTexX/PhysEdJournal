@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
@@ -9,6 +10,9 @@ public class TeacherEntity
     
     [Required]
     public string FullName { get; set; }
+    
+    [DefaultValue(TeacherPermissions.DefaultAccess)]
+    public TeacherPermissions Permissions { get; set; }
     
     public ICollection<GroupEntity> Groups { get; set; }
 }
