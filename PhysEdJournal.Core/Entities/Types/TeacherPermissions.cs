@@ -1,4 +1,4 @@
-﻿namespace PhysEdJournal.Core.Entities.DB;
+﻿namespace PhysEdJournal.Core.Entities.Types;
 
 [Flags]
 public enum TeacherPermissions
