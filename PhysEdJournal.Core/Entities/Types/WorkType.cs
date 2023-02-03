@@ -3,15 +3,11 @@
 public enum WorkType
 {
     Visit,
-    PhysicalTest,
     ExternalFitness,
-    ExternalWorldwideCompetition,
-    ExternalNationalCompetition,
-    IndoorsCompetition,
-    TheoryTest,
-    TheoryEssay,
+    Standards, // Сдача нормативов
     GTO,
-    ScientificConference,
-    ScientificArticle,
-    OnlineWork
+    Science,
+    OnlineWork,
+    InternalTeam, // Сборная
+    Activist
 }
