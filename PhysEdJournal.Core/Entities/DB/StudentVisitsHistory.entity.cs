@@ -17,6 +17,11 @@ public class StudentVisitsHistoryEntity
     [Required]
     public string TeacherGuid { get; set; }
     
+    [ForeignKey("TeacherGuid")]
+    public TeacherEntity Teacher { get; set; }
+    
+    public ICollection<GroupEntity> Groups { get; set; }
+
     [Required]
     public string StudentGuid { get; set; }
     
