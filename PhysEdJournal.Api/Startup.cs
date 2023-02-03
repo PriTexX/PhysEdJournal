@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using PhysEdJournal.Infrastructure.DI;
 
 namespace PhysEdJournal.Api;
 
@@ -15,6 +16,8 @@ public class Startup
     {
         services.AddAuthentication();
         services.AddDateOnlyTimeOnlyStringConverters();
+
+        services.AddInfrastructure(Configuration);
         
         services.AddControllers()
             .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
