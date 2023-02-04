@@ -15,5 +15,5 @@ public class TeacherEntity
     [DefaultValue(TeacherPermissions.DefaultAccess)]
     public TeacherPermissions Permissions { get; set; }
     
-    public ICollection<GroupEntity> Groups { get; set; }
+    public ICollection<GroupEntity>? Groups { get; set; }
 }

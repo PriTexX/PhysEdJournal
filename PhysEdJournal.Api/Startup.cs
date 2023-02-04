@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Infrastructure.DI;
 
 namespace PhysEdJournal.Api;
@@ -18,6 +19,13 @@ public class Startup
         services.AddDateOnlyTimeOnlyStringConverters();
 
         services.AddInfrastructure(Configuration);
+
+        services
+            .AddGraphQLServer()
+            .AddQueryType<Query>()
+            .AddProjections()
+            .AddFiltering()
+            .AddSorting();
         
         services.AddControllers()
             .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
@@ -39,7 +47,12 @@ public class Startup
 
         app.UseAuthentication();
         app.UseAuthorization();
-
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
+        
+           
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapGraphQL();
+            endpoints.MapControllers();
+        });
     }
 }
