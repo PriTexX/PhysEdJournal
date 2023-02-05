@@ -40,7 +40,7 @@ public sealed class StudentService
         };
 
         await _applicationContext.StudentsPointsHistory.AddAsync(record);
-        await _applicationContext.Students.AddAsync(student);
+        _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
         return record;
