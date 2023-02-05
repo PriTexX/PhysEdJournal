@@ -16,6 +16,9 @@ public class StudentEntity
     [Required]
     public string GroupNumber { get; set; }
     
+    [DefaultValue(0)]
+    public int PointsAmount { get; set; }
+    
     [ForeignKey("GroupNumber")]
     public GroupEntity Group { get; set; }
 

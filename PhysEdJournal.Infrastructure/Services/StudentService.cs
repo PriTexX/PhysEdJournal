@@ -1,5 +1,10 @@
 ﻿using System.Net.Mime;
+using System.Text.RegularExpressions;
+using LanguageExt;
+using LanguageExt.Common;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Services;
@@ -12,26 +17,80 @@ public sealed class StudentService
     {
         _applicationContext = applicationContext;
     }
-    
-    private void Create(StudentEntity studentEntity)
+
+    public async Task<Result<StudentPointsHistoryEntity>> AddPointsAsync(int pointsAmount, DateOnly date, WorkType workType, string studentGuid, string? comment = null)
     {
-        _applicationContext.Students.Add(studentEntity);
+        var student = await _applicationContext.Students.FindAsync(studentGuid);
+
+        if (student is null)
+        {
+            var exception = new Exception("Нет пользователя");
+            return await Task.FromResult(new Result<StudentPointsHistoryEntity>(exception));
+        }
+        
+        student.PointsAmount += pointsAmount;
+
+        var record = new StudentPointsHistoryEntity()
+        {
+            Points = pointsAmount,
+            Date = date,
+            WorkType = workType,
+            StudentGuid = studentGuid,
+            Comment = comment
+        };
+
+        await _applicationContext.StudentsPointsHistory.AddAsync(record);
+        await _applicationContext.Students.AddAsync(student);
+        await _applicationContext.SaveChangesAsync();
+
+        return record;
     }
 
-    private async Task<StudentEntity?> Read(StudentEntity studentEntity)
+    public void AddVisits(float visitsAmount, string comment = null)
     {
-        var student = await _applicationContext.Students.FindAsync(studentEntity);
+        
+    }
+
+    internal async Task<Result<Unit>> CreateAsync(StudentEntity studentEntity)
+    { 
+        _applicationContext.Students.Add(studentEntity);
+        await _applicationContext.SaveChangesAsync();
+        
+        return Unit.Default;
+    }
+
+    public async Task<Result<StudentEntity?>> GetAsync(string guid)
+    {
+        var student = await _applicationContext.Students.FindAsync(guid);
 
         return student;
     }
 
-    private void Update(StudentEntity studentEntity)
+    public async Task<Result<Unit>> UpdateAsync(string guid)
     {
-        _applicationContext.Students.Update(studentEntity);
+        var studentFromDb = await GetAsync(guid);
+
+        return await studentFromDb.Match<Task<Result<Unit>>>(async student =>
+            {
+                _applicationContext.Students.Update(student!);
+                await _applicationContext.SaveChangesAsync();
+                
+                return Unit.Default;
+            },
+            exception => Task.FromResult(new Result<Unit>(exception)));
     }
 
-    private void Delete(StudentEntity studentEntity)
+    public async Task<Result<Unit>> DeleteAsync(string guid)
     {
-        _applicationContext.Students.Remove(studentEntity);
+        var studentFromDb = await GetAsync(guid);
+
+        return await studentFromDb.Match<Task<Result<Unit>>>(async student =>
+            {
+                _applicationContext.Students.Remove(student!);
+                await _applicationContext.SaveChangesAsync();
+                
+                return Unit.Default;
+            },
+            exception => Task.FromResult(new Result<Unit>(exception)));
     }
 }
