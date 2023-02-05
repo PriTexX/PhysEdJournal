@@ -46,9 +46,30 @@ public sealed class StudentService
         return record;
     }
 
-    public void AddVisits(float visitsAmount, string comment = null)
+    public async Task<Result<StudentVisitsHistoryEntity>> AddVisitAsync(string studentGuid, DateOnly date, string teacherGuid)
     {
+        var student = await _applicationContext.Students.FindAsync(studentGuid);
+
+        if (student is null)
+        {
+            var exception = new Exception("Нет пользователя");
+            return await Task.FromResult(new Result<StudentVisitsHistoryEntity>(exception));
+        }
         
+        student.Visits++;
+
+        var record = new StudentVisitsHistoryEntity()
+        {
+            Date = date,
+            StudentGuid = studentGuid,
+            TeacherGuid = teacherGuid
+        };
+
+        await _applicationContext.StudentsVisitsHistory.AddAsync(record);
+        _applicationContext.Students.Update(student);
+        await _applicationContext.SaveChangesAsync();
+
+        return record;
     }
 
     internal async Task<Result<Unit>> CreateAsync(StudentEntity studentEntity)
