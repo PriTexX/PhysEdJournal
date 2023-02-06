@@ -1,12 +1,13 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
-public sealed class StudentService
+public sealed class StudentService : IStudentService
 {
     private readonly ApplicationContext _applicationContext;
     
@@ -43,72 +44,99 @@ public sealed class StudentService
         return record;
     }
 
-    public async Task<Result<StudentVisitsHistoryEntity>> AddVisitAsync(string studentGuid, DateOnly date, string teacherGuid)
+    public async Task<Result<StudentVisitsHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid)
     {
-        var student = await _applicationContext.Students.FindAsync(studentGuid);
-
-        if (student is null)
+        try
         {
-            var exception = new Exception("Нет пользователя");
-            return await Task.FromResult(new Result<StudentVisitsHistoryEntity>(exception));
+            var student = await _applicationContext.Students.FindAsync(studentGuid);
+
+            if (student is null)
+            {
+                return await Task.FromResult(new Result<StudentVisitsHistoryEntity>(new Exception($"No student with such guid {studentGuid}")));
+            }
+        
+            student.Visits++;
+
+            var record = new StudentVisitsHistoryEntity
+            {
+                Date = date,
+                StudentGuid = studentGuid,
+                TeacherGuid = teacherGuid
+            };
+
+            await _applicationContext.StudentsVisitsHistory.AddAsync(record);
+            _applicationContext.Students.Update(student);
+            await _applicationContext.SaveChangesAsync();
+
+            return record;
         }
-        
-        student.Visits++;
-
-        var record = new StudentVisitsHistoryEntity()
+        catch (Exception err)
         {
-            Date = date,
-            StudentGuid = studentGuid,
-            TeacherGuid = teacherGuid
-        };
-
-        await _applicationContext.StudentsVisitsHistory.AddAsync(record);
-        _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
-
-        return record;
+            return new Result<StudentVisitsHistoryEntity>(err);
+        }
     }
 
-    internal async Task<Result<Unit>> CreateAsync(StudentEntity studentEntity)
-    { 
-        _applicationContext.Students.Add(studentEntity);
-        await _applicationContext.SaveChangesAsync();
+    public async Task<Result<Unit>> CreateStudentAsync(StudentEntity studentEntity)
+    {
+        try
+        {
+            await _applicationContext.Students.AddAsync(studentEntity);
+            await _applicationContext.SaveChangesAsync();
         
-        return Unit.Default;
+            return Unit.Default;
+        }
+        catch (Exception err)
+        {
+            return new Result<Unit>(err);
+        }
     }
 
-    public async Task<Result<StudentEntity?>> GetAsync(string guid)
+    public async Task<Result<StudentEntity?>> GetStudentAsync(string guid)
     {
-        var student = await _applicationContext.Students.FindAsync(guid);
-
-        return student;
+        try
+        {
+            var student = await _applicationContext.Students.FindAsync(guid);
+            return student;
+        }
+        catch (Exception err)
+        {
+            return new Result<StudentEntity?>(err);
+        }
     }
 
-    public async Task<Result<Unit>> UpdateAsync(string guid)
+    public async Task<Result<Unit>> UpdateStudentAsync(string guid, StudentEntity updatedStudent)
     {
-        var studentFromDb = await GetAsync(guid);
+        try
+        {
+            _applicationContext.Students.Update(updatedStudent);
+            await _applicationContext.SaveChangesAsync();
 
-        return await studentFromDb.Match<Task<Result<Unit>>>(async student =>
-            {
-                _applicationContext.Students.Update(student!);
-                await _applicationContext.SaveChangesAsync();
+            return Unit.Default;
+        }
+        catch (Exception err)
+        {
+            return new Result<Unit>(err);
+        }
+    }
+
+    public async Task<Result<Unit>> DeleteStudentAsync(string guid)
+    {
+        try
+        {
+            var studentFromDb = await GetStudentAsync(guid);
+
+            return await studentFromDb.Match<Task<Result<Unit>>>(async student =>
+                {
+                    _applicationContext.Students.Remove(student!);
+                    await _applicationContext.SaveChangesAsync();
                 
-                return Unit.Default;
-            },
-            exception => Task.FromResult(new Result<Unit>(exception)));
-    }
-
-    public async Task<Result<Unit>> DeleteAsync(string guid)
-    {
-        var studentFromDb = await GetAsync(guid);
-
-        return await studentFromDb.Match<Task<Result<Unit>>>(async student =>
-            {
-                _applicationContext.Students.Remove(student!);
-                await _applicationContext.SaveChangesAsync();
-                
-                return Unit.Default;
-            },
-            exception => Task.FromResult(new Result<Unit>(exception)));
+                    return Unit.Default;
+                },
+                exception => Task.FromResult(new Result<Unit>(exception)));
+        }
+        catch (Exception err)
+        {
+            return new Result<Unit>(err);
+        }
     }
 }
