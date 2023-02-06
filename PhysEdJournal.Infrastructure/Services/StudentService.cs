@@ -1,8 +1,5 @@
-﻿using System.Net.Mime;
-using System.Text.RegularExpressions;
-using LanguageExt;
+﻿using LanguageExt;
 using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Database;
@@ -28,7 +25,7 @@ public sealed class StudentService
             return await Task.FromResult(new Result<StudentPointsHistoryEntity>(exception));
         }
         
-        student.PointsAmount += pointsAmount;
+        student.AdditionalPoints += pointsAmount;
 
         var record = new StudentPointsHistoryEntity()
         {

@@ -17,7 +17,11 @@ public class StudentEntity
     public string GroupNumber { get; set; }
     
     [DefaultValue(0)]
-    public int PointsAmount { get; set; }
+    [NotMapped]
+    public double TotalPoints => (Visits * Group.VisitValue) + AdditionalPoints;
+
+    [DefaultValue(0)]
+    public int AdditionalPoints { get; set; }
     
     [ForeignKey("GroupNumber")]
     public GroupEntity Group { get; set; }
