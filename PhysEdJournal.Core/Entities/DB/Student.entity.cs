@@ -15,10 +15,6 @@ public class StudentEntity
     
     [Required]
     public string GroupNumber { get; set; }
-    
-    [DefaultValue(0)]
-    [NotMapped]
-    public double TotalPoints => (Visits * Group.VisitValue) + AdditionalPoints;
 
     [DefaultValue(0)]
     public int AdditionalPoints { get; set; }
