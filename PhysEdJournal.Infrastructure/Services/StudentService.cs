@@ -22,13 +22,12 @@ public sealed class StudentService : IStudentService
 
         if (student is null)
         {
-            var exception = new Exception("Нет пользователя");
-            return await Task.FromResult(new Result<StudentPointsHistoryEntity>(exception));
+            return await Task.FromResult(new Result<StudentPointsHistoryEntity>(new Exception($"No student with such guid {studentGuid}")));
         }
         
         student.AdditionalPoints += pointsAmount;
 
-        var record = new StudentPointsHistoryEntity()
+        var record = new StudentPointsHistoryEntity
         {
             Points = pointsAmount,
             Date = date,
