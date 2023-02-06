@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhysEdJournal.Application.Services;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Services;
 
 namespace PhysEdJournal.Infrastructure.DI;
 
@@ -11,6 +13,8 @@ public static class DependencyInjectionExtensions
     {
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddSingleton<IStudentService, StudentService>();
 
         return services;
     }
