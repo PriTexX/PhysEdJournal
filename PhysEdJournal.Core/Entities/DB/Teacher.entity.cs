@@ -9,7 +9,7 @@ public class TeacherEntity
     [Key]
     public string TeacherGuid { get; set; }
     
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string FullName { get; set; }
     
     [DefaultValue(TeacherPermissions.DefaultAccess)]

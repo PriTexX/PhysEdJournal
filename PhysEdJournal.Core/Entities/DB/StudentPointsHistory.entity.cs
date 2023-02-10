@@ -18,7 +18,7 @@ public class StudentPointsHistoryEntity
     [Required]
     public int Points { get; set; }
     
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string TeacherGuid { get; set; }
     
     [ForeignKey("TeacherGuid")]
@@ -33,7 +33,7 @@ public class StudentPointsHistoryEntity
     
     public string? Comment { get; set; }
 
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
     
     [ForeignKey("StudentGuid")]

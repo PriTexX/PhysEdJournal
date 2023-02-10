@@ -12,16 +12,13 @@ public class StudentVisitsHistoryEntity
     public int Id { get; set; }
     
     [Column(TypeName = "date")]
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public DateOnly Date { get; set; }
     
     [Required]
     public SportType Sport { get; set; }
-    
-    [Required]
-    public GymType Gym { get; set; }
 
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string TeacherGuid { get; set; }
     
     [DefaultValue(false)]
@@ -30,7 +27,7 @@ public class StudentVisitsHistoryEntity
     [ForeignKey("TeacherGuid")]
     public TeacherEntity Teacher { get; set; }
 
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
     
     [ForeignKey("StudentGuid")]

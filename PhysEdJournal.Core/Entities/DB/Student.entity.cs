@@ -7,13 +7,13 @@ namespace PhysEdJournal.Core.Entities.DB;
 public class StudentEntity
 {
     [Key]
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
     
-    [Required] 
+    [Required(AllowEmptyStrings = false)]
     public string FullName { get; set; }
     
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string GroupNumber { get; set; }
     
     [DefaultValue(false)]

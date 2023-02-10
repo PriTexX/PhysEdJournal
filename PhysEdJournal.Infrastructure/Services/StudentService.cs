@@ -24,7 +24,7 @@ public sealed class StudentService : IStudentService
 
         if (student is null)
         {
-            return await Task.FromResult(new Result<StudentPointsHistoryEntity>(new Exception($"No student with such guid {studentGuid}")));
+            return await Task.FromResult(new Result<StudentPointsHistoryEntity>(new StudentNotFound(studentGuid)));
         }
         
         student.AdditionalPoints += pointsAmount;
