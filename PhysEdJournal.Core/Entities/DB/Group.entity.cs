@@ -12,10 +12,10 @@ public class GroupEntity
     [DefaultValue(2.0)]
     public double VisitValue { get; set; }
     
-    public string? Curator { get; set; }
+    public string? CuratorGuid { get; set; }
     
-    [ForeignKey("Curator")]
-    public TeacherEntity? Teacher { get; set; }
+    [ForeignKey("CuratorGuid")]
+    public TeacherEntity? Curator { get; set; }
     
     public ICollection<StudentEntity> Students { get; set; }
 }

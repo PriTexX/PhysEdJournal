@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PhysEdJournal.Core.Entities.Types;
 
@@ -16,9 +17,19 @@ public class StudentPointsHistoryEntity
 
     [Required]
     public int Points { get; set; }
+    
+    [Required]
+    public string TeacherGuid { get; set; }
+    
+    [ForeignKey("TeacherGuid")]
+    
+    public TeacherEntity Teacher { get; set; }
 
     [Required]
     public WorkType WorkType { get; set; }
+    
+    [DefaultValue(false)]
+    public bool IsArchived { get; set; }
     
     public string? Comment { get; set; }
 

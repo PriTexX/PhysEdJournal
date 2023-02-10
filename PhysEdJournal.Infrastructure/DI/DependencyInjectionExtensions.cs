@@ -14,7 +14,7 @@ public static class DependencyInjectionExtensions
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddSingleton<IStudentService, StudentService>();
+        services.AddScoped<IStudentService, StudentService>();
 
         return services;
     }
