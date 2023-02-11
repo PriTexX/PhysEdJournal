@@ -1,7 +1,5 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
