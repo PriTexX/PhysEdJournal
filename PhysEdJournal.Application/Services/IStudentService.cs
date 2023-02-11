@@ -7,9 +7,9 @@ namespace PhysEdJournal.Application.Services;
 
 public interface IStudentService
 {
-    public Task<Result<StudentPointsHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null);
+    public Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null);
     
-    public Task<Result<StudentVisitsHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid);
+    public Task<Result<VisitsStudentHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid);
 
     public Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false); 
 

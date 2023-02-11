@@ -38,6 +38,7 @@ public sealed class StudentEntity
 
     public string? Department { get; set; }
     
-    public ICollection<StudentPointsHistoryEntity>? StudentPointsHistory { get; set; }
-    public ICollection<StudentVisitsHistoryEntity>? StudentVisitsHistory { get; set; }
+    public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
+    
+    public ICollection<VisitsStudentHistoryEntity>? VisitsStudentHistory { get; set; }
 }

@@ -12,7 +12,7 @@ public sealed class SemesterEntity
     public string Name { get; set; }
 
     public ICollection<ArchivedStudentEntity> ArchivedStudents { get; set; }
-    public ICollection<StudentPointsHistoryEntity> StudentPointsHistories { get; set; }
+    public ICollection<PointsStudentHistoryEntity> StudentPointsHistories { get; set; }
     
     public int ToInt() // 2022-2023/весна
     {

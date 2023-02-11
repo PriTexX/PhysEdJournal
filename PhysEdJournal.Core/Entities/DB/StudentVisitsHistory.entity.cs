@@ -5,7 +5,7 @@ using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public sealed class StudentVisitsHistoryEntity
+public sealed class VisitsStudentHistoryEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

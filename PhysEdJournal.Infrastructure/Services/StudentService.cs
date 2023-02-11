@@ -23,18 +23,18 @@ public sealed class StudentService : IStudentService
         int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT); 
     }
 
-    public async Task<Result<StudentPointsHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
+    public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
     {
         var student = await _applicationContext.Students.FindAsync(studentGuid);
 
         if (student is null)
         {
-            return await Task.FromResult(new Result<StudentPointsHistoryEntity>(new StudentNotFound(studentGuid)));
+            return await Task.FromResult(new Result<PointsStudentHistoryEntity>(new StudentNotFound(studentGuid)));
         }
         
         student.AdditionalPoints += pointsAmount;
 
-        var record = new StudentPointsHistoryEntity
+        var record = new PointsStudentHistoryEntity
         {
             TeacherGuid = teacherGuid, 
             Points = pointsAmount,
@@ -52,7 +52,7 @@ public sealed class StudentService : IStudentService
         return record;
     }
 
-    public async Task<Result<StudentVisitsHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid)
+    public async Task<Result<VisitsStudentHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid)
     {
         try
         {
@@ -60,12 +60,12 @@ public sealed class StudentService : IStudentService
 
             if (student is null)
             {
-                return await Task.FromResult(new Result<StudentVisitsHistoryEntity>(new Exception($"No student with such guid {studentGuid}")));
+                return await Task.FromResult(new Result<VisitsStudentHistoryEntity>(new Exception($"No student with such guid {studentGuid}")));
             }
         
             student.Visits++;
 
-            var record = new StudentVisitsHistoryEntity
+            var record = new VisitsStudentHistoryEntity
             {
                 Date = date,
                 StudentGuid = studentGuid,
@@ -80,7 +80,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception err)
         {
-            return new Result<StudentVisitsHistoryEntity>(err);
+            return new Result<VisitsStudentHistoryEntity>(err);
         }
     }
 
@@ -184,9 +184,21 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            _applicationContext.Students.Update(updatedStudent);
-            await _applicationContext.SaveChangesAsync();
-
+            await _applicationContext.Students.Where(s => s.StudentGuid == updatedStudent.StudentGuid)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(s => s.FullName, updatedStudent.FullName)
+                    .SetProperty(s => s.Visits, updatedStudent.Visits)
+                    .SetProperty(s => s.GroupNumber, updatedStudent.GroupNumber)
+                    .SetProperty(s => s.HasDebtFromPreviousSemester, updatedStudent.HasDebtFromPreviousSemester)
+                    .SetProperty(s => s.AdditionalPoints, updatedStudent.AdditionalPoints)
+                    .SetProperty(s => s.ArchivedVisitValue, updatedStudent.ArchivedVisitValue)
+                    .SetProperty(s => s.Group, updatedStudent.Group)
+                    .SetProperty(s => s.Course, updatedStudent.Course)
+                    .SetProperty(s => s.HealthGroup, updatedStudent.HealthGroup)
+                    .SetProperty(s => s.Department, updatedStudent.Department)
+                    .SetProperty(s => s.PointsStudentHistory, updatedStudent.PointsStudentHistory)
+                    .SetProperty(s => s.VisitsStudentHistory, updatedStudent.VisitsStudentHistory));
+            
             return Unit.Default;
         }
         catch (Exception err)
@@ -199,16 +211,8 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            var studentFromDb = await GetStudentAsync(guid);
-
-            return await studentFromDb.Match<Task<Result<Unit>>>(async student =>
-                {
-                    _applicationContext.Students.Remove(student!);
-                    await _applicationContext.SaveChangesAsync();
-                
-                    return Unit.Default;
-                },
-                exception => Task.FromResult(new Result<Unit>(exception)));
+            await _applicationContext.Students.Where(s => s.StudentGuid == guid).ExecuteDeleteAsync();
+            return Unit.Default;
         }
         catch (Exception err)
         {
