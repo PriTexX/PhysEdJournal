@@ -11,6 +11,7 @@ public class ApplicationContext : DbContext
     public DbSet<StudentEntity> Students { get; set; }
     public DbSet<TeacherEntity> Teachers { get; set; }
     public DbSet<ArchivedStudentEntity> ArchivedStudents { get; set; }
+    public DbSet<SemesterEntity> Semesters { get; set; }
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {

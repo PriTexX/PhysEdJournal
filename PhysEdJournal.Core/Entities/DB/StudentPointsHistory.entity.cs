@@ -18,6 +18,12 @@ public class StudentPointsHistoryEntity
     [Required]
     public int Points { get; set; }
     
+    [Required]
+    public int SemesterId { get; set; }
+    
+    [ForeignKey("SemesterId")]
+    public SemesterEntity Semester { get; set; }
+    
     [Required(AllowEmptyStrings = false)]
     public string TeacherGuid { get; set; }
     

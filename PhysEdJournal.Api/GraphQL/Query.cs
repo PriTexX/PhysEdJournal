@@ -16,6 +16,13 @@ public class Query
     {
         return context.Students;
     }
+    
+    [UseProjection]
+    [UseFiltering]
+    public IQueryable<ArchivedStudentEntity> GetArchivedStudents([Service] ApplicationContext context)
+    {
+        return context.ArchivedStudents;
+    }
 
     [UseProjection]
     [UseFiltering]

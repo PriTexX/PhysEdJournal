@@ -6,9 +6,14 @@ namespace PhysEdJournal.Core.Entities.DB;
 
 public class ArchivedStudentEntity
 {
-    [Key]
     [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
+    
+    [Required]
+    public int SemesterId { get; set; }
+    
+    [ForeignKey("SemesterId")]
+    public SemesterEntity Semester { get; set; }
     
     [Required(AllowEmptyStrings = false)]
     public string FullName { get; set; }
@@ -24,7 +29,4 @@ public class ArchivedStudentEntity
 
     [DefaultValue(0)]
     public int Visits { get; set; }
-
-    public ICollection<StudentPointsHistoryEntity> StudentPointsHistory { get; set; }
-    public ICollection<StudentVisitsHistoryEntity> StudentVisitsHistory { get; set; }
 }

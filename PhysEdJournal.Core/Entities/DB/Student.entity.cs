@@ -25,7 +25,7 @@ public class StudentEntity
     public int AdditionalPoints { get; set; }
     
     [ForeignKey("GroupNumber")]
-    public GroupEntity Group { get; set; }
+    public GroupEntity? Group { get; set; }
 
     [DefaultValue(0)]
     public int Visits { get; set; }
@@ -38,6 +38,6 @@ public class StudentEntity
 
     public string? Department { get; set; }
     
-    public ICollection<StudentPointsHistoryEntity> StudentPointsHistory { get; set; }
-    public ICollection<StudentVisitsHistoryEntity> StudentVisitsHistory { get; set; }
+    public ICollection<StudentPointsHistoryEntity>? StudentPointsHistory { get; set; }
+    public ICollection<StudentVisitsHistoryEntity>? StudentVisitsHistory { get; set; }
 }

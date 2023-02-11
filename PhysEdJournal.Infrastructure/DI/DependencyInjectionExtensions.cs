@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhysEdJournal.Application.Services;
+using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
 
@@ -14,7 +15,10 @@ public static class DependencyInjectionExtensions
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+        services.AddSingleton<TxtFileConfig>(s => new TxtFileConfig("../PhysEdJournal.Infrastructure/SemesterInfo.txt"));
+        
         services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<ISemesterService, SemesterService>();
 
         return services;
     }

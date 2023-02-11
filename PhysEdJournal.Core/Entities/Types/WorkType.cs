@@ -2,7 +2,6 @@
 
 public enum WorkType
 {
-    Visit,
     ExternalFitness,
     Standards, // Сдача нормативов
     GTO,

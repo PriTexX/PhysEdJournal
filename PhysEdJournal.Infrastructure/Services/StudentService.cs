@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
@@ -12,10 +13,14 @@ namespace PhysEdJournal.Infrastructure.Services;
 public sealed class StudentService : IStudentService
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly SemesterEntity _currentSemester;
+    private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext)
+    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration)
     {
         _applicationContext = applicationContext;
+        _currentSemester = SemesterEntity.FromString(fileConfig.ReadTextFromFile()); // Чтобы была возможность выставлять баллы и архивировать студентов на основе текущего семестра
+        int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT); 
     }
 
     public async Task<Result<StudentPointsHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
@@ -36,7 +41,8 @@ public sealed class StudentService : IStudentService
             Date = date,
             WorkType = workType,
             StudentGuid = studentGuid,
-            Comment = comment
+            Comment = comment,
+            SemesterId = _currentSemester.Id
         };
 
         await _applicationContext.StudentsPointsHistory.AddAsync(record);
@@ -91,7 +97,7 @@ public sealed class StudentService : IStudentService
             return new Result<ArchivedStudentEntity>(new StudentNotFound(studentGuid));
         }
         
-        if ((student.Visits * student.VisitValue + student.AdditionalPoints) < 50)
+        if ((student.Visits * student.VisitValue + student.AdditionalPoints) < POINT_AMOUNT) // если не превысил порог по баллам
         {
             await _applicationContext.Students
                 .Where(s => s.StudentGuid == studentGuid)
@@ -100,36 +106,25 @@ public sealed class StudentService : IStudentService
                     .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
             return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
         }
-
-        var archivedStudent = await _applicationContext.ArchivedStudents.Where(s => s.StudentGuid == studentGuid).FirstOrDefaultAsync();
-
-        if (archivedStudent is null)
+        
+        var archivedStudent = new ArchivedStudentEntity
         {
-            archivedStudent = new ArchivedStudentEntity
-            {
-                StudentGuid = studentGuid,
-                FullName = student.FullName,
-                GroupNumber = student.GroupNumber,
-                TotalPoints = student.Visits * student.VisitValue + student.AdditionalPoints,
-                Visits = student.Visits
-            };
+            StudentGuid = studentGuid,
+            FullName = student.FullName,
+            GroupNumber = student.GroupNumber,
+            TotalPoints = student.Visits * student.VisitValue + student.AdditionalPoints,
+            SemesterId = _currentSemester.Id,
+            Visits = student.Visits
+        };
 
-            await _applicationContext.ArchivedStudents.AddAsync(archivedStudent);
-        }
-        else
-        {
-            archivedStudent.TotalPoints = student.Visits * student.VisitValue + student.AdditionalPoints;
-            archivedStudent.Visits = student.Visits;
-
-            _applicationContext.ArchivedStudents.Update(archivedStudent);
-        }
+        await _applicationContext.ArchivedStudents.AddAsync(archivedStudent);
 
         await _applicationContext.SaveChangesAsync();
 
         // Удалить историю с прошлого семестра
-        await _applicationContext.StudentsPointsHistory
-            .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
-            .ExecuteDeleteAsync();
+        // await _applicationContext.StudentsPointsHistory
+        //     .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
+        //     .ExecuteDeleteAsync();
         
         await _applicationContext.StudentsVisitsHistory
             .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
