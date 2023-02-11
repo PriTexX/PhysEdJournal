@@ -84,7 +84,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid)
+    public async Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false)
     {
         var student = await _applicationContext.Students
             .AsNoTracking()
@@ -96,48 +96,46 @@ public sealed class StudentService : IStudentService
         {
             return new Result<ArchivedStudentEntity>(new StudentNotFound(studentGuid));
         }
-        
-        if ((student.Visits * student.VisitValue + student.AdditionalPoints) < POINT_AMOUNT) // если не превысил порог по баллам
+
+        if (isForceMode || 
+            ((student.Visits * student.VisitValue + student.AdditionalPoints) > POINT_AMOUNT)) // если превысил порог по баллам
         {
-            await _applicationContext.Students
-                .Where(s => s.StudentGuid == studentGuid)
-                .ExecuteUpdateAsync(p => p
-                    .SetProperty(s => s.HasDebtFromPreviousSemester, true)
-                    .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
-            return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
+            return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints);
         }
-        
+
+        await _applicationContext.Students
+            .Where(s => s.StudentGuid == studentGuid)
+            .ExecuteUpdateAsync(p => p
+                .SetProperty(s => s.HasDebtFromPreviousSemester, true)
+                .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
+        return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
+    }
+
+    private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints)
+    {
         var archivedStudent = new ArchivedStudentEntity
         {
             StudentGuid = studentGuid,
-            FullName = student.FullName,
-            GroupNumber = student.GroupNumber,
-            TotalPoints = student.Visits * student.VisitValue + student.AdditionalPoints,
+            FullName = fullName,
+            GroupNumber = groupNumber,
+            TotalPoints = visitsAmount * visitValue + additionalPoints,
             SemesterId = _currentSemester.Id,
-            Visits = student.Visits
+            Visits = visitsAmount
         };
 
         await _applicationContext.ArchivedStudents.AddAsync(archivedStudent);
-
         await _applicationContext.SaveChangesAsync();
 
-        // Удалить историю с прошлого семестра
-        // await _applicationContext.StudentsPointsHistory
-        //     .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
-        //     .ExecuteDeleteAsync();
-        
         await _applicationContext.StudentsVisitsHistory
             .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
             .ExecuteDeleteAsync();
 
-        
-        
         // Заархивировать историю с текущего семестра
         await _applicationContext.StudentsPointsHistory
             .Where(h => h.StudentGuid == studentGuid)
             .ExecuteUpdateAsync(p => p
                 .SetProperty(s => s.IsArchived, true));
-        
+
         await _applicationContext.StudentsVisitsHistory
             .Where(h => h.StudentGuid == studentGuid)
             .ExecuteUpdateAsync(p => p
@@ -150,7 +148,7 @@ public sealed class StudentService : IStudentService
                 .SetProperty(s => s.Visits, 0)
                 .SetProperty(s => s.HasDebtFromPreviousSemester, false)
                 .SetProperty(s => s.ArchivedVisitValue, 0));
-        
+
         return archivedStudent;
     }
 
@@ -182,7 +180,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> UpdateStudentAsync(string guid, StudentEntity updatedStudent)
+    public async Task<Result<Unit>> UpdateStudentAsync(StudentEntity updatedStudent)
     {
         try
         {
