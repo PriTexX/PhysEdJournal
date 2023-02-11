@@ -3,7 +3,7 @@ using PhysEdJournal.Core.Entities.DB;
 
 namespace PhysEdJournal.Infrastructure.Database;
 
-public class ApplicationContext : DbContext
+public sealed class ApplicationContext : DbContext
 {
     public DbSet<GroupEntity> Groups { get; set; }
     public DbSet<StudentPointsHistoryEntity> StudentsPointsHistory { get; set; }

@@ -2,7 +2,7 @@
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class SemesterEntity
+public sealed class SemesterEntity
 {
     [Required]
     public int Id { get; set; }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class ArchivedStudentEntity
+public sealed class ArchivedStudentEntity
 {
     [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }

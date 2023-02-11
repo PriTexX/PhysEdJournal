@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class GroupEntity
+public sealed class GroupEntity
 {
     [Key]
     public string GroupName { get; set; }

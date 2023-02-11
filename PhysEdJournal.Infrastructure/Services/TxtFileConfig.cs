@@ -1,6 +1,6 @@
 ﻿namespace PhysEdJournal.Infrastructure.Services;
 
-public class TxtFileConfig
+public sealed class TxtFileConfig
 {
     private readonly string _filePath;
 

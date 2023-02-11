@@ -6,7 +6,7 @@ using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
-public class SemesterService : ISemesterService
+public sealed class SemesterService : ISemesterService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly TxtFileConfig _fileConfig;

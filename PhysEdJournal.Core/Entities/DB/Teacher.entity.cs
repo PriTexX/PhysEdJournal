@@ -4,7 +4,7 @@ using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class TeacherEntity
+public sealed class TeacherEntity
 {
     [Key]
     public string TeacherGuid { get; set; }
