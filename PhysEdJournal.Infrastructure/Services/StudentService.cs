@@ -1,4 +1,7 @@
-﻿using LanguageExt;
+﻿using GraphQL;
+using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
+using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +19,7 @@ public sealed class StudentService : IStudentService
     private readonly SemesterEntity _currentSemester;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration)
+    public StudentService(ApplicationContext applicationContext = null, TxtFileConfig fileConfig = null, IConfiguration configuration = null)
     {
         _applicationContext = applicationContext;
         _currentSemester = SemesterEntity.FromString(fileConfig.ReadTextFromFile()); // Чтобы была возможность выставлять баллы и архивировать студентов на основе текущего семестра
@@ -109,6 +112,62 @@ public sealed class StudentService : IStudentService
                 .SetProperty(s => s.HasDebtFromPreviousSemester, true)
                 .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
         return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
+    }
+
+    public async Task<Result<Unit>> UpdateStudentInfoAsync(string url)
+    {
+        var query = "query {students {fullName guid department group course}}";
+        
+        var client = new GraphQLHttpClient(url, new NewtonsoftJsonSerializer());
+        var request = new GraphQLRequest { Query = query };
+        var response = await client.SendQueryAsync<dynamic>(request);
+
+        if (response.Errors != null)
+            return new Result<Unit>(new Exception($"Error: {response.Errors[0].Message}"));
+
+        var students = response.Data.students;
+        int batchSize = 1000;
+        await UpdateStudentsInDb(students, batchSize);
+
+        return Unit.Default;
+    }
+
+    private async Task UpdateStudentsInDb(dynamic students, int batchSize = 50)
+    {
+        var studentsChunks = students.Chunk(batchSize);
+        foreach (var student in studentsChunks)
+        {
+            var studentEntity = new StudentEntity()
+            {
+                StudentGuid = student.guid,
+                FullName = student.fullName,
+                GroupNumber = student.group,
+                Course = student.course,
+                Department = student.department,
+            };
+
+            var studentFromDb = await _applicationContext.Students.FindAsync(studentEntity.StudentGuid);
+
+            if (studentFromDb == null)
+            {
+                studentEntity.Visits = 0;
+                studentEntity.HasDebtFromPreviousSemester = false;
+                studentEntity.AdditionalPoints = 0;
+                studentEntity.ArchivedVisitValue = 0;
+                studentEntity.Group =
+                    new
+                        GroupEntity() //TODO: сделать метод в судент сервисе, который будет создавать новую группу, если найти такую не удалось
+                        {
+                            GroupName = studentEntity.GroupNumber
+                        };
+                studentEntity.HealthGroup = 0; //TODO: уточнить про дефолтное значение группы здоровья
+                studentEntity.PointsStudentHistory = new List<PointsStudentHistoryEntity>();
+                studentEntity.VisitsStudentHistory = new List<VisitsStudentHistoryEntity>();
+                continue;
+            }
+
+            await UpdateStudentAsync(studentEntity);
+        }
     }
 
     private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints)
