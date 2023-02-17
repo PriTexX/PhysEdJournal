@@ -146,6 +146,11 @@ public sealed class StudentService : IStudentService
                 Department = student.department,
             };
 
+            if (studentEntity.GroupNumber == "")
+            {
+                continue;
+            }
+
             var studentFromDb = await _applicationContext.Students.FindAsync(studentEntity.StudentGuid);
 
             if (studentFromDb == null)
