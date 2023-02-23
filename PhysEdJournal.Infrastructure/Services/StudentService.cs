@@ -147,6 +147,11 @@ public sealed class StudentService : IStudentService
         var studentsChunks = students.Chunk(batchSize);
         foreach (var student in studentsChunks)
         {
+            if (student.group == "")
+            {
+                continue;
+            }
+            
             var studentEntity = new StudentEntity()
             {
                 StudentGuid = student.guid,
@@ -155,11 +160,6 @@ public sealed class StudentService : IStudentService
                 Course = student.course,
                 Department = student.department,
             };
-
-            if (studentEntity.GroupNumber == "")
-            {
-                continue;
-            }
 
             var studentFromDb = await _applicationContext.Students.FindAsync(studentEntity.StudentGuid);
 
