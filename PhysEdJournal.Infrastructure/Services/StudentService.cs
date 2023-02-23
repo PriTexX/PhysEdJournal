@@ -165,7 +165,7 @@ public sealed class StudentService : IStudentService
                         {
                             GroupName = studentEntity.GroupNumber
                         };
-                studentEntity.HealthGroup = 0; //TODO: уточнить про дефолтное значение группы здоровья
+                studentEntity.HealthGroup = 0;
                 studentEntity.PointsStudentHistory = new List<PointsStudentHistoryEntity>();
                 studentEntity.VisitsStudentHistory = new List<VisitsStudentHistoryEntity>();
                 continue;
