@@ -15,15 +15,17 @@ namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class StudentService : IStudentService
 {
+    private readonly GroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly SemesterEntity _currentSemester;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext = null, TxtFileConfig fileConfig = null, IConfiguration configuration = null)
+    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration, GroupService groupService)
     {
+        _groupService = groupService;
         _applicationContext = applicationContext;
         _currentSemester = SemesterEntity.FromString(fileConfig.ReadTextFromFile()); // Чтобы была возможность выставлять баллы и архивировать студентов на основе текущего семестра
-        int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT); 
+        int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
     }
 
     public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
@@ -126,13 +128,21 @@ public sealed class StudentService : IStudentService
             return new Result<Unit>(new Exception($"Error: {response.Errors[0].Message}"));
 
         var students = response.Data.students;
-        int batchSize = 1000;
-        await UpdateStudentsInDb(students, batchSize);
+        const int BATCH_SIZE = 1000;
+
+        try
+        {
+            await UpdateStudentsInDbAsync(students, BATCH_SIZE);
+        }
+        catch (Exception e)
+        {
+            return new Result<Unit>(e);
+        }
 
         return Unit.Default;
     }
 
-    private async Task UpdateStudentsInDb(dynamic students, int batchSize = 50)
+    private async Task UpdateStudentsInDbAsync(dynamic students, int batchSize = 50)
     {
         var studentsChunks = students.Chunk(batchSize);
         foreach (var student in studentsChunks)
@@ -159,12 +169,11 @@ public sealed class StudentService : IStudentService
                 studentEntity.HasDebtFromPreviousSemester = false;
                 studentEntity.AdditionalPoints = 0;
                 studentEntity.ArchivedVisitValue = 0;
-                studentEntity.Group =
-                    new
-                        GroupEntity() //TODO: сделать метод в судент сервисе, который будет создавать новую группу, если найти такую не удалось
-                        {
-                            GroupName = studentEntity.GroupNumber
-                        };
+                studentEntity.Group = (await _groupService.GetExistingGroupOrNewWithName(studentEntity.GroupNumber))
+                    .Match<GroupEntity?>(
+                        (group) => group,
+                        (f) => throw f
+                    );
                 studentEntity.HealthGroup = 0;
                 studentEntity.PointsStudentHistory = new List<PointsStudentHistoryEntity>();
                 studentEntity.VisitsStudentHistory = new List<VisitsStudentHistoryEntity>();

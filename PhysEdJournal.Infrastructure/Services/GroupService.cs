@@ -55,6 +55,28 @@ public sealed class GroupService : IGroupService
 
         return Unit.Default;
     }
+    
+    public async Task<Result<GroupEntity?>> GetExistingGroupOrNewWithName(string groupName)
+    {
+        var group = await _applicationContext.Groups.FindAsync(groupName);
+        
+        if (group != null)
+        {
+            return group;
+        }
+
+        group = new GroupEntity()
+        {
+            GroupName = groupName,
+            Students = new List<StudentEntity?>(),
+            Curator = null,
+            CuratorGuid = null
+        };
+
+        await CreateGroupAsync(group);
+
+        return group;
+    }
 
     public async Task<Result<Unit>> CreateGroupAsync(GroupEntity groupEntity)
     {
