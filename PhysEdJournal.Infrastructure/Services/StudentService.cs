@@ -257,20 +257,13 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _applicationContext.Students.Where(s => s.StudentGuid == updatedStudent.StudentGuid)
-                .ExecuteUpdateAsync(p => p
-                    .SetProperty(s => s.FullName, updatedStudent.FullName)
-                    .SetProperty(s => s.Visits, updatedStudent.Visits)
-                    .SetProperty(s => s.GroupNumber, updatedStudent.GroupNumber)
-                    .SetProperty(s => s.HasDebtFromPreviousSemester, updatedStudent.HasDebtFromPreviousSemester)
-                    .SetProperty(s => s.AdditionalPoints, updatedStudent.AdditionalPoints)
-                    .SetProperty(s => s.ArchivedVisitValue, updatedStudent.ArchivedVisitValue)
-                    .SetProperty(s => s.Group, updatedStudent.Group)
-                    .SetProperty(s => s.Course, updatedStudent.Course)
-                    .SetProperty(s => s.HealthGroup, updatedStudent.HealthGroup)
-                    .SetProperty(s => s.Department, updatedStudent.Department)
-                    .SetProperty(s => s.PointsStudentHistory, updatedStudent.PointsStudentHistory)
-                    .SetProperty(s => s.VisitsStudentHistory, updatedStudent.VisitsStudentHistory));
+            var student = await _applicationContext.Students.FindAsync(updatedStudent.StudentGuid);
+
+            student = updatedStudent;
+
+            _applicationContext.Students.Update(student);
+
+            await _applicationContext.SaveChangesAsync();
             
             return Unit.Default;
         }
@@ -279,7 +272,6 @@ public sealed class StudentService : IStudentService
             return new Result<Unit>(err);
         }
     }
-
     public async Task<Result<Unit>> DeleteStudentAsync(string guid)
     {
         try

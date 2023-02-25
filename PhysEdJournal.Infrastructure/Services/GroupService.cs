@@ -68,7 +68,7 @@ public sealed class GroupService : IGroupService
         group = new GroupEntity()
         {
             GroupName = groupName,
-            Students = new List<StudentEntity?>(),
+            Students = new List<StudentEntity>(),
             Curator = null,
             CuratorGuid = null
         };
