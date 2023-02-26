@@ -1,7 +1,4 @@
-﻿using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
-using LanguageExt;
+﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,22 +7,25 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Database;
+using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class StudentService : IStudentService
 {
-    private readonly GroupService _groupService;
+    private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly SemesterEntity _currentSemester;
+    private readonly string UserInfoServerURL;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration, GroupService groupService)
+    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration, IGroupService groupService)
     {
         _groupService = groupService;
         _applicationContext = applicationContext;
         _currentSemester = SemesterEntity.FromString(fileConfig.ReadTextFromFile()); // Чтобы была возможность выставлять баллы и архивировать студентов на основе текущего семестра
         int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
+        UserInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
     }
 
     public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
@@ -116,27 +116,34 @@ public sealed class StudentService : IStudentService
         return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
     }
 
-    public async Task<Result<Unit>> UpdateStudentInfoAsync(string url)
+    public async Task<Result<Unit>> UpdateStudentInfoAsync()
     {
-        var query = "query {students {fullName guid department group course}}";
+        await _groupService.UpdateGroupsInfoAsync();
         
-        var client = new GraphQLHttpClient(url, new NewtonsoftJsonSerializer());
-        var request = new GraphQLRequest { Query = query };
-        var response = await client.SendQueryAsync<dynamic>(request);
+        const int batchSize = 250;
+        var updateTasks = GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
+            .Buffer(batchSize)
+            .SelectAwait(async actualStudents => new
+            {
+                actualStudents = actualStudents.ToDictionary(s => s.Guid), 
+                dbStudents = (await GetManyStudentsWithManyKeys(_applicationContext, actualStudents
+                    .Select(s => s.Guid)
+                    .ToArray()))
+                    .ToDictionary(d => d.StudentGuid)
+            })
+            .Select(s => s.actualStudents.Keys
+                .Select(actualStudentGuid => 
+                    (
+                        s.actualStudents[actualStudentGuid], 
+                        s.dbStudents.GetValueOrDefault(actualStudentGuid)
+                    )))
+            .Select(d => d
+                .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2)))
+            .Select(s => CommitChangesToContext(_applicationContext, s.ToList()));
 
-        if (response.Errors != null)
-            return new Result<Unit>(new Exception($"Error: {response.Errors[0].Message}"));
-
-        var students = response.Data.students;
-        const int BATCH_SIZE = 1000;
-
-        try
+        await foreach (var updateTask in updateTasks)
         {
-            await UpdateStudentsInDbAsync(students, BATCH_SIZE);
-        }
-        catch (Exception e)
-        {
-            return new Result<Unit>(e);
+            await updateTask;
         }
 
         return Unit.Default;

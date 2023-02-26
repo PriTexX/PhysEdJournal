@@ -43,7 +43,7 @@ public static class StudentServiceFunctions
         return results;
     }
     
-    public static async IAsyncEnumerable<Student> GetAllStudents(string url, int pageSize)
+    public static async IAsyncEnumerable<Student> GetAllStudentsAsync(string url, int pageSize)
     {
         var query = @"query($pageSize: Int!, $skipSize: Int!) {
             students(take: $pageSize, skip: $skipSize) {

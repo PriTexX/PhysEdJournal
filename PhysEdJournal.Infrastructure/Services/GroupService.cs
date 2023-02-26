@@ -64,7 +64,7 @@ public sealed class GroupService : IGroupService
     {
         const int batchSize = 500;
         
-        var distinctGroups = await GetAllStudents(UserInfoServerURL, pageSize: batchSize)
+        var distinctGroups = await GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
             .Select(s => s.Group)
             .Where(g => !string.IsNullOrEmpty(g))
             .Distinct()
