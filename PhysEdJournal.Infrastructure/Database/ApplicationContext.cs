@@ -16,4 +16,12 @@ public sealed class ApplicationContext : DbContext
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ArchivedStudentEntity>()
+            .HasKey(s => new { s.StudentGuid, s.SemesterId });
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
