@@ -15,7 +15,7 @@ public sealed class StudentService : IStudentService
 {
     private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
-    private readonly string UserInfoServerURL;
+    private readonly string _userInfoServerUrl;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
     public StudentService(ApplicationContext applicationContext, IConfiguration configuration, IGroupService groupService)
@@ -23,7 +23,7 @@ public sealed class StudentService : IStudentService
         _groupService = groupService;
         _applicationContext = applicationContext;
         int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
-        UserInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
+        _userInfoServerUrl = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
     }
 
     public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string currentSemesterName, string? comment = null)
@@ -133,7 +133,13 @@ public sealed class StudentService : IStudentService
             .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
             .ExecuteDeleteAsync();
 
-        // Заархивировать историю с текущего семестра
+        await ArchiveCurrentSemesterHistory(studentGuid);
+
+        return archivedStudent;
+    }
+
+    private async Task ArchiveCurrentSemesterHistory(string studentGuid)
+    {
         await _applicationContext.StudentsPointsHistory
             .Where(h => h.StudentGuid == studentGuid)
             .ExecuteUpdateAsync(p => p
@@ -151,8 +157,6 @@ public sealed class StudentService : IStudentService
                 .SetProperty(s => s.Visits, 0)
                 .SetProperty(s => s.HasDebtFromPreviousSemester, false)
                 .SetProperty(s => s.ArchivedVisitValue, 0));
-
-        return archivedStudent;
     }
 
     public async Task<Result<Unit>> UpdateStudentInfoAsync()
@@ -160,7 +164,7 @@ public sealed class StudentService : IStudentService
         await _groupService.UpdateGroupsInfoAsync();
         
         const int batchSize = 250;
-        var updateTasks = GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
+        var updateTasks = GetAllStudentsAsync(_userInfoServerUrl, pageSize: batchSize)
             .Buffer(batchSize)
             .SelectAwait(async actualStudents => new
             {
