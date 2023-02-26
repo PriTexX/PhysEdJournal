@@ -115,82 +115,7 @@ public sealed class StudentService : IStudentService
                 .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
         return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
     }
-
-    public async Task<Result<Unit>> UpdateStudentInfoAsync()
-    {
-        await _groupService.UpdateGroupsInfoAsync();
-        
-        const int batchSize = 250;
-        var updateTasks = GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
-            .Buffer(batchSize)
-            .SelectAwait(async actualStudents => new
-            {
-                actualStudents = actualStudents.ToDictionary(s => s.Guid), 
-                dbStudents = (await GetManyStudentsWithManyKeys(_applicationContext, actualStudents
-                    .Select(s => s.Guid)
-                    .ToArray()))
-                    .ToDictionary(d => d.StudentGuid)
-            })
-            .Select(s => s.actualStudents.Keys
-                .Select(actualStudentGuid => 
-                    (
-                        s.actualStudents[actualStudentGuid], 
-                        s.dbStudents.GetValueOrDefault(actualStudentGuid)
-                    )))
-            .Select(d => d
-                .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2)))
-            .Select(s => CommitChangesToContext(_applicationContext, s.ToList()));
-
-        await foreach (var updateTask in updateTasks)
-        {
-            await updateTask;
-        }
-
-        return Unit.Default;
-    }
-
-    private async Task UpdateStudentsInDbAsync(dynamic students, int batchSize = 50)
-    {
-        var studentsChunks = students.Chunk(batchSize);
-        foreach (var student in studentsChunks)
-        {
-            if (student.group == "")
-            {
-                continue;
-            }
-            
-            var studentEntity = new StudentEntity()
-            {
-                StudentGuid = student.guid,
-                FullName = student.fullName,
-                GroupNumber = student.group,
-                Course = student.course,
-                Department = student.department,
-            };
-
-            var studentFromDb = await _applicationContext.Students.FindAsync(studentEntity.StudentGuid);
-
-            if (studentFromDb == null)
-            {
-                studentEntity.Visits = 0;
-                studentEntity.HasDebtFromPreviousSemester = false;
-                studentEntity.AdditionalPoints = 0;
-                studentEntity.ArchivedVisitValue = 0;
-                studentEntity.Group = (await _groupService.GetExistingGroupOrNewWithName(studentEntity.GroupNumber))
-                    .Match<GroupEntity?>(
-                        (group) => group,
-                        (f) => throw f
-                    );
-                studentEntity.HealthGroup = 0;
-                studentEntity.PointsStudentHistory = new List<PointsStudentHistoryEntity>();
-                studentEntity.VisitsStudentHistory = new List<VisitsStudentHistoryEntity>();
-                continue;
-            }
-
-            await UpdateStudentAsync(studentEntity);
-        }
-    }
-
+    
     private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints)
     {
         var archivedStudent = new ArchivedStudentEntity
@@ -232,6 +157,39 @@ public sealed class StudentService : IStudentService
         return archivedStudent;
     }
 
+    public async Task<Result<Unit>> UpdateStudentInfoAsync()
+    {
+        await _groupService.UpdateGroupsInfoAsync();
+        
+        const int batchSize = 250;
+        var updateTasks = GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
+            .Buffer(batchSize)
+            .SelectAwait(async actualStudents => new
+            {
+                actualStudents = actualStudents.ToDictionary(s => s.Guid), 
+                dbStudents = (await GetManyStudentsWithManyKeys(_applicationContext, actualStudents
+                    .Select(s => s.Guid)
+                    .ToArray()))
+                    .ToDictionary(d => d.StudentGuid)
+            })
+            .Select(s => s.actualStudents.Keys
+                .Select(actualStudentGuid => 
+                    (
+                        s.actualStudents[actualStudentGuid], 
+                        s.dbStudents.GetValueOrDefault(actualStudentGuid)
+                    )))
+            .Select(d => d
+                .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2)))
+            .Select(s => CommitChangesToContext(_applicationContext, s.ToList()));
+
+        await foreach (var updateTask in updateTasks)
+        {
+            await updateTask;
+        }
+
+        return Unit.Default;
+    }
+    
     public async Task<Result<Unit>> CreateStudentAsync(StudentEntity studentEntity)
     {
         try
