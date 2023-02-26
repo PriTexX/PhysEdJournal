@@ -1,22 +1,26 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
+using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class GroupService : IGroupService
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly string UserInfoServerURL;
 
-    public GroupService(ApplicationContext applicationContext)
+    public GroupService(ApplicationContext applicationContext, IConfiguration configuration)
     {
         _applicationContext = applicationContext;
+        UserInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
     }
 
-    public async Task<Result<Unit>> AssignCurator(string groupName, string teacherGuid)
+    public async Task<Result<Unit>> AssignCuratorAsync(string groupName, string teacherGuid)
     {
         var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
         
@@ -40,7 +44,7 @@ public sealed class GroupService : IGroupService
         return Unit.Default;
     }
 
-    public async Task<Result<Unit>> AssignVisitValue(string groupName, double newVisitValue)
+    public async Task<Result<Unit>> AssignVisitValueAsync(string groupName, double newVisitValue)
     {
         var group = await _applicationContext.Groups.FindAsync(groupName);
 
@@ -53,6 +57,28 @@ public sealed class GroupService : IGroupService
 
         await UpdateGroupAsync(group);
 
+        return Unit.Default;
+    }
+
+    public async Task<Result<Unit>> UpdateGroupsInfoAsync()
+    {
+        const int batchSize = 500;
+        
+        var distinctGroups = await GetAllStudents(UserInfoServerURL, pageSize: batchSize)
+            .Select(s => s.Group)
+            .Where(g => !string.IsNullOrEmpty(g))
+            .Distinct()
+            .ToListAsync();
+
+        var dbGroups = await _applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
+
+        var newGroups = distinctGroups
+            .Where(g => !dbGroups.ContainsKey(g))
+            .Select(g => new GroupEntity { GroupName = g });
+
+        _applicationContext.Groups.AddRange(newGroups);
+        await _applicationContext.SaveChangesAsync();
+        
         return Unit.Default;
     }
     

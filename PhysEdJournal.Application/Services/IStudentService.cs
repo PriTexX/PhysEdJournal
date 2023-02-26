@@ -13,7 +13,7 @@ public interface IStudentService
 
     public Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false);
 
-    public Task<Result<Unit>> UpdateStudentInfoAsync(string url);
+    public Task<Result<Unit>> UpdateStudentInfoAsync();
     
     public Task<Result<Unit>> CreateStudentAsync(StudentEntity studentEntity);
     
