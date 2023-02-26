@@ -19,7 +19,8 @@ public sealed class StudentEntity
     [DefaultValue(false)]
     public bool HasDebtFromPreviousSemester { get; set; } // Если студент не получил зачет из-за нехватки баллов
      
-    public double? ArchivedVisitValue { get; set; } // Сохраняем стоимость посещения в прошлом семестре здесь, чтобы считать по ней баллы, пока не набертся 50
+    [DefaultValue(0)]
+    public double ArchivedVisitValue { get; set; }  // Сохраняем стоимость посещения в прошлом семестре здесь, чтобы считать по ней баллы, пока не набертся 50
                                                     // После набора 50 баллов и получения зачета вернуть в Null, а HasDebt в false
     [DefaultValue(0)]
     public int AdditionalPoints { get; set; }
