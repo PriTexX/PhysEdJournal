@@ -17,8 +17,9 @@ public static class DependencyInjectionExtensions
 
         services.AddSingleton<TxtFileConfig>(s => new TxtFileConfig("../PhysEdJournal.Infrastructure/SemesterInfo.txt"));
         
-        services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<ISemesterService, SemesterService>();
+        services.AddScoped<IStudentService, StudentService>();
 
         return services;
     }

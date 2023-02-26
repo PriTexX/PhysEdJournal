@@ -7,20 +7,25 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Database;
+using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class StudentService : IStudentService
 {
+    private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly SemesterEntity _currentSemester;
+    private readonly string UserInfoServerURL;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration)
+    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration, IGroupService groupService)
     {
+        _groupService = groupService;
         _applicationContext = applicationContext;
         _currentSemester = SemesterEntity.FromString(fileConfig.ReadTextFromFile()); // Чтобы была возможность выставлять баллы и архивировать студентов на основе текущего семестра
-        int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT); 
+        int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
+        UserInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
     }
 
     public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
@@ -111,6 +116,81 @@ public sealed class StudentService : IStudentService
         return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
     }
 
+    public async Task<Result<Unit>> UpdateStudentInfoAsync()
+    {
+        await _groupService.UpdateGroupsInfoAsync();
+        
+        const int batchSize = 250;
+        var updateTasks = GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
+            .Buffer(batchSize)
+            .SelectAwait(async actualStudents => new
+            {
+                actualStudents = actualStudents.ToDictionary(s => s.Guid), 
+                dbStudents = (await GetManyStudentsWithManyKeys(_applicationContext, actualStudents
+                    .Select(s => s.Guid)
+                    .ToArray()))
+                    .ToDictionary(d => d.StudentGuid)
+            })
+            .Select(s => s.actualStudents.Keys
+                .Select(actualStudentGuid => 
+                    (
+                        s.actualStudents[actualStudentGuid], 
+                        s.dbStudents.GetValueOrDefault(actualStudentGuid)
+                    )))
+            .Select(d => d
+                .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2)))
+            .Select(s => CommitChangesToContext(_applicationContext, s.ToList()));
+
+        await foreach (var updateTask in updateTasks)
+        {
+            await updateTask;
+        }
+
+        return Unit.Default;
+    }
+
+    private async Task UpdateStudentsInDbAsync(dynamic students, int batchSize = 50)
+    {
+        var studentsChunks = students.Chunk(batchSize);
+        foreach (var student in studentsChunks)
+        {
+            if (student.group == "")
+            {
+                continue;
+            }
+            
+            var studentEntity = new StudentEntity()
+            {
+                StudentGuid = student.guid,
+                FullName = student.fullName,
+                GroupNumber = student.group,
+                Course = student.course,
+                Department = student.department,
+            };
+
+            var studentFromDb = await _applicationContext.Students.FindAsync(studentEntity.StudentGuid);
+
+            if (studentFromDb == null)
+            {
+                studentEntity.Visits = 0;
+                studentEntity.HasDebtFromPreviousSemester = false;
+                studentEntity.AdditionalPoints = 0;
+                studentEntity.ArchivedVisitValue = 0;
+                studentEntity.Group = (await _groupService.GetExistingGroupOrNewWithName(studentEntity.GroupNumber))
+                    .Match<GroupEntity?>(
+                        (group) => group,
+                        (f) => throw f
+                    );
+                studentEntity.HealthGroup = 0;
+                studentEntity.PointsStudentHistory = new List<PointsStudentHistoryEntity>();
+                studentEntity.VisitsStudentHistory = new List<VisitsStudentHistoryEntity>();
+                continue;
+            }
+
+            await UpdateStudentAsync(studentEntity);
+        }
+    }
+
     private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints)
     {
         var archivedStudent = new ArchivedStudentEntity
@@ -184,20 +264,13 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _applicationContext.Students.Where(s => s.StudentGuid == updatedStudent.StudentGuid)
-                .ExecuteUpdateAsync(p => p
-                    .SetProperty(s => s.FullName, updatedStudent.FullName)
-                    .SetProperty(s => s.Visits, updatedStudent.Visits)
-                    .SetProperty(s => s.GroupNumber, updatedStudent.GroupNumber)
-                    .SetProperty(s => s.HasDebtFromPreviousSemester, updatedStudent.HasDebtFromPreviousSemester)
-                    .SetProperty(s => s.AdditionalPoints, updatedStudent.AdditionalPoints)
-                    .SetProperty(s => s.ArchivedVisitValue, updatedStudent.ArchivedVisitValue)
-                    .SetProperty(s => s.Group, updatedStudent.Group)
-                    .SetProperty(s => s.Course, updatedStudent.Course)
-                    .SetProperty(s => s.HealthGroup, updatedStudent.HealthGroup)
-                    .SetProperty(s => s.Department, updatedStudent.Department)
-                    .SetProperty(s => s.PointsStudentHistory, updatedStudent.PointsStudentHistory)
-                    .SetProperty(s => s.VisitsStudentHistory, updatedStudent.VisitsStudentHistory));
+            var student = await _applicationContext.Students.FindAsync(updatedStudent.StudentGuid);
+
+            student = updatedStudent;
+
+            _applicationContext.Students.Update(student);
+
+            await _applicationContext.SaveChangesAsync();
             
             return Unit.Default;
         }
@@ -206,7 +279,6 @@ public sealed class StudentService : IStudentService
             return new Result<Unit>(err);
         }
     }
-
     public async Task<Result<Unit>> DeleteStudentAsync(string guid)
     {
         try

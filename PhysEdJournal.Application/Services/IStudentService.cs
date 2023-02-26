@@ -11,8 +11,10 @@ public interface IStudentService
     
     public Task<Result<VisitsStudentHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid);
 
-    public Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false); 
+    public Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false);
 
+    public Task<Result<Unit>> UpdateStudentInfoAsync();
+    
     public Task<Result<Unit>> CreateStudentAsync(StudentEntity studentEntity);
     
     public Task<Result<StudentEntity?>> GetStudentAsync(string guid);
