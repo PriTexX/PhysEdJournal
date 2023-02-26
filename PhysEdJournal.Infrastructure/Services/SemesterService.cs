@@ -9,23 +9,19 @@ namespace PhysEdJournal.Infrastructure.Services;
 public sealed class SemesterService : ISemesterService
 {
     private readonly ApplicationContext _applicationContext;
-    private readonly TxtFileConfig _fileConfig;
 
-    public SemesterService(ApplicationContext applicationContext, TxtFileConfig fileConfig)
+    public SemesterService(ApplicationContext applicationContext)
     {
         _applicationContext = applicationContext;
-        _fileConfig = fileConfig;
     }
 
     public async Task<Result<Unit>> StartNewSemesterAsync(string semesterName)
     {
         try
         {
-            await _applicationContext.AddAsync(SemesterEntity.FromString(semesterName));
+            _applicationContext.Add(new SemesterEntity{Name = semesterName});
             await _applicationContext.SaveChangesAsync();
-            
-            _fileConfig.WriteTextToFile(semesterName);
-            
+
             return Unit.Default;
         }
         catch (Exception err)

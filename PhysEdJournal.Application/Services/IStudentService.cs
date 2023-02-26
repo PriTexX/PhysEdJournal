@@ -7,11 +7,11 @@ namespace PhysEdJournal.Application.Services;
 
 public interface IStudentService
 {
-    public Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null);
+    public Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string currentSemesterName, string? comment = null);
     
     public Task<Result<VisitsStudentHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid);
 
-    public Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false);
+    public Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string studentGuid, string currentSemesterName, bool isForceMode = false);
 
     public Task<Result<Unit>> UpdateStudentInfoAsync();
     

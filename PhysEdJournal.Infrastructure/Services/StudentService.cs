@@ -15,20 +15,18 @@ public sealed class StudentService : IStudentService
 {
     private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
-    private readonly SemesterEntity _currentSemester;
     private readonly string UserInfoServerURL;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, TxtFileConfig fileConfig, IConfiguration configuration, IGroupService groupService)
+    public StudentService(ApplicationContext applicationContext, IConfiguration configuration, IGroupService groupService)
     {
         _groupService = groupService;
         _applicationContext = applicationContext;
-        _currentSemester = SemesterEntity.FromString(fileConfig.ReadTextFromFile()); // Чтобы была возможность выставлять баллы и архивировать студентов на основе текущего семестра
         int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
         UserInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
     }
 
-    public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
+    public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string currentSemesterName, string? comment = null)
     {
         var student = await _applicationContext.Students.FindAsync(studentGuid);
 
@@ -43,11 +41,11 @@ public sealed class StudentService : IStudentService
         {
             TeacherGuid = teacherGuid, 
             Points = pointsAmount,
+            SemesterName = currentSemesterName,
             Date = date,
             WorkType = workType,
             StudentGuid = studentGuid,
             Comment = comment,
-            SemesterId = _currentSemester.Id
         };
 
         _applicationContext.StudentsPointsHistory.Add(record);
@@ -89,7 +87,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<ArchivedStudentEntity>> ArchiveStudent(string studentGuid, bool isForceMode = false)
+    public async Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string studentGuid, string currentSemesterName, bool isForceMode = false)
     {
         var student = await _applicationContext.Students
             .AsNoTracking()
@@ -105,7 +103,7 @@ public sealed class StudentService : IStudentService
         if (isForceMode || 
             (student.Visits * student.VisitValue + student.AdditionalPoints) > POINT_AMOUNT) // если превысил порог по баллам
         {
-            return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints);
+            return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
         }
 
         await _applicationContext.Students
@@ -116,7 +114,7 @@ public sealed class StudentService : IStudentService
         return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
     }
     
-    private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints)
+    private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
     {
         var archivedStudent = new ArchivedStudentEntity
         {
@@ -124,7 +122,7 @@ public sealed class StudentService : IStudentService
             FullName = fullName,
             GroupNumber = groupNumber,
             TotalPoints = visitsAmount * visitValue + additionalPoints,
-            SemesterId = _currentSemester.Id,
+            SemesterName = currentSemesterName,
             Visits = visitsAmount
         };
 

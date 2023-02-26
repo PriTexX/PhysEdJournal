@@ -20,7 +20,7 @@ public sealed class ApplicationContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ArchivedStudentEntity>()
-            .HasKey(s => new { s.StudentGuid, s.SemesterId });
+            .HasKey(s => new { s.StudentGuid, s.SemesterName });
 
         base.OnModelCreating(modelBuilder);
     }

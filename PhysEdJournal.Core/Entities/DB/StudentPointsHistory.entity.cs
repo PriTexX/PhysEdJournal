@@ -18,10 +18,11 @@ public sealed class PointsStudentHistoryEntity
     [Required]
     public int Points { get; set; }
     
-    [Required]
-    public int SemesterId { get; set; }
+    [Required(AllowEmptyStrings = false)]
+    [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
+    public string SemesterName { get; set; }
     
-    [ForeignKey("SemesterId")]
+    [ForeignKey("SemesterName")]
     public SemesterEntity Semester { get; set; }
     
     [Required(AllowEmptyStrings = false)]
