@@ -50,7 +50,7 @@ public sealed class StudentService : IStudentService
             SemesterId = _currentSemester.Id
         };
 
-        await _applicationContext.StudentsPointsHistory.AddAsync(record);
+        _applicationContext.StudentsPointsHistory.Add(record);
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
@@ -77,7 +77,7 @@ public sealed class StudentService : IStudentService
                 TeacherGuid = teacherGuid
             };
 
-            await _applicationContext.StudentsVisitsHistory.AddAsync(record);
+            _applicationContext.StudentsVisitsHistory.Add(record);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
@@ -103,7 +103,7 @@ public sealed class StudentService : IStudentService
         }
 
         if (isForceMode || 
-            ((student.Visits * student.VisitValue + student.AdditionalPoints) > POINT_AMOUNT)) // если превысил порог по баллам
+            (student.Visits * student.VisitValue + student.AdditionalPoints) > POINT_AMOUNT) // если превысил порог по баллам
         {
             return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints);
         }
@@ -128,7 +128,7 @@ public sealed class StudentService : IStudentService
             Visits = visitsAmount
         };
 
-        await _applicationContext.ArchivedStudents.AddAsync(archivedStudent);
+        _applicationContext.ArchivedStudents.Add(archivedStudent);
         await _applicationContext.SaveChangesAsync();
 
         await _applicationContext.StudentsVisitsHistory
@@ -194,7 +194,7 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _applicationContext.Students.AddAsync(studentEntity);
+            _applicationContext.Students.Add(studentEntity);
             await _applicationContext.SaveChangesAsync();
         
             return Unit.Default;
