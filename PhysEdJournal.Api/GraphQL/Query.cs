@@ -8,42 +8,42 @@ public class Query
     [UseFirstOrDefault]
     [UseProjection]
     [UseFiltering]
-    public IQueryable<StudentEntity?> GetStudent([Service] ApplicationContext context, string guid)
+    public IQueryable<StudentEntity?> GetStudent(ApplicationContext context, string guid)
     {
         return context.Students.Where(s => s.StudentGuid == guid);
     }
     
     [UseProjection]
     [UseFiltering]
-    public IQueryable<StudentEntity> GetStudents([Service] ApplicationContext context)
+    public IQueryable<StudentEntity> GetStudents(ApplicationContext context)
     {
         return context.Students;
     }
     
     [UseProjection]
     [UseFiltering]
-    public IQueryable<ArchivedStudentEntity> GetArchivedStudents([Service] ApplicationContext context)
+    public IQueryable<ArchivedStudentEntity> GetArchivedStudents(ApplicationContext context)
     {
         return context.ArchivedStudents;
     }
     
     [UseProjection]
     [UseFiltering]
-    public IQueryable<PointsStudentHistoryEntity?> GetStudentPointsHistory([Service] ApplicationContext context, string guid)
+    public IQueryable<PointsStudentHistoryEntity?> GetStudentPointsHistory(ApplicationContext context, string guid)
     {
         return context.StudentsPointsHistory.Where(s => s.StudentGuid == guid);
     }
     
     [UseProjection]
     [UseFiltering]
-    public IQueryable<PointsStudentHistoryEntity?> GetPointsHistory([Service] ApplicationContext context)
+    public IQueryable<PointsStudentHistoryEntity?> GetPointsHistory(ApplicationContext context)
     {
         return context.StudentsPointsHistory;
     }
 
     [UseProjection]
     [UseFiltering]
-    public IQueryable<GroupEntity> GetGroups([Service] ApplicationContext context)
+    public IQueryable<GroupEntity> GetGroups(ApplicationContext context)
     {
         return context.Groups;
     }

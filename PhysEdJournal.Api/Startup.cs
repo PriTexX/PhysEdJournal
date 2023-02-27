@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using PhysEdJournal.Api.GraphQL;
+using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
 
 namespace PhysEdJournal.Api;
@@ -22,6 +23,7 @@ public class Startup
 
         services
             .AddGraphQLServer()
+            .RegisterDbContext<ApplicationContext>()
             .AddQueryType<Query>()
             .AddProjections()
             .AddFiltering()
