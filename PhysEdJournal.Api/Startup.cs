@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using PhysEdJournal.Api.GraphQL;
+using PhysEdJournal.Api.GraphQL.MutationsExtensions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
 
@@ -23,8 +24,11 @@ public class Startup
 
         services
             .AddGraphQLServer()
+            .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()
             .AddQueryType<Query>()
+            .AddMutationType<Mutation>()
+            .AddTypeExtension<TeacherMutationExtensions>()
             .AddProjections()
             .AddFiltering()
             .AddSorting();
