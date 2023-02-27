@@ -1,6 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using PhysEdJournal.Api.GraphQL;
-using PhysEdJournal.Api.GraphQL.MutationsExtensions;
+using PhysEdJournal.Api.GraphQL.Models;
+using PhysEdJournal.Api.GraphQL.MutationExtensions;
+using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
 
@@ -27,6 +29,9 @@ public class Startup
             .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()
             .AddQueryType<Query>()
+            .AddType<SuccessType>()
+            .BindRuntimeType<Success, SuccessType>()
+            .AddTypeExtension<TeacherQueryExtensions>()
             .AddMutationType<Mutation>()
             .AddTypeExtension<TeacherMutationExtensions>()
             .AddProjections()
