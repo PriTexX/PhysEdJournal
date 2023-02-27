@@ -12,12 +12,17 @@ namespace PhysEdJournal.Infrastructure.Services;
 public sealed class GroupService : IGroupService
 {
     private readonly ApplicationContext _applicationContext;
-    private readonly string UserInfoServerURL;
+    private readonly string _userInfoServerURL;
+    private readonly int _pageSize;
 
     public GroupService(ApplicationContext applicationContext, IConfiguration configuration)
     {
         _applicationContext = applicationContext;
-        UserInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
+        _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
+        if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
+        {
+            throw new Exception("Specify PageSizeToQueryUserInfoServer value in config");
+        }
     }
 
     public async Task<Result<Unit>> AssignCuratorAsync(string groupName, string teacherGuid)
@@ -64,7 +69,7 @@ public sealed class GroupService : IGroupService
     {
         const int batchSize = 500;
         
-        var distinctGroups = await GetAllStudentsAsync(UserInfoServerURL, pageSize: batchSize)
+        var distinctGroups = await GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
             .Select(s => s.Group)
             .Where(g => !string.IsNullOrEmpty(g))
             .Distinct()

@@ -15,7 +15,8 @@ public sealed class StudentService : IStudentService
 {
     private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
-    private readonly string _userInfoServerUrl;
+    private readonly string _userInfoServerURL;
+    private readonly int _pageSize;
     private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
     
     public StudentService(ApplicationContext applicationContext, IConfiguration configuration, IGroupService groupService)
@@ -23,7 +24,11 @@ public sealed class StudentService : IStudentService
         _groupService = groupService;
         _applicationContext = applicationContext;
         int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
-        _userInfoServerUrl = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
+        _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
+        if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
+        {
+            throw new Exception("Specify PageSizeToQueryUserInfoServer value in config");
+        }
     }
 
     public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string currentSemesterName, string? comment = null)
@@ -164,7 +169,7 @@ public sealed class StudentService : IStudentService
         await _groupService.UpdateGroupsInfoAsync();
         
         const int batchSize = 250;
-        var updateTasks = GetAllStudentsAsync(_userInfoServerUrl, pageSize: batchSize)
+        var updateTasks = GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
             .Buffer(batchSize)
             .SelectAwait(async actualStudents => new
             {

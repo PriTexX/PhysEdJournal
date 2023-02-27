@@ -57,7 +57,7 @@ public static class StudentServiceFunctions
                 }
             }
          }";
-        pageSize = pageSize > 100 ? 100 : pageSize;
+       
         var client = new GraphQLHttpClient(url, new NewtonsoftJsonSerializer());
         var skipSize = 0;
 
