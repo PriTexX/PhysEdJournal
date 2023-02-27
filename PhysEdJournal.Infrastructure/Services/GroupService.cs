@@ -67,8 +67,6 @@ public sealed class GroupService : IGroupService
 
     public async Task<Result<Unit>> UpdateGroupsInfoAsync()
     {
-        const int batchSize = 500;
-        
         var distinctGroups = await GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
             .Select(s => s.Group)
             .Where(g => !string.IsNullOrEmpty(g))

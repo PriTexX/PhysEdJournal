@@ -20,6 +20,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<ISemesterService, SemesterService>();
         services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<ITeacherService, TeacherService>();
 
         return services;
     }

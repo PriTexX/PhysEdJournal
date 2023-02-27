@@ -1,23 +1,56 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
+using static PhysEdJournal.Infrastructure.Services.StaticFunctions.TeacherServiceFunctions;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class TeacherService : ITeacherService
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly int _pageSize;
+    private readonly string _userInfoServerURL;
 
-    public TeacherService(ApplicationContext applicationContext)
+    public TeacherService(ApplicationContext applicationContext, IConfiguration configuration)
     {
         _applicationContext = applicationContext;
+        _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
+        if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
+        {
+            throw new Exception("Specify PageSizeToQueryUserInfoServer value in config");
+        }
     }
 
-    public async Task<Result<TeacherEntity>> GivePermissions(string teacherGuid, TeacherPermissions type)
+    public async Task<Result<Unit>> UpdateTeacherInfoAsync()
+    {
+        var getTeachersTask = GetAllTeachersAsync(_userInfoServerURL, pageSize: _pageSize).ToListAsync();
+        var getDbTeachersTask = _applicationContext.Teachers.ToDictionaryAsync(t => t.TeacherGuid);
+
+        await Task.WhenAll(getTeachersTask.AsTask(), getDbTeachersTask);
+
+        var dbTeachers = getDbTeachersTask.Result;
+        var newTeachers = getTeachersTask.Result
+            .Where(t => !dbTeachers.ContainsKey(t.Guid))
+            .Select(t => new TeacherEntity
+            {
+                TeacherGuid = t.Guid, 
+                FullName = t.FullName, 
+                Permissions = TeacherPermissions.DefaultAccess
+            });
+        
+        _applicationContext.Teachers.AddRange(newTeachers);
+        await _applicationContext.SaveChangesAsync();
+
+        return Unit.Default;
+    }
+
+    public async Task<Result<TeacherEntity>> GivePermissionsAsync(string teacherGuid, TeacherPermissions type)
     {
         try
         {

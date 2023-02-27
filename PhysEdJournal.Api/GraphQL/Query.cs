@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Entities.DB;
+﻿using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Api.GraphQL;

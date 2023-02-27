@@ -168,7 +168,7 @@ public sealed class StudentService : IStudentService
     {
         await _groupService.UpdateGroupsInfoAsync();
         
-        const int batchSize = 250;
+        const int batchSize = 500;
         var updateTasks = GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
             .Buffer(batchSize)
             .SelectAwait(async actualStudents => new
