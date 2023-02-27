@@ -47,4 +47,19 @@ public class Query
     {
         return context.Groups;
     }
+    
+    [UseFirstOrDefault]
+    [UseProjection]
+    [UseFiltering]
+    public IQueryable<TeacherEntity?> GetTeacher(ApplicationContext context, string guid)
+    {
+        return context.Teachers.Where(t => t.TeacherGuid == guid);
+    }
+    
+    [UseProjection]
+    [UseFiltering]
+    public IQueryable<TeacherEntity> GetTeachers(ApplicationContext context)
+    {
+        return context.Teachers;
+    }
 }
