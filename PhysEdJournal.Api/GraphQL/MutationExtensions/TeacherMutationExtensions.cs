@@ -1,7 +1,8 @@
-﻿using PhysEdJournal.Api.GraphQL.Models;
+﻿using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -27,6 +28,7 @@ public class TeacherMutationExtensions
         return result.Match(_ => true, exception => throw exception);
     }
 
+    [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> GivePermissionsToTeacherAsync(string teacherGuid, IEnumerable<TeacherPermissions> permissions, [Service] ITeacherService teacherService)
     {
         var teacherPermissions = permissions.Aggregate((prev, next) => prev | next);

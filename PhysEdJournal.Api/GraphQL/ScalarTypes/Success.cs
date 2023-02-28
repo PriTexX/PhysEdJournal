@@ -2,7 +2,7 @@
 
 namespace PhysEdJournal.Api.GraphQL.ScalarTypes;
 
-public struct Success
+public readonly struct Success
 {
     public static readonly Success Yes = new Success(true);
     public static readonly Success No = new Success(false);

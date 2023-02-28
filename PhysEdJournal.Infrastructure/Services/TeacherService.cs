@@ -58,7 +58,7 @@ public sealed class TeacherService : ITeacherService
 
             if (teacher is null)
             {
-                return await Task.FromResult(new Result<TeacherEntity>(new TeacherNotFound(teacherGuid)));
+                return await Task.FromResult(new Result<TeacherEntity>(new TeacherNotFoundException(teacherGuid)));
             }
 
             teacher.Permissions = type;
@@ -77,6 +77,15 @@ public sealed class TeacherService : ITeacherService
     {
         try
         {
+            var teacherGuid = await _applicationContext.Teachers
+                .AsNoTracking()
+                .Where(t => t.TeacherGuid == teacherEntity.TeacherGuid)
+                .Select(t => t.TeacherGuid)
+                .FirstOrDefaultAsync();
+
+            if (teacherGuid is not null)
+                return new Result<Unit>(new TeacherAlreadyExistsException(teacherGuid));
+            
             await _applicationContext.Teachers.AddAsync(teacherEntity);
             await _applicationContext.SaveChangesAsync();
         
