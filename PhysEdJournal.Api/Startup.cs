@@ -38,6 +38,7 @@ public class Startup
             .AddTypeExtension<TeacherMutationExtensions>()
             .AddTypeExtension<GroupMutationExtensions>()
             .AddTypeExtension<SemesterMutationExtensions>()
+            .AddTypeExtension<StudentMutationExtensions>()
             .AddProjections()
             .AddFiltering()
             .AddSorting();

@@ -9,23 +9,24 @@ namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 [ExtendObjectType(OperationTypeNames.Mutation)]
 public class TeacherMutationExtensions
 {
+    
+    [Error(typeof(TeacherAlreadyExistsException))]
     public async Task<TeacherEntity> CreateTeacherAsync(string teacherGuid, string fullName, [Service] ITeacherService teacherService)
     {
         var result = await teacherService.CreateTeacherAsync(new TeacherEntity
         {
-            TeacherGuid = teacherGuid.ToString(),
+            TeacherGuid = teacherGuid,
             FullName = fullName,
             Permissions = TeacherPermissions.DefaultAccess
         });
 
-        return result.Match(_ => new TeacherEntity{FullName = fullName, TeacherGuid = teacherGuid.ToString(), Permissions = TeacherPermissions.DefaultAccess}, exception => throw exception);
-    }
-
-    public async Task<Success> UpdateTeachersInfoAsync([Service] ITeacherService teacherService)
-    {
-        var result = await teacherService.UpdateTeacherInfoAsync();
-        
-        return result.Match(_ => true, exception => throw exception);
+        return result.Match(_ => new TeacherEntity
+        {
+            FullName = fullName, 
+            TeacherGuid = teacherGuid, 
+            Permissions = TeacherPermissions.DefaultAccess
+        }, 
+            exception => throw exception);
     }
 
     [Error(typeof(TeacherNotFoundException))]
