@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Language;
 
-namespace PhysEdJournal.Api.GraphQL.Models;
+namespace PhysEdJournal.Api.GraphQL.ScalarTypes;
 
 public struct Success
 {
