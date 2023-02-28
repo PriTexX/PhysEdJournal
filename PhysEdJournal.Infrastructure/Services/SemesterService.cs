@@ -1,5 +1,6 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
@@ -9,9 +10,11 @@ namespace PhysEdJournal.Infrastructure.Services;
 public sealed class SemesterService : ISemesterService
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly ILogger<SemesterService> _logger;
 
-    public SemesterService(ApplicationContext applicationContext)
+    public SemesterService(ApplicationContext applicationContext, ILogger<SemesterService> logger)
     {
+        _logger = logger;
         _applicationContext = applicationContext;
     }
 
@@ -26,6 +29,7 @@ public sealed class SemesterService : ISemesterService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }

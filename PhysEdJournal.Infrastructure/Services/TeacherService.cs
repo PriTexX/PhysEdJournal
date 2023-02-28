@@ -2,6 +2,7 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
@@ -13,12 +14,14 @@ namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class TeacherService : ITeacherService
 {
+    private readonly ILogger<TeacherService> _logger;
     private readonly ApplicationContext _applicationContext;
     private readonly int _pageSize;
     private readonly string _userInfoServerURL;
 
-    public TeacherService(ApplicationContext applicationContext, IConfiguration configuration)
+    public TeacherService(ApplicationContext applicationContext, IConfiguration configuration, ILogger<TeacherService> logger)
     {
+        _logger = logger;
         _applicationContext = applicationContext;
         _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
         if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
@@ -29,25 +32,33 @@ public sealed class TeacherService : ITeacherService
 
     public async Task<Result<Unit>> UpdateTeacherInfoAsync()
     {
-        var getTeachersTask = GetAllTeachersAsync(_userInfoServerURL, pageSize: _pageSize).ToListAsync();
-        var getDbTeachersTask = _applicationContext.Teachers.ToDictionaryAsync(t => t.TeacherGuid);
+        try
+        {
+            var getTeachersTask = GetAllTeachersAsync(_userInfoServerURL, pageSize: _pageSize).ToListAsync();
+            var getDbTeachersTask = _applicationContext.Teachers.ToDictionaryAsync(t => t.TeacherGuid);
 
-        await Task.WhenAll(getTeachersTask.AsTask(), getDbTeachersTask);
+            await Task.WhenAll(getTeachersTask.AsTask(), getDbTeachersTask);
 
-        var dbTeachers = getDbTeachersTask.Result;
-        var newTeachers = getTeachersTask.Result
-            .Where(t => !dbTeachers.ContainsKey(t.Guid))
-            .Select(t => new TeacherEntity
-            {
-                TeacherGuid = t.Guid, 
-                FullName = t.FullName, 
-                Permissions = TeacherPermissions.DefaultAccess
-            });
+            var dbTeachers = getDbTeachersTask.Result;
+            var newTeachers = getTeachersTask.Result
+                .Where(t => !dbTeachers.ContainsKey(t.Guid))
+                .Select(t => new TeacherEntity
+                {
+                    TeacherGuid = t.Guid, 
+                    FullName = t.FullName, 
+                    Permissions = TeacherPermissions.DefaultAccess
+                });
         
-        _applicationContext.Teachers.AddRange(newTeachers);
-        await _applicationContext.SaveChangesAsync();
+            _applicationContext.Teachers.AddRange(newTeachers);
+            await _applicationContext.SaveChangesAsync();
 
-        return Unit.Default;
+            return Unit.Default;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            return new Result<Unit>(e);
+        }
     }
 
     public async Task<Result<TeacherEntity>> GivePermissionsAsync(string teacherGuid, TeacherPermissions type)
@@ -69,6 +80,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<TeacherEntity>(err);
         }
     }
@@ -84,6 +96,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }
@@ -97,6 +110,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<TeacherEntity?>(err);
         }
     }
@@ -116,6 +130,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }
@@ -137,6 +152,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }

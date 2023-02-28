@@ -2,6 +2,7 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
@@ -11,12 +12,14 @@ namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class GroupService : IGroupService
 {
+    private readonly ILogger<GroupService> _logger;
     private readonly ApplicationContext _applicationContext;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
 
-    public GroupService(ApplicationContext applicationContext, IConfiguration configuration)
+    public GroupService(ApplicationContext applicationContext, IConfiguration configuration, ILogger<GroupService> logger)
     {
+        _logger = logger;
         _applicationContext = applicationContext;
         _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
         if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
@@ -27,84 +30,116 @@ public sealed class GroupService : IGroupService
 
     public async Task<Result<Unit>> AssignCuratorAsync(string groupName, string teacherGuid)
     {
-        var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
-        
-        if (teacher == null)
+        try
         {
-            return new Result<Unit>(new Exception("No such teacher found"));
+            var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
+        
+            if (teacher == null)
+            {
+                return new Result<Unit>(new Exception("No such teacher found"));
+            }
+        
+            var group = await _applicationContext.Groups.FindAsync(groupName);
+        
+            if (group == null)
+            {
+                return new Result<Unit>(new Exception("No such group found"));
+            }
+
+            group.Curator = teacher;
+            group.CuratorGuid = teacher.TeacherGuid;
+        
+            await UpdateGroupAsync(group);
+
+            return Unit.Default;
         }
-        
-        var group = await _applicationContext.Groups.FindAsync(groupName);
-        
-        if (group == null)
+        catch (Exception e)
         {
-            return new Result<Unit>(new Exception("No such group found"));
+            _logger.LogError(e.ToString());
+            return new Result<Unit>(e);
         }
-
-        group.Curator = teacher;
-        group.CuratorGuid = teacher.TeacherGuid;
-        
-        await UpdateGroupAsync(group);
-
-        return Unit.Default;
     }
 
     public async Task<Result<Unit>> AssignVisitValueAsync(string groupName, double newVisitValue)
     {
-        var group = await _applicationContext.Groups.FindAsync(groupName);
-
-        if (group == null)
+        try
         {
-            return new Result<Unit>(new Exception("No such group found"));
+            var group = await _applicationContext.Groups.FindAsync(groupName);
+
+            if (group == null)
+            {
+                return new Result<Unit>(new Exception("No such group found"));
+            }
+
+            group.VisitValue = newVisitValue;
+
+            await UpdateGroupAsync(group);
+
+            return Unit.Default;
         }
-
-        group.VisitValue = newVisitValue;
-
-        await UpdateGroupAsync(group);
-
-        return Unit.Default;
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            return new Result<Unit>(e);
+        }
     }
 
     public async Task<Result<Unit>> UpdateGroupsInfoAsync()
     {
-        var distinctGroups = await GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
-            .Select(s => s.Group)
-            .Where(g => !string.IsNullOrEmpty(g))
-            .Distinct()
-            .ToListAsync();
+        try
+        {
+            var distinctGroups = await GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
+                .Select(s => s.Group)
+                .Where(g => !string.IsNullOrEmpty(g))
+                .Distinct()
+                .ToListAsync();
 
-        var dbGroups = await _applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
+            var dbGroups = await _applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
 
-        var newGroups = distinctGroups
-            .Where(g => !dbGroups.ContainsKey(g))
-            .Select(g => new GroupEntity { GroupName = g });
+            var newGroups = distinctGroups
+                .Where(g => !dbGroups.ContainsKey(g))
+                .Select(g => new GroupEntity { GroupName = g });
 
-        _applicationContext.Groups.AddRange(newGroups);
-        await _applicationContext.SaveChangesAsync();
+            _applicationContext.Groups.AddRange(newGroups);
+            await _applicationContext.SaveChangesAsync();
         
-        return Unit.Default;
+            return Unit.Default;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            return new Result<Unit>(e);
+        }
     }
     
     public async Task<Result<GroupEntity?>> GetExistingGroupOrNewWithName(string groupName)
     {
-        var group = await _applicationContext.Groups.FindAsync(groupName);
-        
-        if (group != null)
+        try
         {
+            var group = await _applicationContext.Groups.FindAsync(groupName);
+        
+            if (group != null)
+            {
+                return group;
+            }
+
+            group = new GroupEntity()
+            {
+                GroupName = groupName,
+                Students = new List<StudentEntity>(),
+                Curator = null,
+                CuratorGuid = null
+            };
+
+            await CreateGroupAsync(group);
+
             return group;
         }
-
-        group = new GroupEntity()
+        catch (Exception e)
         {
-            GroupName = groupName,
-            Students = new List<StudentEntity>(),
-            Curator = null,
-            CuratorGuid = null
-        };
-
-        await CreateGroupAsync(group);
-
-        return group;
+            _logger.LogError(e.ToString());
+            return new Result<GroupEntity?>(e);
+        }
     }
 
     public async Task<Result<Unit>> CreateGroupAsync(GroupEntity groupEntity)
@@ -118,6 +153,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }
@@ -131,6 +167,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<GroupEntity?>(err);
         }
     }
@@ -150,6 +187,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }
@@ -163,6 +201,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception err)
         {
+            _logger.LogError(err.ToString());
             return new Result<Unit>(err);
         }
     }
