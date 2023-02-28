@@ -234,7 +234,6 @@ public sealed class StudentService : IStudentService
             student = updatedStudent;
 
             _applicationContext.Students.Update(student);
-
             await _applicationContext.SaveChangesAsync();
             
             return Unit.Default;

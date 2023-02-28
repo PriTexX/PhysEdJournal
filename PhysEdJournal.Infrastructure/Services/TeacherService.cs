@@ -105,9 +105,13 @@ public sealed class TeacherService : ITeacherService
     {
         try
         {
-            _applicationContext.Teachers.Update(updatedTeacher);
-            await _applicationContext.SaveChangesAsync();
+            var teacher = await _applicationContext.Teachers.FindAsync(updatedTeacher.TeacherGuid);
 
+            teacher = updatedTeacher;
+
+            _applicationContext.Teachers.Update(teacher);
+            await _applicationContext.SaveChangesAsync();
+            
             return Unit.Default;
         }
         catch (Exception err)

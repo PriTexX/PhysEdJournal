@@ -139,13 +139,13 @@ public sealed class GroupService : IGroupService
     {
         try
         {
-            await _applicationContext.Groups.Where(g => g.GroupName == updatedGroup.GroupName)
-                .ExecuteUpdateAsync(p => p
-                    .SetProperty(g => g.Students, updatedGroup.Students)
-                    .SetProperty(g => g.VisitValue, updatedGroup.VisitValue)
-                    .SetProperty(g => g.Curator, updatedGroup.Curator)
-                    .SetProperty(g => g.CuratorGuid, updatedGroup.CuratorGuid));
+            var group = await _applicationContext.Groups.FindAsync(updatedGroup.GroupName);
 
+            group = updatedGroup;
+
+            _applicationContext.Groups.Update(group);
+            await _applicationContext.SaveChangesAsync();
+            
             return Unit.Default;
         }
         catch (Exception err)
