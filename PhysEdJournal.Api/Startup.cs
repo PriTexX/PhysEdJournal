@@ -3,6 +3,7 @@ using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
 
@@ -20,7 +21,11 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddAuthentication();
-        services.AddDateOnlyTimeOnlyStringConverters();
+        services.AddAuthorization();
+
+        services
+            .AddOptions<ApplicationOptions>()
+            .BindConfiguration("Application");
 
         services.AddInfrastructure(Configuration);
 
@@ -42,22 +47,12 @@ public class Startup
             .AddProjections()
             .AddFiltering()
             .AddSorting();
-        
-        services.AddControllers()
-            .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
-        
+
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c => c.UseDateOnlyTimeOnlyStringConverters());
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-        
         app.UseHttpsRedirection();
         app.UseRouting();
 
@@ -68,7 +63,6 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGraphQL();
-            endpoints.MapControllers();
         });
     }
 }

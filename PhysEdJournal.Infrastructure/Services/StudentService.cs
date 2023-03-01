@@ -1,8 +1,8 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
@@ -18,19 +18,16 @@ public sealed class StudentService : IStudentService
     private readonly ApplicationContext _applicationContext;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
-    private readonly int POINT_AMOUNT; // Кол-во баллов для получения зачета
+    private readonly int _pointAmount; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, IConfiguration configuration, IGroupService groupService, ILogger<StudentService> logger)
+    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, ILogger<StudentService> logger)
     {
         _logger = logger;
         _groupService = groupService;
         _applicationContext = applicationContext;
-        int.TryParse(configuration["PointBorderForSemester"], out POINT_AMOUNT);
-        _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
-        if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
-        {
-            throw new Exception("Specify PageSizeToQueryUserInfoServer value in config");
-        }
+        _pointAmount = options.Value.PointBorderForSemester;
+        _userInfoServerURL = options.Value.UserInfoServerURL;
+        _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
     public async Task<Result<Unit>> AddPointsAsync(PointsStudentHistoryEntity pointsStudentHistoryEntity)
@@ -108,7 +105,7 @@ public sealed class StudentService : IStudentService
             }
 
             if (isForceMode || 
-                (student.Visits * student.VisitValue + student.AdditionalPoints) > POINT_AMOUNT) // если превысил порог по баллам
+                (student.Visits * student.VisitValue + student.AdditionalPoints) > _pointAmount) // если превысил порог по баллам
             {
                 return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
             }

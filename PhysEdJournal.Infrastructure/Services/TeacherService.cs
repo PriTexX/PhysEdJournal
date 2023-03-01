@@ -1,8 +1,8 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
@@ -19,15 +19,12 @@ public sealed class TeacherService : ITeacherService
     private readonly int _pageSize;
     private readonly string _userInfoServerURL;
 
-    public TeacherService(ApplicationContext applicationContext, IConfiguration configuration, ILogger<TeacherService> logger)
+    public TeacherService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, ILogger<TeacherService> logger)
     {
         _logger = logger;
         _applicationContext = applicationContext;
-        _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
-        if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
-        {
-            throw new Exception("Specify PageSizeToQueryUserInfoServer value in config");
-        }
+        _userInfoServerURL = options.Value.UserInfoServerURL;
+        _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
     public async Task<Result<Unit>> UpdateTeacherInfoAsync()

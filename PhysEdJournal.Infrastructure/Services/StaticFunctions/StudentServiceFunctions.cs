@@ -46,7 +46,7 @@ public static class StudentServiceFunctions
     public static async IAsyncEnumerable<Student> GetAllStudentsAsync(string url, int pageSize)
     {
         var query = @"query($pageSize: Int!, $skipSize: Int!) {
-            students(take: $pageSize, skip: $skipSize) {
+            students(take: $pageSize, skip: $skipSize, filter: ""!string.IsNullOrEmpty(group)"") {
                 hasNextPage
                 items {
                     guid

@@ -1,11 +1,12 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
+using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 
@@ -18,15 +19,12 @@ public sealed class GroupService : IGroupService
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
 
-    public GroupService(ApplicationContext applicationContext, IConfiguration configuration, ILogger<GroupService> logger)
+    public GroupService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, ILogger<GroupService> logger)
     {
         _logger = logger;
         _applicationContext = applicationContext;
-        _userInfoServerURL = configuration["UserInfoServerURL"] ?? throw new Exception("Specify UserinfoServerURL in config");
-        if (!int.TryParse(configuration["PageSizeToQueryUserInfoServer"], out _pageSize))
-        {
-            throw new Exception("Specify PageSizeToQueryUserInfoServer value in config");
-        }
+        _userInfoServerURL = options.Value.UserInfoServerURL;
+        _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
     public async Task<Result<Unit>> AssignCuratorAsync(string groupName, string teacherGuid)
@@ -37,14 +35,14 @@ public sealed class GroupService : IGroupService
         
             if (teacher == null)
             {
-                return new Result<Unit>(new Exception("No such teacher found"));
+                return new Result<Unit>(new TeacherNotFoundException(teacherGuid));
             }
         
             var group = await _applicationContext.Groups.FindAsync(groupName);
         
             if (group == null)
             {
-                return new Result<Unit>(new Exception("No such group found"));
+                return new Result<Unit>(new GroupNotFoundException(groupName));
             }
 
             group.Curator = teacher;
@@ -74,7 +72,7 @@ public sealed class GroupService : IGroupService
 
             if (group == null)
             {
-                return new Result<Unit>(new Exception("No such group found"));
+                return new Result<Unit>(new GroupNotFoundException(groupName));
             }
 
             group.VisitValue = newVisitValue;
