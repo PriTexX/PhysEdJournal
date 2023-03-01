@@ -15,8 +15,6 @@ public static class DependencyInjectionExtensions
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddSingleton<TxtFileConfig>(s => new TxtFileConfig("../PhysEdJournal.Infrastructure/SemesterInfo.txt"));
-        
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<ISemesterService, SemesterService>();
         services.AddScoped<IStudentService, StudentService>();

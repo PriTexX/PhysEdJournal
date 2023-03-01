@@ -26,7 +26,7 @@ public sealed class SemesterService : ISemesterService
         {
             if (!Regex.IsMatch(semesterName, @"\d{4}-\d{4}/\w{5}"))
             {
-                throw new SemesterNameValidationException();
+                return new Result<Unit>(new SemesterNameValidationException());
             }
             
             _applicationContext.Add(new SemesterEntity{Name = semesterName});

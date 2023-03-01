@@ -144,9 +144,9 @@ public sealed class StudentService : IStudentService
             _applicationContext.ArchivedStudents.Add(archivedStudent);
             await _applicationContext.SaveChangesAsync();
 
-            await ArchiveCurrentSemesterHistory(studentGuid);
+            var res = await ArchiveCurrentSemesterHistory(studentGuid);
 
-            return archivedStudent;
+            return res.Match(_ => archivedStudent, exception => new Result<ArchivedStudentEntity>(exception));
         }
         catch (Exception e)
         {
@@ -155,7 +155,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    private async Task ArchiveCurrentSemesterHistory(string studentGuid)
+    private async Task<Result<Unit>> ArchiveCurrentSemesterHistory(string studentGuid)
     {
         try
         {
@@ -181,11 +181,13 @@ public sealed class StudentService : IStudentService
                     .SetProperty(s => s.Visits, 0)
                     .SetProperty(s => s.HasDebtFromPreviousSemester, false)
                     .SetProperty(s => s.ArchivedVisitValue, 0));
+            
+            return Unit.Default;
         }
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            throw;
+            return new Result<Unit>(e);
         }
     }
 
