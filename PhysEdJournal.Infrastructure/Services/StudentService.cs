@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
@@ -105,7 +104,7 @@ public sealed class StudentService : IStudentService
             .ExecuteUpdateAsync(p => p
                 .SetProperty(s => s.HasDebtFromPreviousSemester, true)
                 .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
-        return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
+        return new Result<ArchivedStudentEntity>(new NotEnoughPointsException(studentGuid));
     }
     
     private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
@@ -123,10 +122,6 @@ public sealed class StudentService : IStudentService
         _applicationContext.ArchivedStudents.Add(archivedStudent);
         await _applicationContext.SaveChangesAsync();
 
-        await _applicationContext.StudentsVisitsHistory
-            .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
-            .ExecuteDeleteAsync();
-
         await ArchiveCurrentSemesterHistory(studentGuid);
 
         return archivedStudent;
@@ -134,6 +129,10 @@ public sealed class StudentService : IStudentService
 
     private async Task ArchiveCurrentSemesterHistory(string studentGuid)
     {
+        await _applicationContext.StudentsVisitsHistory
+            .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
+            .ExecuteDeleteAsync();
+        
         await _applicationContext.StudentsPointsHistory
             .Where(h => h.StudentGuid == studentGuid)
             .ExecuteUpdateAsync(p => p
