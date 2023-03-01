@@ -1,5 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using PhysEdJournal.Api.GraphQL;
+using PhysEdJournal.Api.GraphQL.MutationExtensions;
+using PhysEdJournal.Api.GraphQL.QueryExtensions;
+using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
 
@@ -23,8 +26,19 @@ public class Startup
 
         services
             .AddGraphQLServer()
+            .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()
             .AddQueryType<Query>()
+            .AddType<SuccessType>()
+            .AddType<DateOnlyType>()
+            .BindRuntimeType<Success, SuccessType>()
+            .BindRuntimeType<DateOnly, DateOnlyType>()
+            .AddTypeExtension<TeacherQueryExtensions>()
+            .AddMutationType<Mutation>()
+            .AddTypeExtension<TeacherMutationExtensions>()
+            .AddTypeExtension<GroupMutationExtensions>()
+            .AddTypeExtension<SemesterMutationExtensions>()
+            .AddTypeExtension<StudentMutationExtensions>()
             .AddProjections()
             .AddFiltering()
             .AddSorting();

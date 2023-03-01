@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
@@ -34,44 +33,33 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<PointsStudentHistoryEntity>> AddPointsAsync(string studentGuid, string teacherGuid, int pointsAmount, DateOnly date, WorkType workType, string currentSemesterName, string? comment = null)
+    public async Task<Result<Unit>> AddPointsAsync(PointsStudentHistoryEntity pointsStudentHistoryEntity)
     {
         try
         {
-            var student = await _applicationContext.Students.FindAsync(studentGuid);
+            var student = await _applicationContext.Students.FindAsync(pointsStudentHistoryEntity.StudentGuid);
 
-            if (student is null)
-            {
-                return await Task.FromResult(new Result<PointsStudentHistoryEntity>(new StudentNotFound(studentGuid)));
-            }
+        if (student is null)
+        {
+            return await Task.FromResult(new Result<Unit>(new StudentNotFound(pointsStudentHistoryEntity.StudentGuid)));
+        }
+
+        student.AdditionalPoints += pointsStudentHistoryEntity.Points;
         
-            student.AdditionalPoints += pointsAmount;
+        _applicationContext.StudentsPointsHistory.Add(pointsStudentHistoryEntity);
+        _applicationContext.Students.Update(student);
+        await _applicationContext.SaveChangesAsync();
 
-            var record = new PointsStudentHistoryEntity
-            {
-                TeacherGuid = teacherGuid, 
-                Points = pointsAmount,
-                SemesterName = currentSemesterName,
-                Date = date,
-                WorkType = workType,
-                StudentGuid = studentGuid,
-                Comment = comment,
-            };
-
-            _applicationContext.StudentsPointsHistory.Add(record);
-            _applicationContext.Students.Update(student);
-            await _applicationContext.SaveChangesAsync();
-
-            return record;
+        return Unit.Default;
         }
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            return new Result<PointsStudentHistoryEntity>(e);
+            return new Result<Unit>(e);
         }
     }
 
-    public async Task<Result<VisitsStudentHistoryEntity>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid)
+    public async Task<Result<Unit>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid)
     {
         try
         {
@@ -79,12 +67,12 @@ public sealed class StudentService : IStudentService
 
             if (student is null)
             {
-                return await Task.FromResult(new Result<VisitsStudentHistoryEntity>(new Exception($"No student with such guid {studentGuid}")));
+                return await Task.FromResult(new Result<Unit>(new StudentNotFound(studentGuid)));
             }
         
             student.Visits++;
 
-            var record = new VisitsStudentHistoryEntity
+            var record = new VisitStudentHistoryEntity
             {
                 Date = date,
                 StudentGuid = studentGuid,
@@ -95,12 +83,12 @@ public sealed class StudentService : IStudentService
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
-            return record;
+            return Unit.Default;
         }
         catch (Exception err)
         {
             _logger.LogError(err.ToString());
-            return new Result<VisitsStudentHistoryEntity>(err);
+            return new Result<Unit>(err);
         }
     }
 
@@ -130,7 +118,7 @@ public sealed class StudentService : IStudentService
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.HasDebtFromPreviousSemester, true)
                     .SetProperty(s => s.ArchivedVisitValue, student.VisitValue));
-            return new Result<ArchivedStudentEntity>(new NotEnoughPoints(studentGuid));
+            return new Result<ArchivedStudentEntity>(new NotEnoughPointsException(studentGuid));
         }
         catch (Exception e)
         {
@@ -156,10 +144,6 @@ public sealed class StudentService : IStudentService
             _applicationContext.ArchivedStudents.Add(archivedStudent);
             await _applicationContext.SaveChangesAsync();
 
-            await _applicationContext.StudentsVisitsHistory
-                .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
-                .ExecuteDeleteAsync();
-
             await ArchiveCurrentSemesterHistory(studentGuid);
 
             return archivedStudent;
@@ -175,6 +159,11 @@ public sealed class StudentService : IStudentService
     {
         try
         {
+
+            await _applicationContext.StudentsVisitsHistory
+                .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
+                .ExecuteDeleteAsync();
+        
             await _applicationContext.StudentsPointsHistory
                 .Where(h => h.StudentGuid == studentGuid)
                 .ExecuteUpdateAsync(p => p
@@ -200,7 +189,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> UpdateStudentInfoAsync()
+    public async Task<Result<Unit>> UpdateStudentsInfoAsync()
     {
         try
         {

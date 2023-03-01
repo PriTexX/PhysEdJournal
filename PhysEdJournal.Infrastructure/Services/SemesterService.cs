@@ -1,8 +1,10 @@
-﻿using LanguageExt;
+﻿using System.Text.RegularExpressions;
+using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Services;
@@ -22,6 +24,11 @@ public sealed class SemesterService : ISemesterService
     {
         try
         {
+            if (!Regex.IsMatch(semesterName, @"\d{4}-\d{4}/\w{5}"))
+            {
+                throw new SemesterNameValidationException();
+            }
+            
             _applicationContext.Add(new SemesterEntity{Name = semesterName});
             await _applicationContext.SaveChangesAsync();
 
