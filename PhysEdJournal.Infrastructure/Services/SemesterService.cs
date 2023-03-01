@@ -36,7 +36,7 @@ public sealed class SemesterService : ISemesterService
         }
         catch (Exception err)
         {
-            _logger.LogError(err.ToString());
+            _logger.LogError(err, "Error during starting a new semester");
             return new Result<Unit>(err);
         }
     }

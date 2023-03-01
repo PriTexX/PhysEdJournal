@@ -56,7 +56,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during updating teachers' info in database");
             return new Result<Unit>(e);
         }
     }
@@ -78,10 +78,10 @@ public sealed class TeacherService : ITeacherService
 
             return teacher;
         }
-        catch (Exception err)
+        catch (Exception e)
         {
-            _logger.LogError(err.ToString());
-            return new Result<TeacherEntity>(err);
+            _logger.LogError(e, "Error during updating teacher's permissions. Teacher guid: {teacherGuid}", teacherGuid);
+            return new Result<TeacherEntity>(e);
         }
     }
 
@@ -105,7 +105,7 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
-            _logger.LogError(err.ToString());
+            _logger.LogError(err, "Error during teacher creation. Teacher: {teacherEntity}", teacherEntity);
             return new Result<Unit>(err);
         }
     }

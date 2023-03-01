@@ -1,5 +1,6 @@
 ﻿using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Application.Services;
+using PhysEdJournal.Core.Exceptions.GroupExceptions;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -14,6 +15,7 @@ public class GroupMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
+    [Error(typeof(NullVisitValueException))]
     public async Task<Success> AssignVisitValue(string groupName, double newVisitValue,
         [Service] IGroupService groupService)
     {

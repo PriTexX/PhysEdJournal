@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 
@@ -55,7 +56,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during assigning curator with guid: {teacherGuid} to group with name: {groupName}", teacherGuid, groupName);
             return new Result<Unit>(e);
         }
     }
@@ -64,6 +65,11 @@ public sealed class GroupService : IGroupService
     {
         try
         {
+            if (newVisitValue < 0)
+            {
+                return new Result<Unit>(new NullVisitValueException(newVisitValue));
+            }
+            
             var group = await _applicationContext.Groups.FindAsync(groupName);
 
             if (group == null)
@@ -79,7 +85,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during setting group's visit value {visitValue} to group with name: {groupName}", newVisitValue, groupName);
             return new Result<Unit>(e);
         }
     }
@@ -107,7 +113,7 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during updating groups' info in database");
             return new Result<Unit>(e);
         }
     }

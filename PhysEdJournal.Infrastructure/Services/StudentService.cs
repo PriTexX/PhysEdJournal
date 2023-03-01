@@ -87,7 +87,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception err)
         {
-            _logger.LogError(err.ToString());
+            _logger.LogError(err, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, teacherGuid);
             return new Result<Unit>(err);
         }
     }
@@ -122,7 +122,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during archiving. Student guid: {studentGuid}", studentGuid);
             return new Result<ArchivedStudentEntity>(e);
         }
     }
@@ -150,7 +150,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during archiving. Student guid: {studentGuid}", studentGuid);
             return new Result<ArchivedStudentEntity>(e);
         }
     }
@@ -186,7 +186,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during archiving student's semester history. Student guid: {studentGuid}", studentGuid);
             return new Result<Unit>(e);
         }
     }
@@ -227,7 +227,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error during updating students' info in database");
             return new Result<Unit>(e);
         }
     }
