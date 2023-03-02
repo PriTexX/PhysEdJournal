@@ -51,7 +51,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(e, "Error adding points to student with guid: {studentGuid}. With points history entity: {pointsHistory}", pointsStudentHistoryEntity.StudentGuid, pointsStudentHistoryEntity);
             return new Result<Unit>(e);
         }
     }
