@@ -47,8 +47,9 @@ public sealed class GroupService : IGroupService
 
             group.Curator = teacher;
             group.CuratorGuid = teacher.TeacherGuid;
-        
-            await UpdateGroupAsync(group);
+
+            _applicationContext.Groups.Update(group);
+            await _applicationContext.SaveChangesAsync();
 
             return Unit.Default;
         }
@@ -77,7 +78,8 @@ public sealed class GroupService : IGroupService
 
             group.VisitValue = newVisitValue;
 
-            await UpdateGroupAsync(group);
+            _applicationContext.Groups.Update(group);
+            await _applicationContext.SaveChangesAsync();
 
             return Unit.Default;
         }
@@ -113,100 +115,6 @@ public sealed class GroupService : IGroupService
         {
             _logger.LogError(e, "Error during updating groups' info in database");
             return new Result<Unit>(e);
-        }
-    }
-    
-    public async Task<Result<GroupEntity?>> GetExistingGroupOrNewWithName(string groupName)
-    {
-        try
-        {
-            var group = await _applicationContext.Groups.FindAsync(groupName);
-        
-            if (group != null)
-            {
-                return group;
-            }
-
-            group = new GroupEntity()
-            {
-                GroupName = groupName,
-                Students = new List<StudentEntity>(),
-                Curator = null,
-                CuratorGuid = null
-            };
-
-            await CreateGroupAsync(group);
-
-            return group;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            return new Result<GroupEntity?>(e);
-        }
-    }
-
-    public async Task<Result<Unit>> CreateGroupAsync(GroupEntity groupEntity)
-    {
-        try
-        {
-            await _applicationContext.Groups.AddAsync(groupEntity);
-            await _applicationContext.SaveChangesAsync();
-        
-            return Unit.Default;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<Unit>(err);
-        }
-    }
-
-    public async Task<Result<GroupEntity?>> GetGroupAsync(string groupName)
-    {
-        try
-        {
-            var group = await _applicationContext.Groups.FindAsync(groupName);
-            return group;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<GroupEntity?>(err);
-        }
-    }
-
-    public async Task<Result<Unit>> UpdateGroupAsync(GroupEntity updatedGroup)
-    {
-        try
-        {
-            var group = await _applicationContext.Groups.FindAsync(updatedGroup.GroupName);
-
-            group = updatedGroup;
-
-            _applicationContext.Groups.Update(group);
-            await _applicationContext.SaveChangesAsync();
-            
-            return Unit.Default;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<Unit>(err);
-        }
-    }
-
-    public async Task<Result<Unit>> DeleteGroupAsync(string groupName)
-    {
-        try
-        {
-            await _applicationContext.Groups.Where(g => g.GroupName == groupName).ExecuteDeleteAsync();
-            return Unit.Default;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<Unit>(err);
         }
     }
 }
