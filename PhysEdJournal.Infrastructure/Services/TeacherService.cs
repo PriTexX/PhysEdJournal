@@ -1,24 +1,20 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
-using static PhysEdJournal.Infrastructure.Services.StaticFunctions.TeacherServiceFunctions;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class TeacherService : ITeacherService
 {
-    private readonly ILogger<TeacherService> _logger;
     private readonly ApplicationContext _applicationContext;
 
-    public TeacherService(ApplicationContext applicationContext, ILogger<TeacherService> logger)
+    public TeacherService(ApplicationContext applicationContext)
     {
-        _logger = logger;
         _applicationContext = applicationContext;
     }
     
@@ -41,7 +37,6 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during updating teacher's permissions. Teacher guid: {teacherGuid}", teacherGuid);
             return new Result<TeacherEntity>(e);
         }
     }
@@ -66,7 +61,6 @@ public sealed class TeacherService : ITeacherService
         }
         catch (Exception err)
         {
-            _logger.LogError(err, "Error during teacher creation. Teacher: {teacherEntity}", teacherEntity);
             return new Result<Unit>(err);
         }
     }

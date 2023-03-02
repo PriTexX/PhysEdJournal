@@ -1,7 +1,6 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
@@ -13,16 +12,14 @@ namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class StudentService : IStudentService
 {
-    private readonly ILogger<StudentService> _logger;
     private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
     private readonly int _pointAmount; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, ILogger<StudentService> logger)
+    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService)
     {
-        _logger = logger;
         _groupService = groupService;
         _applicationContext = applicationContext;
         _pointAmount = options.Value.PointBorderForSemester;
@@ -51,7 +48,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error adding points to student with guid: {studentGuid}. With points history entity: {pointsHistory}", pointsStudentHistoryEntity.StudentGuid, pointsStudentHistoryEntity);
             return new Result<Unit>(e);
         }
     }
@@ -84,7 +80,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception err)
         {
-            _logger.LogError(err, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, teacherGuid);
             return new Result<Unit>(err);
         }
     }
@@ -119,7 +114,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during archiving. Student guid: {studentGuid}", studentGuid);
             return new Result<ArchivedStudentEntity>(e);
         }
     }
@@ -147,7 +141,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during archiving. Student guid: {studentGuid}", studentGuid);
             return new Result<ArchivedStudentEntity>(e);
         }
     }
@@ -183,7 +176,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during archiving student's semester history. Student guid: {studentGuid}", studentGuid);
             return new Result<Unit>(e);
         }
     }
@@ -224,7 +216,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during updating students' info in database");
             return new Result<Unit>(e);
         }
     }

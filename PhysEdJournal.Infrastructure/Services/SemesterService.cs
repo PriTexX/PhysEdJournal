@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using LanguageExt;
 using LanguageExt.Common;
-using Microsoft.Extensions.Logging;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
@@ -12,11 +11,9 @@ namespace PhysEdJournal.Infrastructure.Services;
 public sealed class SemesterService : ISemesterService
 {
     private readonly ApplicationContext _applicationContext;
-    private readonly ILogger<SemesterService> _logger;
 
-    public SemesterService(ApplicationContext applicationContext, ILogger<SemesterService> logger)
+    public SemesterService(ApplicationContext applicationContext)
     {
-        _logger = logger;
         _applicationContext = applicationContext;
     }
 
@@ -36,7 +33,6 @@ public sealed class SemesterService : ISemesterService
         }
         catch (Exception err)
         {
-            _logger.LogError(err, "Error during starting a new semester");
             return new Result<Unit>(err);
         }
     }

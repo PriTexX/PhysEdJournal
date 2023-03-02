@@ -1,7 +1,6 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
@@ -14,14 +13,12 @@ namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class GroupService : IGroupService
 {
-    private readonly ILogger<GroupService> _logger;
     private readonly ApplicationContext _applicationContext;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
 
-    public GroupService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, ILogger<GroupService> logger)
+    public GroupService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options)
     {
-        _logger = logger;
         _applicationContext = applicationContext;
         _userInfoServerURL = options.Value.UserInfoServerURL;
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
@@ -55,7 +52,6 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during assigning curator with guid: {teacherGuid} to group with name: {groupName}", teacherGuid, groupName);
             return new Result<Unit>(e);
         }
     }
@@ -85,7 +81,6 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during setting group's visit value {visitValue} to group with name: {groupName}", newVisitValue, groupName);
             return new Result<Unit>(e);
         }
     }
@@ -113,7 +108,6 @@ public sealed class GroupService : IGroupService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during updating groups' info in database");
             return new Result<Unit>(e);
         }
     }
