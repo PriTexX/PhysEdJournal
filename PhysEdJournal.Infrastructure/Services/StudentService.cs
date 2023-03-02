@@ -107,7 +107,7 @@ public sealed class StudentService : IStudentService
             if (isForceMode || 
                 (student.Visits * student.VisitValue + student.AdditionalPoints) > _pointAmount) // если превысил порог по баллам
             {
-                return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
+                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
             }
 
             await _applicationContext.Students
@@ -124,7 +124,7 @@ public sealed class StudentService : IStudentService
         }
     }
     
-    private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
+    private async Task<Result<ArchivedStudentEntity>> ArchiveAsync(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
     {
         try
         {
@@ -141,7 +141,7 @@ public sealed class StudentService : IStudentService
             _applicationContext.ArchivedStudents.Add(archivedStudent);
             await _applicationContext.SaveChangesAsync();
 
-            var res = await ArchiveCurrentSemesterHistory(studentGuid);
+            var res = await ArchiveCurrentSemesterHistoryAsync(studentGuid);
 
             return res.Match(_ => archivedStudent, exception => new Result<ArchivedStudentEntity>(exception));
         }
@@ -152,7 +152,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    private async Task<Result<Unit>> ArchiveCurrentSemesterHistory(string studentGuid)
+    private async Task<Result<Unit>> ArchiveCurrentSemesterHistoryAsync(string studentGuid)
     {
         try
         {
