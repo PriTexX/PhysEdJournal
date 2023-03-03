@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
+using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
@@ -10,17 +11,16 @@ namespace PhysEdJournal.Tests;
 
 public class GroupServiceTests
 {
-    private readonly ApplicationContext _context;
-    private readonly GroupService _groupService;
+    private readonly DbContextOptions<ApplicationContext> _contextOptions;
 
-    public GroupServiceTests()
+    private ApplicationContext CreateContext()
     {
-        var options = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseInMemoryDatabase("Guid.NewGuid().ToString()")
-            .Options;
-        _context = new ApplicationContext(options);
+        return new ApplicationContext(_contextOptions);
+    }
 
-        _groupService = new GroupService(_context, Options.Create(new ApplicationOptions
+    private GroupService CreateGroupService(ApplicationContext context)
+    {
+        return new GroupService(context, Options.Create(new ApplicationOptions
         {
             UserInfoServerURL = null,
             PageSizeToQueryUserInfoServer = 0,
@@ -28,19 +28,28 @@ public class GroupServiceTests
         }));
     }
 
+    public GroupServiceTests()
+    {
+        _contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+    }
+
     [Fact]
     public async Task AssignCuratorAsync_WithExistingGroupAndTeacher_ShouldAssignCuratorToGroup()
     {
         // Arrange
-        var teacher = new TeacherEntity() { TeacherGuid = Guid.NewGuid().ToString(), FullName = "teacher"};
-        var group = new GroupEntity() { GroupName = "test-group" };
-        _context.Teachers.Add(teacher);
-        _context.Groups.Add(group);
-        await _context.SaveChangesAsync();
+        var context = CreateContext();
+        var groupService = CreateGroupService(context);
+        var teacher = new TeacherEntity { TeacherGuid = Guid.NewGuid().ToString(), FullName = "teacher"};
+        var group = new GroupEntity { GroupName = "test-group" };
+        context.Teachers.Add(teacher);
+        context.Groups.Add(group);
+        await context.SaveChangesAsync();
 
         // Act
-        var result = await _groupService.AssignCuratorAsync(group.GroupName, teacher.TeacherGuid);
-        group = await _context.Groups.FindAsync(group.GroupName);
+        var result = await groupService.AssignCuratorAsync(group.GroupName, teacher.TeacherGuid);
+        group = await context.Groups.FindAsync(group.GroupName);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -51,14 +60,16 @@ public class GroupServiceTests
     public async Task AssignCuratorAsync_WithNonExistingGroup_ShouldReturnGroupNotFoundException()
     {
         // Arrange
-        var teacher = new TeacherEntity() { TeacherGuid = Guid.NewGuid().ToString(), FullName = "Teacher1"};
+        var context = CreateContext();
+        var groupService = CreateGroupService(context);
+        var teacher = new TeacherEntity { TeacherGuid = Guid.NewGuid().ToString(), FullName = "Teacher1"};
         var groupName = "non-existing-group";
         
-        _context.Teachers.Add(teacher);
-        await _context.SaveChangesAsync();
+        context.Teachers.Add(teacher);
+        await context.SaveChangesAsync();
 
         // Act
-        var result = await _groupService.AssignCuratorAsync(groupName, teacher.TeacherGuid);
+        var result = await groupService.AssignCuratorAsync(groupName, teacher.TeacherGuid);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -73,19 +84,21 @@ public class GroupServiceTests
     public async Task AssignCuratorAsync_WithNonExistingTeacher_ShouldReturnTeacherNotFoundException()
     {
         // Arrange
+        var context = CreateContext();
+        var groupService = CreateGroupService(context);
         var teacherGuid = Guid.NewGuid().ToString();
         var group = new GroupEntity() { GroupName = "test-group" };
-        _context.Groups.Add(group);
-        await _context.SaveChangesAsync();
+        context.Groups.Add(group);
+        await context.SaveChangesAsync();
 
         // Act
-        var result = await _groupService.AssignCuratorAsync(group.GroupName, teacherGuid);
+        var result = await groupService.AssignCuratorAsync(group.GroupName, teacherGuid);
 
         // Assert
         Assert.False(result.IsSuccess);
         result.Match(_ => true, exception =>
         {
-            Assert.IsType<GroupNotFoundException>(exception);
+            Assert.IsType<TeacherNotFoundException>(exception);
             return true;
         });
     }
