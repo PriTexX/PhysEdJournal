@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using HotChocolate.Types.Pagination;
 using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
@@ -39,6 +39,7 @@ public class Startup
             .BindRuntimeType<Success, SuccessType>()
             .BindRuntimeType<DateOnly, DateOnlyType>()
             .AddTypeExtension<TeacherQueryExtensions>()
+            .AddTypeExtension<StudentQueryExtensions>()
             .AddMutationType<Mutation>()
             .AddTypeExtension<TeacherMutationExtensions>()
             .AddTypeExtension<GroupMutationExtensions>()
@@ -46,7 +47,13 @@ public class Startup
             .AddTypeExtension<StudentMutationExtensions>()
             .AddProjections()
             .AddFiltering()
-            .AddSorting();
+            .AddSorting()
+            .SetPagingOptions(new PagingOptions
+            {
+                MaxPageSize = 200,
+                DefaultPageSize = 30,
+                IncludeTotalCount = true
+            });
 
         services.AddEndpointsApiExplorer();
     }
