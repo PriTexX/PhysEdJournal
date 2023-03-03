@@ -13,6 +13,7 @@ public class Query
         return context.Students.Where(s => s.StudentGuid == guid);
     }
     
+    [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
     public IQueryable<StudentEntity> GetStudents(ApplicationContext context)
@@ -20,20 +21,15 @@ public class Query
         return context.Students;
     }
     
+    [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
     public IQueryable<ArchivedStudentEntity> GetArchivedStudents(ApplicationContext context)
     {
         return context.ArchivedStudents;
     }
-    
-    [UseProjection]
-    [UseFiltering]
-    public IQueryable<PointsStudentHistoryEntity?> GetStudentPointsHistory(ApplicationContext context, string guid)
-    {
-        return context.StudentsPointsHistory.Where(s => s.StudentGuid == guid);
-    }
-    
+
+    [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
     public IQueryable<PointsStudentHistoryEntity?> GetPointsHistory(ApplicationContext context)
@@ -41,6 +37,7 @@ public class Query
         return context.StudentsPointsHistory;
     }
 
+    [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
     public IQueryable<GroupEntity> GetGroups(ApplicationContext context)
@@ -56,6 +53,7 @@ public class Query
         return context.Teachers.Where(t => t.TeacherGuid == guid);
     }
     
+    [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
     public IQueryable<TeacherEntity> GetTeachers(ApplicationContext context)

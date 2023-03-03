@@ -8,10 +8,14 @@ namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 public class SemesterMutationExtensions
 {
     [Error(typeof(SemesterNameValidationException))]
-    public async Task<Success> StartNewSemester(string semesterName, [Service] ISemesterService semesterService)
+    public async Task<Success> StartNewSemester(string semesterName, [Service] ISemesterService semesterService, [Service] ILogger<ISemesterService> logger)
     {
         var res = await semesterService.StartNewSemesterAsync(semesterName);
-        throw new SemesterNameValidationException();
-        return res.Match(_ => true, exception => throw exception);
+        
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error during starting a new semester");
+            throw exception;
+        });
     }
 }

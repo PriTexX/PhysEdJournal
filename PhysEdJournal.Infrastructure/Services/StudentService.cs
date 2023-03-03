@@ -1,7 +1,6 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
@@ -13,16 +12,14 @@ namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class StudentService : IStudentService
 {
-    private readonly ILogger<StudentService> _logger;
     private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
     private readonly int _pointAmount; // Кол-во баллов для получения зачета
     
-    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, ILogger<StudentService> logger)
+    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService)
     {
-        _logger = logger;
         _groupService = groupService;
         _applicationContext = applicationContext;
         _pointAmount = options.Value.PointBorderForSemester;
@@ -51,7 +48,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
             return new Result<Unit>(e);
         }
     }
@@ -84,7 +80,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception err)
         {
-            _logger.LogError(err, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, teacherGuid);
             return new Result<Unit>(err);
         }
     }
@@ -107,7 +102,7 @@ public sealed class StudentService : IStudentService
             if (isForceMode || 
                 (student.Visits * student.VisitValue + student.AdditionalPoints) > _pointAmount) // если превысил порог по баллам
             {
-                return await Archive(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
+                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
             }
 
             await _applicationContext.Students
@@ -119,12 +114,11 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during archiving. Student guid: {studentGuid}", studentGuid);
             return new Result<ArchivedStudentEntity>(e);
         }
     }
     
-    private async Task<Result<ArchivedStudentEntity>> Archive(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
+    private async Task<Result<ArchivedStudentEntity>> ArchiveAsync(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
     {
         try
         {
@@ -141,18 +135,17 @@ public sealed class StudentService : IStudentService
             _applicationContext.ArchivedStudents.Add(archivedStudent);
             await _applicationContext.SaveChangesAsync();
 
-            var res = await ArchiveCurrentSemesterHistory(studentGuid);
+            var res = await ArchiveCurrentSemesterHistoryAsync(studentGuid);
 
             return res.Match(_ => archivedStudent, exception => new Result<ArchivedStudentEntity>(exception));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during archiving. Student guid: {studentGuid}", studentGuid);
             return new Result<ArchivedStudentEntity>(e);
         }
     }
 
-    private async Task<Result<Unit>> ArchiveCurrentSemesterHistory(string studentGuid)
+    private async Task<Result<Unit>> ArchiveCurrentSemesterHistoryAsync(string studentGuid)
     {
         try
         {
@@ -183,7 +176,6 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during archiving student's semester history. Student guid: {studentGuid}", studentGuid);
             return new Result<Unit>(e);
         }
     }
@@ -224,71 +216,7 @@ public sealed class StudentService : IStudentService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error during updating students' info in database");
             return new Result<Unit>(e);
-        }
-    }
-    
-    public async Task<Result<Unit>> CreateStudentAsync(StudentEntity studentEntity)
-    {
-        try
-        {
-            _applicationContext.Students.Add(studentEntity);
-            await _applicationContext.SaveChangesAsync();
-        
-            return Unit.Default;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<Unit>(err);
-        }
-    }
-
-    public async Task<Result<StudentEntity?>> GetStudentAsync(string guid)
-    {
-        try
-        {
-            var student = await _applicationContext.Students.FindAsync(guid);
-            return student;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<StudentEntity?>(err);
-        }
-    }
-
-    public async Task<Result<Unit>> UpdateStudentAsync(StudentEntity updatedStudent)
-    {
-        try
-        {
-            var student = await _applicationContext.Students.FindAsync(updatedStudent.StudentGuid);
-
-            student = updatedStudent;
-
-            _applicationContext.Students.Update(student);
-            await _applicationContext.SaveChangesAsync();
-            
-            return Unit.Default;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<Unit>(err);
-        }
-    }
-    public async Task<Result<Unit>> DeleteStudentAsync(string guid)
-    {
-        try
-        {
-            await _applicationContext.Students.Where(s => s.StudentGuid == guid).ExecuteDeleteAsync();
-            return Unit.Default;
-        }
-        catch (Exception err)
-        {
-            _logger.LogError(err.ToString());
-            return new Result<Unit>(err);
         }
     }
 }
