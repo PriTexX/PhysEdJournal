@@ -6,7 +6,7 @@ using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
 
-namespace Test;
+namespace PhysEdJournal.Tests;
 
 public class GroupServiceTests
 {

@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Application", "PhysEdJournal.Application\PhysEdJournal.Application.csproj", "{3657C09E-19FE-4C53-9614-CDD240974923}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{B8791C2E-5725-48C9-B32D-05C34B97E6B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Tests", "PhysEdJournal.Tests\PhysEdJournal.Tests.csproj", "{B8791C2E-5725-48C9-B32D-05C34B97E6B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
