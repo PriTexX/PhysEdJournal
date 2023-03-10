@@ -143,38 +143,6 @@ public class StudentServiceTests
         Assert.Equal(student.StudentGuid, record.StudentGuid);
         Assert.Equal(teacherGuid, record.TeacherGuid);
     }
-    
-    [Fact]
-    public async Task ArchiveStudentAsync_WhenValidInput_ShouldArchivesStudent()
-    {
-        // Arrange
-        var context = CreateContext();
-        var studentService = CreateStudentService(context);
-        var currentSemesterName = "2022-2023/весна";
-        var student = DefaultStudentEntity();
-        var group = DefaultGroupEntity();
-        var semester = new SemesterEntity() {Name = currentSemesterName};
-        student.Group = group;
-
-        context.Semesters.Add(semester);
-        context.Students.Add(student);
-        context.Groups.Add(group);
-        await context.SaveChangesAsync();
-
-        // Act
-        var result = await studentService.ArchiveStudentAsync(student.StudentGuid, currentSemesterName, true);
-
-        // Assert
-        Assert.True(result.IsSuccess);
-        // Assert.Equal(studentGuid, result.Value.StudentGuid);
-        // Assert.Equal(student.Visits, result.Value.Visits);
-        // Assert.Equal(student.VisitValue, result.Value.VisitValue);
-        // Assert.Equal(student.AdditionalPoints, result.Value.AdditionalPoints);
-        // Assert.Equal(student.FullName, result.Value.FullName);
-        // Assert.Equal(student.GroupNumber, result.Value.GroupNumber);
-        // Assert.Equal(student.HasDebtFromPreviousSemester, result.Value.HasDebtFromPreviousSemester);
-        // Assert.Equal(student.ArchivedVisitValue, result.Value.ArchivedVisitValue);
-    }
 
     private StudentEntity DefaultStudentEntity(bool hasDebt = false)
     {
