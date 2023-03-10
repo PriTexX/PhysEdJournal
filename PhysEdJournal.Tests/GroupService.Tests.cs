@@ -42,7 +42,7 @@ public class GroupServiceTests
         var context = CreateContext();
         var groupService = CreateGroupService(context);
         var teacher = new TeacherEntity { TeacherGuid = Guid.NewGuid().ToString(), FullName = "teacher"};
-        var group = new GroupEntity { GroupName = "test-group" };
+        var group = DefaultGroupEntity();
         context.Teachers.Add(teacher);
         context.Groups.Add(group);
         await context.SaveChangesAsync();
@@ -87,7 +87,7 @@ public class GroupServiceTests
         var context = CreateContext();
         var groupService = CreateGroupService(context);
         var teacherGuid = Guid.NewGuid().ToString();
-        var group = new GroupEntity() { GroupName = "test-group" };
+        var group = DefaultGroupEntity();
         context.Groups.Add(group);
         await context.SaveChangesAsync();
 
@@ -101,5 +101,12 @@ public class GroupServiceTests
             Assert.IsType<TeacherNotFoundException>(exception);
             return true;
         });
+    }
+    
+    private GroupEntity DefaultGroupEntity(string groupName = "DefaultName")
+    {
+        var group = new GroupEntity {GroupName = groupName};
+
+        return group;
     }
 }

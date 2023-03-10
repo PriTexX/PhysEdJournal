@@ -3,52 +3,59 @@ using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
 
-namespace Test;
+namespace PhysEdJournal.Tests;
 
 public class SemesterServiceTests
 {
-    private readonly ApplicationContext _context;
-    private readonly SemesterService _semesterService;
+    private readonly DbContextOptions<ApplicationContext> _contextOptions;
+
+    private ApplicationContext CreateContext()
+    {
+        return new ApplicationContext(_contextOptions);
+    }
+
+    private SemesterService CreateSemesterService(ApplicationContext context)
+    {
+        return new SemesterService(context);
+    }
 
     public SemesterServiceTests()
     {
-        var options = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseInMemoryDatabase("Guid.NewGuid().ToString()")
+        _contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        
-        _context = new ApplicationContext(options);
-
-        _semesterService = new SemesterService(_context);
     }
-    
+
     [Fact]
     public async Task StartNewSemesterAsync_ValidName_ShouldCreateNewSemester()
     {
         // Arrange
+        var context = CreateContext();
+        var semesterService = CreateSemesterService(context);
         var validSemesterName = "2022-2023/spring";
 
         // Act
-        var result = await _semesterService.StartNewSemesterAsync(validSemesterName);
+        var result = await semesterService.StartNewSemesterAsync(validSemesterName);
 
         // Assert
         Assert.True(result.IsSuccess);
         
-        var semester = await _context.Semesters.FirstOrDefaultAsync(s => s.Name == validSemesterName);
+        var semester = await context.Semesters.FirstOrDefaultAsync(s => s.Name == validSemesterName);
         Assert.NotNull(semester);
         
         Assert.Equal(semester.Name, validSemesterName);
-        
-        ClearDatabase();
     }
     
     [Fact]
     public async Task StartNewSemesterAsync_InvalidName_ShouldThrowException()
     {
         // Arrange
+        var context = CreateContext();
+        var semesterService = CreateSemesterService(context);
         var semesterName = "invalid_name";
     
         // Act
-        var result = await _semesterService.StartNewSemesterAsync(semesterName);
+        var result = await semesterService.StartNewSemesterAsync(semesterName);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -57,13 +64,5 @@ public class SemesterServiceTests
             Assert.IsType<SemesterNameValidationException>(exception);
             return true;
         });
-
-        ClearDatabase();
-    }
-    
-    private void ClearDatabase()
-    {
-        _context.Semesters.RemoveRange(_context.Semesters);
-        _context.SaveChanges();
     }
 }
