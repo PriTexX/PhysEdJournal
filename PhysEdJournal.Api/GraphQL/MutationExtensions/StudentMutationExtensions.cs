@@ -1,8 +1,11 @@
 ﻿using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Api.Permissions;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
+using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using static PhysEdJournal.Api.Permissions.PermissionsConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -10,13 +13,28 @@ namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 public class StudentMutationExtensions
 {
     
-    [Error(typeof(StudentNotFound))]
-    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger,
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, 
+        [Service] ILogger<IStudentService> logger, [Service] PermissionValidator permissionValidator,
         string studentGuid, string teacherGuid, 
         int pointsAmount, DateOnly date, 
         WorkType workType, string currentSemesterName,
         string? comment = null)
     {
+        if (workType is WorkType.InternalTeam or WorkType.Activist)
+        {
+            var validationResult = await permissionValidator.ValidateTeacherPermissions(teacherGuid, ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS);
+            validationResult.Match(_ => true, exception => throw exception);
+        }
+
+        if (workType is WorkType.OnlineWork)
+        {
+            var validationResult = await permissionValidator.ValidateTeacherPermissions(teacherGuid, ADD_POINTS_FOR_LMS_PERMISSIONS);
+            validationResult.Match(_ => true, exception => throw exception);
+        }
+        
         var pointsHistory = new PointsStudentHistoryEntity
         {
             StudentGuid = studentGuid,
@@ -36,7 +54,8 @@ public class StudentMutationExtensions
         });
     }
 
-    [Error(typeof(StudentNotFound))]
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date, string teacherGuid, 
         [Service] IStudentService studentService, [Service] ILogger<IStudentService> logger)
     {
@@ -49,8 +68,12 @@ public class StudentMutationExtensions
         });
     }
 
-    [Error(typeof(StudentNotFound))]
-    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger, string studentGuid, string currentSemesterName, bool isForceMode = false)
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
+        [Service] ILogger<IStudentService> logger, 
+        string studentGuid, string currentSemesterName, bool isForceMode = false) // TODO добавить аутентификацию и проверить гуид из jwt на наличие прав админа
     {
         var res = await studentService.ArchiveStudentAsync(studentGuid, currentSemesterName, isForceMode);
 
@@ -61,7 +84,7 @@ public class StudentMutationExtensions
         });
     }
 
-    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger)
+    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger) // TODO добавить аутентификацию и проверить гуид из jwt на наличие прав админа
     {
         var res = await studentService.UpdateStudentsInfoAsync();
 

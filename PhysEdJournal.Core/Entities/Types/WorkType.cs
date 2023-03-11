@@ -6,7 +6,7 @@ public enum WorkType
     Standards, // Сдача нормативов
     GTO,
     Science,
-    OnlineWork,
+    OnlineWork, // СДО
     InternalTeam, // Сборная
     Activist
 }

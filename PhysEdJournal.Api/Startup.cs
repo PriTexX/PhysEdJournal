@@ -3,6 +3,7 @@ using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Api.Permissions;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
@@ -28,23 +29,28 @@ public class Startup
             .BindConfiguration("Application");
 
         services.AddInfrastructure(Configuration);
-
+        services.AddScoped<PermissionValidator>();
+        
         services
             .AddGraphQLServer()
             .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()
+            
             .AddQueryType<Query>()
+            .AddTypeExtension<TeacherQueryExtensions>()
+            .AddTypeExtension<StudentQueryExtensions>()
+            
             .AddType<SuccessType>()
             .AddType<DateOnlyType>()
             .BindRuntimeType<Success, SuccessType>()
             .BindRuntimeType<DateOnly, DateOnlyType>()
-            .AddTypeExtension<TeacherQueryExtensions>()
-            .AddTypeExtension<StudentQueryExtensions>()
+
             .AddMutationType<Mutation>()
             .AddTypeExtension<TeacherMutationExtensions>()
             .AddTypeExtension<GroupMutationExtensions>()
             .AddTypeExtension<SemesterMutationExtensions>()
             .AddTypeExtension<StudentMutationExtensions>()
+            
             .AddProjections()
             .AddFiltering()
             .AddSorting()
@@ -54,7 +60,7 @@ public class Startup
                 DefaultPageSize = 30,
                 IncludeTotalCount = true
             });
-
+        
         services.AddEndpointsApiExplorer();
     }
 

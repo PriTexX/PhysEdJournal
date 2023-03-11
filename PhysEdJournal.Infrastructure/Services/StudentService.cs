@@ -35,7 +35,7 @@ public sealed class StudentService : IStudentService
 
         if (student is null)
         {
-            return await Task.FromResult(new Result<Unit>(new StudentNotFound(pointsStudentHistoryEntity.StudentGuid)));
+            return await Task.FromResult(new Result<Unit>(new StudentNotFoundException(pointsStudentHistoryEntity.StudentGuid)));
         }
 
         student.AdditionalPoints += pointsStudentHistoryEntity.Points;
@@ -60,7 +60,7 @@ public sealed class StudentService : IStudentService
 
             if (student is null)
             {
-                return await Task.FromResult(new Result<Unit>(new StudentNotFound(studentGuid)));
+                return await Task.FromResult(new Result<Unit>(new StudentNotFoundException(studentGuid)));
             }
         
             student.Visits++;
@@ -96,7 +96,7 @@ public sealed class StudentService : IStudentService
 
             if (student is null)
             {
-                return new Result<ArchivedStudentEntity>(new StudentNotFound(studentGuid));
+                return new Result<ArchivedStudentEntity>(new StudentNotFoundException(studentGuid));
             }
 
             if (isForceMode || 
