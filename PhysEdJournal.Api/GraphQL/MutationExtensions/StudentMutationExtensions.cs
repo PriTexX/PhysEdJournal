@@ -1,4 +1,6 @@
-﻿using PhysEdJournal.Api.GraphQL.ScalarTypes;
+﻿using System.Security.Claims;
+using HotChocolate.AspNetCore.Authorization;
+using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Permissions;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
@@ -16,25 +18,30 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, 
+    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
         [Service] ILogger<IStudentService> logger, [Service] PermissionValidator permissionValidator,
         string studentGuid, string teacherGuid, 
         int pointsAmount, DateOnly date, 
         WorkType workType, string currentSemesterName,
         string? comment = null)
     {
-        if (workType is WorkType.InternalTeam or WorkType.Activist)
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        switch (workType)
         {
-            var validationResult = await permissionValidator.ValidateTeacherPermissions(teacherGuid, ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS);
-            validationResult.Match(_ => true, exception => throw exception);
+            case WorkType.InternalTeam or WorkType.Activist:
+            {
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS);
+                validationResult.Match(_ => true, exception => throw exception);
+                break;
+            }
+            case WorkType.OnlineWork:
+            {
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, ADD_POINTS_FOR_LMS_PERMISSIONS);
+                validationResult.Match(_ => true, exception => throw exception);
+                break;
+            }
         }
 
-        if (workType is WorkType.OnlineWork)
-        {
-            var validationResult = await permissionValidator.ValidateTeacherPermissions(teacherGuid, ADD_POINTS_FOR_LMS_PERMISSIONS);
-            validationResult.Match(_ => true, exception => throw exception);
-        }
-        
         var pointsHistory = new PointsStudentHistoryEntity
         {
             StudentGuid = studentGuid,
@@ -56,9 +63,16 @@ public class StudentMutationExtensions
 
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date, string teacherGuid, 
-        [Service] IStudentService studentService, [Service] ILogger<IStudentService> logger)
+    [Error(typeof(NotEnoughPermissionsException))]
+    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date, string teacherGuid,  
+        [Service] IStudentService studentService, [Service] PermissionValidator permissionValidator, 
+        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal)
     {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, INCREASE_VISITS_PERMISSIONS);
+        validationResult.Match(_ => true, exception => throw exception);
+        
+        
         var res = await studentService.IncreaseVisitsAsync(studentGuid, date, teacherGuid);
 
         return res.Match(_ => true, exception =>
@@ -72,9 +86,13 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
-        [Service] ILogger<IStudentService> logger, 
-        string studentGuid, string currentSemesterName, bool isForceMode = false) // TODO добавить аутентификацию и проверить гуид из jwt на наличие прав админа
+        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal, [Service] PermissionValidator permissionValidator,
+        string studentGuid, string currentSemesterName, bool isForceMode = false)
     {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, ARCHIVE_PERMISSIONS);
+        validationResult.Match(_ => true, exception => throw exception);
+        
         var res = await studentService.ArchiveStudentAsync(studentGuid, currentSemesterName, isForceMode);
 
         return res.Match(archivedStudent => archivedStudent, exception =>
@@ -83,9 +101,16 @@ public class StudentMutationExtensions
             throw exception;
         });
     }
-
-    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger) // TODO добавить аутентификацию и проверить гуид из jwt на наличие прав админа
+    
+    [Error(typeof(NotEnoughPermissionsException))]
+    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, 
+        [Service] ILogger<IStudentService> logger, [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, INCREASE_VISITS_PERMISSIONS);
+        validationResult.Match(_ => true, exception => throw exception);
+        
         var res = await studentService.UpdateStudentsInfoAsync();
 
         return res.Match(_ => true, exception =>
