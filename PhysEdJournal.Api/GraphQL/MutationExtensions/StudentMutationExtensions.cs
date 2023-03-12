@@ -103,6 +103,7 @@ public class StudentMutationExtensions
     }
     
     [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, 
         [Service] ILogger<IStudentService> logger, [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
