@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using HotChocolate.Types.Pagination;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhysEdJournal.Api.GraphQL;
