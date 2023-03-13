@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
@@ -25,8 +26,12 @@ public sealed class SemesterService : ISemesterService
             {
                 return new Result<Unit>(new SemesterNameValidationException());
             }
-            
-            _applicationContext.Add(new SemesterEntity{Name = semesterName});
+
+            var currentSemester = await _applicationContext.Semesters.Where(s => s.IsCurrent == true).SingleAsync();
+            currentSemester.IsCurrent = false;
+
+            _applicationContext.Update(currentSemester);
+            _applicationContext.Add(new SemesterEntity{Name = semesterName, IsCurrent = true});
             await _applicationContext.SaveChangesAsync();
 
             return Unit.Default;
