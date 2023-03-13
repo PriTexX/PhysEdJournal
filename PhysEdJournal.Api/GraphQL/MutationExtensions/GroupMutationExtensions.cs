@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using LanguageExt;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Permissions;
 using PhysEdJournal.Application.Services;
