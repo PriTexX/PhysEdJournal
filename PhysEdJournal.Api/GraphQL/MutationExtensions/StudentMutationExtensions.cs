@@ -20,7 +20,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
         [Service] ILogger<IStudentService> logger, [Service] PermissionValidator permissionValidator,
-        string studentGuid, string teacherGuid, 
+        string studentGuid, 
         int pointsAmount, DateOnly date, 
         WorkType workType, string currentSemesterName,
         string? comment = null)
@@ -45,7 +45,7 @@ public class StudentMutationExtensions
         var pointsHistory = new PointsStudentHistoryEntity
         {
             StudentGuid = studentGuid,
-            TeacherGuid = teacherGuid,
+            TeacherGuid = callerGuid,
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
@@ -64,7 +64,7 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
-    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date, string teacherGuid,  
+    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date,  
         [Service] IStudentService studentService, [Service] PermissionValidator permissionValidator, 
         [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal)
     {
@@ -73,11 +73,11 @@ public class StudentMutationExtensions
         validationResult.Match(_ => true, exception => throw exception);
         
         
-        var res = await studentService.IncreaseVisitsAsync(studentGuid, date, teacherGuid);
+        var res = await studentService.IncreaseVisitsAsync(studentGuid, date, callerGuid);
 
         return res.Match(_ => true, exception =>
         {
-            logger.LogError(exception, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, teacherGuid);
+            logger.LogError(exception, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, callerGuid);
             throw exception;
         });
     }
