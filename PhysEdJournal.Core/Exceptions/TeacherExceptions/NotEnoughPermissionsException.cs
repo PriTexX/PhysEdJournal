@@ -1,6 +1,6 @@
 ﻿using PhysEdJournal.Core.Entities.Types;
 
-namespace PhysEdJournal.Api.Permissions;
+namespace PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
 public class NotEnoughPermissionsException : Exception
 {

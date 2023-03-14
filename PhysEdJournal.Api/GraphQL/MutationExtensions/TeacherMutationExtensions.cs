@@ -1,11 +1,10 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Api.Permissions;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
-using static PhysEdJournal.Api.Permissions.PermissionsConstants;
+using static PhysEdJournal.Core.Permissions.Constants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -17,16 +16,11 @@ public class TeacherMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     public async Task<TeacherEntity> CreateTeacherAsync(string teacherGuid, string fullName, 
-        [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger,
-        [Service] PermissionValidator permissionValidator, ClaimsPrincipal claimsPrincipal
+        [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal
         )
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        validationResult.Match(_ => true, exception => throw exception);
-        
-        
-        var result = await teacherService.CreateTeacherAsync(new TeacherEntity
+        var result = await teacherService.CreateTeacherAsync(callerGuid, new TeacherEntity
         {
             TeacherGuid = teacherGuid,
             FullName = fullName,
@@ -49,16 +43,12 @@ public class TeacherMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     public async Task<Success> GivePermissionsToTeacherAsync(string teacherGuid, IEnumerable<TeacherPermissions> permissions, 
-        [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger,
-        [Service] PermissionValidator permissionValidator, ClaimsPrincipal claimsPrincipal)
+        [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        var validationResult = await permissionValidator.ValidateTeacherPermissions(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        validationResult.Match(_ => true, exception => throw exception);
-        
         
         var teacherPermissions = permissions.Aggregate((prev, next) => prev | next);
-        var result = await teacherService.GivePermissionsAsync(teacherGuid, teacherPermissions);
+        var result = await teacherService.GivePermissionsAsync(callerGuid, teacherGuid, teacherPermissions);
         
         return result.Match(_ => true, exception =>
         {
