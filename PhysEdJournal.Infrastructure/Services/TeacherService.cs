@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
@@ -15,6 +16,7 @@ public sealed class TeacherService : ITeacherService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;
+    private readonly IMemoryCache _memoryCache;
 
     public TeacherService(ApplicationContext applicationContext, PermissionValidator permissionValidator)
     {
@@ -22,10 +24,15 @@ public sealed class TeacherService : ITeacherService
         _permissionValidator = permissionValidator;
     }
     
-    public async Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid, string teacherGuid, TeacherPermissions type)
+    public async Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid, string teacherGuid, TeacherPermissions type) // TODO может стоит создать роль суперадмина для таких действий
     {
         try
         {
+            // if (callerGuid == teacherGuid)
+            // {
+            //     throw new ArgumentException("Cannot update your own permissions");
+            // }
+            
             await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
             
             var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
@@ -36,6 +43,11 @@ public sealed class TeacherService : ITeacherService
             }
 
             teacher.Permissions = type;
+            
+            using var entry = _memoryCache.CreateEntry(teacherGuid);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            entry.Value = teacher;
+            
             _applicationContext.Teachers.Update(teacher);
             await _applicationContext.SaveChangesAsync();
 

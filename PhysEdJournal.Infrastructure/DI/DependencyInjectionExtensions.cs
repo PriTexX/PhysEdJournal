@@ -15,6 +15,8 @@ public static class DependencyInjectionExtensions
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+        services.AddMemoryCache();
+            
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<ISemesterService, SemesterService>();
         services.AddScoped<IStudentService, StudentService>();
