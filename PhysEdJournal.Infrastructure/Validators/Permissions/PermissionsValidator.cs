@@ -2,7 +2,7 @@
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
 
-namespace PhysEdJournal.Api.Permissions;
+namespace PhysEdJournal.Infrastructure.Validators.Permissions;
 
 public class PermissionValidator
 {
@@ -13,7 +13,8 @@ public class PermissionValidator
         _applicationContext = applicationContext;
     }
 
-    public async Task<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions)
+    public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions) // TODO Заменил Task на ValueTask,
+                                                                                                                                                   // т.к. в будущем планируется добавить кэширование
     {
         var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
 
@@ -28,6 +29,13 @@ public class PermissionValidator
             return new LanguageExt.Common.Result<bool>(new NotEnoughPermissionsException(teacherGuid, teacher.Permissions, requiredPermissions));
 
         return hasEnough;
+    }
+
+    public async ValueTask ValidateTeacherPermissionsAndThrow(string teacherGuid, TeacherPermissions requiredPermissions)
+    {
+        var validationResult = await ValidateTeacherPermissions(teacherGuid, requiredPermissions);
+
+        validationResult.Match(_ => true, exception => throw exception);
     }
 
     private static bool HasEnoughPermissions(TeacherPermissions permissions, TeacherPermissions requiredPermissions)

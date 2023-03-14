@@ -6,22 +6,28 @@ using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Validators.Permissions;
+using static PhysEdJournal.Core.Permissions.Constants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class SemesterService : ISemesterService
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly PermissionValidator _permissionValidator;
 
-    public SemesterService(ApplicationContext applicationContext)
+    public SemesterService(ApplicationContext applicationContext, PermissionValidator permissionValidator)
     {
         _applicationContext = applicationContext;
+        _permissionValidator = permissionValidator;
     }
 
-    public async Task<Result<Unit>> StartNewSemesterAsync(string semesterName)
+    public async Task<Result<Unit>> StartNewSemesterAsync(string teacherGuid, string semesterName)
     {
         try
         {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            
             if (!Regex.IsMatch(semesterName, @"\d{4}-\d{4}/\w{5}"))
             {
                 return new Result<Unit>(new SemesterNameValidationException());

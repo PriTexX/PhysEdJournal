@@ -6,10 +6,10 @@ using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Api.Permissions;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
+using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Api;
 

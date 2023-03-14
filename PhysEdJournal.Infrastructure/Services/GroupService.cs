@@ -7,27 +7,33 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Validators.Permissions;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
+using static PhysEdJournal.Core.Permissions.Constants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
 public sealed class GroupService : IGroupService
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly PermissionValidator _permissionValidator;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
 
-    public GroupService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options)
+    public GroupService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, PermissionValidator permissionValidator)
     {
         _applicationContext = applicationContext;
+        _permissionValidator = permissionValidator;
         _userInfoServerURL = options.Value.UserInfoServerURL;
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
-    public async Task<Result<Unit>> AssignCuratorAsync(string groupName, string teacherGuid)
+    public async Task<Result<Unit>> AssignCuratorAsync(string callerGuid, string groupName, string teacherGuid)
     {
         try
         {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+
             var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
         
             if (teacher == null)
@@ -56,10 +62,12 @@ public sealed class GroupService : IGroupService
         }
     }
 
-    public async Task<Result<Unit>> AssignVisitValueAsync(string groupName, double newVisitValue)
+    public async Task<Result<Unit>> AssignVisitValueAsync(string callerGuid, string groupName, double newVisitValue)
     {
         try
         {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            
             if (newVisitValue < 0)
             {
                 return new Result<Unit>(new NullVisitValueException(newVisitValue));
@@ -85,10 +93,12 @@ public sealed class GroupService : IGroupService
         }
     }
 
-    public async Task<Result<Unit>> UpdateGroupsInfoAsync()
+    public async Task<Result<Unit>> UpdateGroupsInfoAsync(string callerGuid)
     {
         try
         {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            
             var distinctGroups = await GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
                 .Select(s => s.Group)
                 .Where(g => !string.IsNullOrEmpty(g))
