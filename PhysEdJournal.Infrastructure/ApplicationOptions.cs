@@ -9,4 +9,6 @@ public class ApplicationOptions
     public required int PageSizeToQueryUserInfoServer { get; init; }
     
     public required int PointBorderForSemester { get; init; }
+    
+    public required string RsaPublicKey { get; init; }
 }
