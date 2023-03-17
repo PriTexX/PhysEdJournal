@@ -48,6 +48,7 @@ public class Startup
             });
         
         services.AddAuthorization();
+        services.AddCors();
 
         services.AddInfrastructure(Configuration);
         services.AddScoped<PermissionValidator>();
@@ -89,6 +90,7 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
+        app.UseCors(builder => { builder.AllowAnyOrigin(); builder.AllowAnyHeader(); });
         app.UseRouting();
 
         app.UseAuthentication();
