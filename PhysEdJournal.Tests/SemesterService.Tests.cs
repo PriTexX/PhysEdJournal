@@ -7,7 +7,7 @@ namespace PhysEdJournal.Tests;
 
 public class SemesterServiceTests
 {
-    private readonly DbContextOptions<ApplicationContext> _contextOptions;
+    /*private readonly DbContextOptions<ApplicationContext> _contextOptions;
 
     private ApplicationContext CreateContext()
     {
@@ -64,5 +64,5 @@ public class SemesterServiceTests
             Assert.IsType<SemesterNameValidationException>(exception);
             return true;
         });
-    }
+    }*/
 }

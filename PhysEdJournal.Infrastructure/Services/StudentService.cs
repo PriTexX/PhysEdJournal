@@ -6,6 +6,7 @@ using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
+using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Validators.Permissions;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
@@ -21,6 +22,8 @@ public sealed class StudentService : IStudentService
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
     private readonly int _pointAmount; // Кол-во баллов для получения зачета
+    
+    private const int VISIT_LIFE_DAYS = 7;
     
     public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, PermissionValidator permissionValidator)
     {
@@ -54,7 +57,7 @@ public sealed class StudentService : IStudentService
 
             if (student is null)
             {
-                return await Task.FromResult(new Result<Unit>(new StudentNotFoundException(pointsStudentHistoryEntity.StudentGuid)));
+                return new Result<Unit>(new StudentNotFoundException(pointsStudentHistoryEntity.StudentGuid));
             }
 
             student.AdditionalPoints += pointsStudentHistoryEntity.Points;
@@ -75,13 +78,23 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, INCREASE_VISITS_PERMISSIONS);
-            
-            var student = await _applicationContext.Students.FindAsync(studentGuid);
+           await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, INCREASE_VISITS_PERMISSIONS);
+
+           if (date.DayNumber > DateOnly.FromDateTime(DateTime.Now).DayNumber)
+           {
+               return new Result<Unit>(new DayOfVisitBiggerThanNowException(date));
+           }
+
+           if (DateOnly.FromDateTime(DateTime.Now).DayNumber-date.DayNumber > VISIT_LIFE_DAYS)
+           {
+               return new Result<Unit>(new VisitExpiredException(date));
+           }
+
+           var student = await _applicationContext.Students.FindAsync(studentGuid);
 
             if (student is null)
             {
-                return await Task.FromResult(new Result<Unit>(new StudentNotFoundException(studentGuid)));
+                return new Result<Unit>(new StudentNotFoundException(studentGuid));
             }
         
             student.Visits++;
@@ -92,6 +105,13 @@ public sealed class StudentService : IStudentService
                 StudentGuid = studentGuid,
                 TeacherGuid = teacherGuid
             };
+
+            var recordCopy = await _applicationContext.StudentsVisitsHistory.FindAsync(record.Date, record.StudentGuid);
+
+            if (recordCopy is not null)
+            {
+                return new Result<Unit>(new VisitAlreadyExistsException(date));
+            }
 
             _applicationContext.StudentsVisitsHistory.Add(record);
             _applicationContext.Students.Update(student);

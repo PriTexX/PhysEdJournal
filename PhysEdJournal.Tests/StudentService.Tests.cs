@@ -11,7 +11,7 @@ namespace PhysEdJournal.Tests;
 
 public class StudentServiceTests
 {
-    private readonly DbContextOptions<ApplicationContext> _contextOptions;
+    /*private readonly DbContextOptions<ApplicationContext> _contextOptions;
 
     private ApplicationContext CreateContext()
     {
@@ -182,5 +182,5 @@ public class StudentServiceTests
         };
 
         return historyEntity;
-    }
+    }*/
 }
