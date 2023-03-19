@@ -1,8 +1,10 @@
-﻿using PhysEdJournal.Api.GraphQL.ScalarTypes;
+﻿using System.Security.Claims;
+using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
+using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -10,9 +12,12 @@ namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 public class StudentMutationExtensions
 {
     
-    [Error(typeof(StudentNotFound))]
-    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger,
-        string studentGuid, string teacherGuid, 
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
+        [Service] ILogger<IStudentService> logger,
+        string studentGuid, 
         int pointsAmount, DateOnly date, 
         WorkType workType, string currentSemesterName,
         string? comment = null)
@@ -20,7 +25,7 @@ public class StudentMutationExtensions
         var pointsHistory = new PointsStudentHistoryEntity
         {
             StudentGuid = studentGuid,
-            TeacherGuid = teacherGuid,
+            TeacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid"),
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
@@ -36,10 +41,15 @@ public class StudentMutationExtensions
         });
     }
 
-    [Error(typeof(StudentNotFound))]
-    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date, string teacherGuid, 
-        [Service] IStudentService studentService, [Service] ILogger<IStudentService> logger)
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date,  
+        [Service] IStudentService studentService, 
+        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal)
     {
+        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+
         var res = await studentService.IncreaseVisitsAsync(studentGuid, date, teacherGuid);
 
         return res.Match(_ => true, exception =>
@@ -49,10 +59,16 @@ public class StudentMutationExtensions
         });
     }
 
-    [Error(typeof(StudentNotFound))]
-    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger, string studentGuid, string currentSemesterName, bool isForceMode = false)
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
+        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal,
+        string studentGuid, string currentSemesterName, bool isForceMode = false)
     {
-        var res = await studentService.ArchiveStudentAsync(studentGuid, currentSemesterName, isForceMode);
+        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+
+        var res = await studentService.ArchiveStudentAsync(teacherGuid, studentGuid, currentSemesterName, isForceMode);
 
         return res.Match(archivedStudent => archivedStudent, exception =>
         {
@@ -60,10 +76,16 @@ public class StudentMutationExtensions
             throw exception;
         });
     }
-
-    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, [Service] ILogger<IStudentService> logger)
+    
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, 
+        [Service] ILogger<IStudentService> logger,
+        ClaimsPrincipal claimsPrincipal)
     {
-        var res = await studentService.UpdateStudentsInfoAsync();
+        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+
+        var res = await studentService.UpdateStudentsInfoAsync(teacherGuid);
 
         return res.Match(_ => true, exception =>
         {

@@ -1,16 +1,22 @@
-﻿using PhysEdJournal.Api.GraphQL.ScalarTypes;
+﻿using System.Security.Claims;
+using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
+using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using static PhysEdJournal.Core.Permissions.Constants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
 [ExtendObjectType(OperationTypeNames.Mutation)]
 public class GroupMutationExtensions
 {
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> AssignCuratorToGroup(string groupName, string teacherGuid, 
-        [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger)
+        [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
-        var res = await groupService.AssignCuratorAsync(groupName, teacherGuid);
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var res = await groupService.AssignCuratorAsync(callerGuid, groupName, teacherGuid);
         
         return res.Match(_ => true, exception =>
         {
@@ -19,11 +25,14 @@ public class GroupMutationExtensions
         });
     }
 
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NullVisitValueException))]
     public async Task<Success> AssignVisitValue(string groupName, double newVisitValue,
-        [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger)
+        [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
-        var res = await groupService.AssignVisitValueAsync(groupName, newVisitValue);
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var res = await groupService.AssignVisitValueAsync( callerGuid, groupName, newVisitValue);
 
         return res.Match(_ => true, exception =>
         {
@@ -32,9 +41,12 @@ public class GroupMutationExtensions
         });
     }
     
-    public async Task<Success> UpdateGroupsInfo([Service] IGroupService groupService, [Service] ILogger<IGroupService> logger)
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<Success> UpdateGroupsInfo([Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
-        var res = await groupService.UpdateGroupsInfoAsync();
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var res = await groupService.UpdateGroupsInfoAsync(callerGuid);
         
         return res.Match(_ => true, exception =>
         {

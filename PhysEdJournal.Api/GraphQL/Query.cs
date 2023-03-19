@@ -1,4 +1,5 @@
-﻿using PhysEdJournal.Core.Entities.DB;
+﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Api.GraphQL;
@@ -59,5 +60,19 @@ public class Query
     public IQueryable<TeacherEntity> GetTeachers(ApplicationContext context)
     {
         return context.Teachers;
+    }
+
+    public async Task<string> GetCurrentSemesterAsync(ApplicationContext context, [Service] ILogger<Query> logger)
+    {
+        try
+        {
+            var currentSemester = await context.Semesters.SingleAsync(s => s.IsCurrent == true);
+            return currentSemester.Name;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error happened during querying current semester");
+            throw;
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace PhysEdJournal.Application.Services;
 
 public interface ITeacherService
 {
-    public Task<Result<TeacherEntity>> GivePermissionsAsync(string teacherGuid, TeacherPermissions type);
+    public Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid,string teacherGuid, TeacherPermissions type);
 
-    public Task<Result<Unit>> CreateTeacherAsync(TeacherEntity teacherEntity);
+    public Task<Result<Unit>> CreateTeacherAsync(string callerGuid, TeacherEntity teacherEntity);
 }
