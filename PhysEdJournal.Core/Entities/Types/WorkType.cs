@@ -3,7 +3,6 @@
 public enum WorkType
 {
     ExternalFitness,
-    Standards, // Сдача нормативов
     GTO,
     Science,
     OnlineWork, // СДО

@@ -11,6 +11,10 @@ public class StandardsStudentHistoryEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
+    [Required]
+    [Range(0,10)]
+    public int Points { get; set; }
+    
     [Column(TypeName = "date")]
     [Required(AllowEmptyStrings = false)]
     public DateOnly Date { get; set; }
