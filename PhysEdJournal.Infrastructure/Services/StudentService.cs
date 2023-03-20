@@ -9,6 +9,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Validators.Permissions;
+using PhysEdJournal.Infrastructure.Validators.Standards;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 using static PhysEdJournal.Core.Permissions.Constants;
 
@@ -19,16 +20,19 @@ public sealed class StudentService : IStudentService
     private readonly IGroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;
+    private readonly StandardsValidator _standardsValidator;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
     private readonly int _pointAmount; // Кол-во баллов для получения зачета
     
     private const int VISIT_LIFE_DAYS = 7;
+    private const int MAX_POINTS_FOR_STANDARDS = 30;
     
-    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, PermissionValidator permissionValidator)
+    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, PermissionValidator permissionValidator, StandardsValidator standardsValidator)
     {
         _groupService = groupService;
         _permissionValidator = permissionValidator;
+        _standardsValidator = standardsValidator;
         _applicationContext = applicationContext;
         _pointAmount = options.Value.PointBorderForSemester;
         _userInfoServerURL = options.Value.UserInfoServerURL;
@@ -114,6 +118,35 @@ public sealed class StudentService : IStudentService
             }
 
             _applicationContext.StudentsVisitsHistory.Add(record);
+            _applicationContext.Students.Update(student);
+            await _applicationContext.SaveChangesAsync();
+
+            return Unit.Default;
+        }
+        catch (Exception err)
+        {
+            return new Result<Unit>(err);
+        }
+    }
+
+    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardsStudentHistoryEntity standardsStudentHistoryEntity)
+    {
+        try
+        {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardsStudentHistoryEntity.TeacherGuid, ADD_POINTD_FOR_STANDARDS_PERMISSIONS);
+           
+            var student = await _applicationContext.Students.FindAsync(standardsStudentHistoryEntity.StudentGuid);
+
+            if (student is null)
+            {
+                return new Result<Unit>(new StudentNotFoundException(standardsStudentHistoryEntity.StudentGuid));
+            }
+
+            _standardsValidator.ValidateStudentPointsForStandards(standardsStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
+            
+            student.PointsForStandards += student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardsStudentHistoryEntity.Points;
+            
+            _applicationContext.StudentsStandardsHistory.Add(standardsStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
