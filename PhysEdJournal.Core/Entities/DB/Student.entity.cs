@@ -25,6 +25,10 @@ public sealed class StudentEntity
     [DefaultValue(0)]
     public int AdditionalPoints { get; set; }
     
+    [DefaultValue(0)]
+    [Range(0, 30)]
+    public int PointsForStandards { get; set; }
+    
     [ForeignKey("GroupNumber")]
     public GroupEntity? Group { get; set; }
 

@@ -8,6 +8,7 @@ public sealed class ApplicationContext : DbContext
     public DbSet<GroupEntity> Groups { get; set; }
     public DbSet<PointsStudentHistoryEntity> StudentsPointsHistory { get; set; }
     public DbSet<VisitStudentHistoryEntity> StudentsVisitsHistory { get; set; }
+    public DbSet<StandardsStudentHistoryEntity> StudentsStandardsHistory { get; set; }
     public DbSet<StudentEntity> Students { get; set; }
     public DbSet<TeacherEntity> Teachers { get; set; }
     public DbSet<ArchivedStudentEntity> ArchivedStudents { get; set; }
