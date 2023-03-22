@@ -7,7 +7,7 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Validators.Permissions;
-using static PhysEdJournal.Core.Permissions.Constants;
+using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
@@ -33,10 +33,13 @@ public sealed class SemesterService : ISemesterService
                 return new Result<Unit>(new SemesterNameValidationException());
             }
 
-            var currentSemester = await _applicationContext.Semesters.Where(s => s.IsCurrent == true).SingleAsync();
-            currentSemester.IsCurrent = false;
+            var currentSemester = await _applicationContext.Semesters.Where(s => s.IsCurrent == true).SingleOrDefaultAsync();
+            if (currentSemester is not null)
+            {
+                currentSemester.IsCurrent = false;
+                _applicationContext.Update(currentSemester);
+            }
 
-            _applicationContext.Update(currentSemester);
             _applicationContext.Add(new SemesterEntity{Name = semesterName, IsCurrent = true});
             await _applicationContext.SaveChangesAsync();
 

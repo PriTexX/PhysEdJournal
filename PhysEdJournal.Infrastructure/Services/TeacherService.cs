@@ -8,7 +8,7 @@ using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Validators.Permissions;
-using static PhysEdJournal.Core.Permissions.Constants;
+using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
