@@ -20,4 +20,12 @@ public class StudentQueryExtensions
     {
         return student.VisitsStudentHistory;
     }
+    
+    [BindMember(nameof(StudentEntity.StandardsStudentHistory))]
+    [UseFiltering]
+    [UseSorting]
+    public IEnumerable<StandardStudentHistoryEntity> GetStandardsHistory([Parent] StudentEntity student)
+    {
+        return student.StandardsStudentHistory;
+    }
 }

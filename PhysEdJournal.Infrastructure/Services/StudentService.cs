@@ -11,7 +11,8 @@ using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Validators.Permissions;
 using PhysEdJournal.Infrastructure.Validators.Standards;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
-using static PhysEdJournal.Core.Permissions.Constants;
+using static PhysEdJournal.Core.Constants.PermissionConstants;
+using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
@@ -23,18 +24,13 @@ public sealed class StudentService : IStudentService
     private readonly StandardsValidator _standardsValidator;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
-    private readonly int _pointAmount; // Кол-во баллов для получения зачета
-    
-    private const int VISIT_LIFE_DAYS = 7;
-    private const int MAX_POINTS_FOR_STANDARDS = 30;
-    
+
     public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, PermissionValidator permissionValidator, StandardsValidator standardsValidator)
     {
         _groupService = groupService;
         _permissionValidator = permissionValidator;
         _standardsValidator = standardsValidator;
         _applicationContext = applicationContext;
-        _pointAmount = options.Value.PointBorderForSemester;
         _userInfoServerURL = options.Value.UserInfoServerURL;
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
@@ -110,7 +106,8 @@ public sealed class StudentService : IStudentService
                 TeacherGuid = teacherGuid
             };
 
-            var recordCopy = await _applicationContext.VisitsStudentsHistory.FindAsync(record.Date, record.StudentGuid);
+            var recordCopy = await _applicationContext.VisitsStudentsHistory
+                .Where(v => v.StudentGuid == record.StudentGuid && v.Date == record.Date).FirstOrDefaultAsync();
 
             if (recordCopy is not null)
             {
@@ -142,7 +139,7 @@ public sealed class StudentService : IStudentService
                 return new Result<Unit>(new StudentNotFoundException(standardStudentHistoryEntity.StudentGuid));
             }
 
-            _standardsValidator.ValidateStudentPointsForStandards(standardStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
+            _standardsValidator.ValidateStudentPointsForStandardsAndThrow(standardStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
             
             student.PointsForStandards += student.PointsForStandards + standardStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardStudentHistoryEntity.Points;
             
@@ -167,7 +164,7 @@ public sealed class StudentService : IStudentService
             var student = await _applicationContext.Students
                 .AsNoTracking()
                 .Where(s => s.StudentGuid == studentGuid)
-                .Select(s => new {s.Group.VisitValue, s.Visits, s.AdditionalPoints, s.FullName, s.GroupNumber, s.HasDebtFromPreviousSemester, s.ArchivedVisitValue})
+                .Select(s => new {s.Group.VisitValue, s.Visits, s.AdditionalPoints, s.PointsForStandards, s.FullName, s.GroupNumber, s.HasDebtFromPreviousSemester, s.ArchivedVisitValue})
                 .FirstOrDefaultAsync();
 
             if (student is null)
@@ -176,9 +173,11 @@ public sealed class StudentService : IStudentService
             }
 
             if (isForceMode || 
-                (student.Visits * student.VisitValue + student.AdditionalPoints) > _pointAmount) // если превысил порог по баллам
+                (student.Visits * student.VisitValue + student.AdditionalPoints + student.PointsForStandards) > POINT_AMOUNT) // если превысил порог по баллам
             {
-                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, student.VisitValue, student.AdditionalPoints, currentSemesterName);
+                var totalPoints = student.Visits * student.VisitValue + student.AdditionalPoints +
+                                  student.PointsForStandards;
+                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, totalPoints, currentSemesterName);
             }
 
             await _applicationContext.Students
@@ -194,7 +193,7 @@ public sealed class StudentService : IStudentService
         }
     }
     
-    private async Task<Result<ArchivedStudentEntity>> ArchiveAsync(string studentGuid, string fullName, string groupNumber, int visitsAmount, double visitValue, int additionalPoints, string currentSemesterName)
+    private async Task<Result<ArchivedStudentEntity>> ArchiveAsync(string studentGuid, string fullName, string groupNumber, int visitsAmount, double totalPoints, string currentSemesterName)
     {
         try
         {
@@ -203,7 +202,7 @@ public sealed class StudentService : IStudentService
                 StudentGuid = studentGuid,
                 FullName = fullName,
                 GroupNumber = groupNumber,
-                TotalPoints = visitsAmount * visitValue + additionalPoints,
+                TotalPoints = totalPoints,
                 SemesterName = currentSemesterName,
                 Visits = visitsAmount
             };
@@ -240,13 +239,19 @@ public sealed class StudentService : IStudentService
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.IsArchived, true));
 
+            await _applicationContext.StandardsStudentsHistory
+                .Where(h => h.StudentGuid == studentGuid)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(s => s.IsArchived, true));
+
             await _applicationContext.Students
                 .Where(s => s.StudentGuid == studentGuid)
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.AdditionalPoints, 0)
                     .SetProperty(s => s.Visits, 0)
                     .SetProperty(s => s.HasDebtFromPreviousSemester, false)
-                    .SetProperty(s => s.ArchivedVisitValue, 0));
+                    .SetProperty(s => s.ArchivedVisitValue, 0)
+                    .SetProperty(s => s.PointsForStandards, 0));
             
             return Unit.Default;
         }

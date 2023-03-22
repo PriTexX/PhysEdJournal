@@ -1,8 +1,8 @@
 ﻿using PhysEdJournal.Core.Entities.Types;
 
-namespace PhysEdJournal.Core.Permissions;
+namespace PhysEdJournal.Core.Constants;
 
-public static class Constants
+public static class PermissionConstants
 {
     public const TeacherPermissions ADD_POINTS_PERMISSIONS = TeacherPermissions.DefaultAccess;
     public const TeacherPermissions ADD_POINTS_FOR_LMS_PERMISSIONS = TeacherPermissions.OnlineCourseAccess;

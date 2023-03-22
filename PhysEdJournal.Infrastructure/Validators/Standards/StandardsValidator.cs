@@ -1,11 +1,9 @@
-﻿using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
+﻿using PhysEdJournal.Core.Exceptions.StudentExceptions;
+using static PhysEdJournal.Core.Constants.PointsConstants;
 namespace PhysEdJournal.Infrastructure.Validators.Standards;
 
 public class StandardsValidator
 {
-    private const int MAX_POINTS_FOR_STANDARDS = 30;
-    
     public void ValidateStudentPointsForStandardsAndThrow(int pointsToAdd, int pointsForStandards, string studentGuid)
     {
         var validationResult = ValidateStudentPointsForStandards(pointsToAdd, pointsForStandards, studentGuid);
