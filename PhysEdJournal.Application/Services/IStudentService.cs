@@ -15,5 +15,7 @@ public interface IStudentService
 
     public Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, string currentSemesterName, bool isForceMode = false);
 
+    public Task<Result<Unit>> UnArchiveStudentAsync(string teacherGuid, string studentGuid, string currentSemesterName);
+
     public Task<Result<Unit>> UpdateStudentsInfoAsync(string teacherGuid);
 }
