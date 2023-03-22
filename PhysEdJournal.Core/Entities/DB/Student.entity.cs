@@ -39,6 +39,12 @@ public sealed class StudentEntity
     [Range(1, 6)]
     public int Course { get; set; }
     
+    [Required(AllowEmptyStrings = false)]
+    public string CurrentSemesterName { get; set; }
+    
+    [ForeignKey("CurrentSemesterName")]
+    public SemesterEntity Semester { get; set; }
+    
     public int? HealthGroup { get; set; }
 
     public string? Department { get; set; }
