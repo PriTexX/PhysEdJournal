@@ -192,8 +192,8 @@ public sealed class StudentService : IStudentService
             return new Result<ArchivedStudentEntity>(e);
         }
     }
-    
-    private async Task<Result<ArchivedStudentEntity>> ArchiveAsync(string studentGuid, string fullName, string groupNumber, int visitsAmount, double totalPoints, string currentSemesterName)
+
+    private async Task<Result<ArchivedStudentEntity>> ArchiveAsync(string studentGuid, string fullName, string groupNumber, int visitsAmount, double totalPoints, string semesterName)
     {
         try
         {
@@ -203,14 +203,14 @@ public sealed class StudentService : IStudentService
                 FullName = fullName,
                 GroupNumber = groupNumber,
                 TotalPoints = totalPoints,
-                SemesterName = currentSemesterName,
+                SemesterName = semesterName,
                 Visits = visitsAmount
             };
 
-            _applicationContext.ArchivedStudents.Add(archivedStudent);
+            _applicationContext.ArchivedStudents.Add(archivedStudent); // TODO make transaction here
             await _applicationContext.SaveChangesAsync();
 
-            var res = await ArchiveCurrentSemesterHistoryAsync(studentGuid);
+            var res = await ArchiveCurrentSemesterHistoryAsync(studentGuid, semesterName);
 
             return res.Match(_ => archivedStudent, exception => new Result<ArchivedStudentEntity>(exception));
         }
@@ -220,7 +220,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    private async Task<Result<Unit>> ArchiveCurrentSemesterHistoryAsync(string studentGuid)
+    private async Task<Result<Unit>> ArchiveCurrentSemesterHistoryAsync(string studentGuid, string semesterName)
     {
         try
         {
@@ -230,7 +230,7 @@ public sealed class StudentService : IStudentService
                 .ExecuteDeleteAsync();
         
             await _applicationContext.PointsStudentsHistory
-                .Where(h => h.StudentGuid == studentGuid)
+                .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.IsArchived, true));
 
@@ -240,7 +240,7 @@ public sealed class StudentService : IStudentService
                     .SetProperty(s => s.IsArchived, true));
 
             await _applicationContext.StandardsStudentsHistory
-                .Where(h => h.StudentGuid == studentGuid)
+                .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.IsArchived, true));
 
@@ -252,6 +252,48 @@ public sealed class StudentService : IStudentService
                     .SetProperty(s => s.HasDebtFromPreviousSemester, false)
                     .SetProperty(s => s.ArchivedVisitValue, 0)
                     .SetProperty(s => s.PointsForStandards, 0));
+            
+            return Unit.Default;
+        }
+        catch (Exception e)
+        {
+            return new Result<Unit>(e);
+        }
+    }
+    
+    public async Task<Result<Unit>> UnArchiveStudentAsync(string teacherGuid, string studentGuid, string semesterName)
+    {
+        try
+        {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, ARCHIVE_PERMISSIONS);
+        
+            var student = await _applicationContext.Students.FindAsync(studentGuid);
+            if (student is null)
+            {
+                return new Result<Unit>(new StudentNotFoundException(studentGuid));
+            }
+        
+            var archivedStudent = await _applicationContext.ArchivedStudents.FindAsync(studentGuid, semesterName);
+            if (archivedStudent is null)
+            {
+                return new Result<Unit>(new ArchivedStudentNotFound(studentGuid, semesterName));
+            }
+    
+            var pointsStudentHistory = await _applicationContext.PointsStudentsHistory
+                .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
+                .ToListAsync();
+    
+            student.AdditionalPoints = pointsStudentHistory.Aggregate(0, (prev, next) => prev + next.Points);
+            
+            var standardsStudentHistory = await _applicationContext.StandardsStudentsHistory
+                .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
+                .ToListAsync();
+            
+            student.PointsForStandards = standardsStudentHistory.Aggregate(0, (prev, next) => prev + next.Points);
+    
+            student.HasDebtFromPreviousSemester = false;
+            student.ArchivedVisitValue = 0;
+            student.Visits = archivedStudent.Visits;
             
             return Unit.Default;
         }
