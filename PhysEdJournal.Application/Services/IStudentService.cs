@@ -11,7 +11,7 @@ public interface IStudentService
     
     public Task<Result<Unit>> IncreaseVisitsAsync(string studentGuid, DateOnly date, string teacherGuid);
 
-    public Task<Result<Unit>> AddPointsForStandardsAsync(StandardsStudentHistoryEntity standardsStudentHistoryEntity);
+    public Task<Result<Unit>> AddPointsForStandardsAsync(StandardStudentHistoryEntity standardStudentHistoryEntity);
 
     public Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, string currentSemesterName, bool isForceMode = false);
 

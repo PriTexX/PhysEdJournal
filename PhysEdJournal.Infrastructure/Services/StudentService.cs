@@ -66,7 +66,7 @@ public sealed class StudentService : IStudentService
 
             student.AdditionalPoints += pointsStudentHistoryEntity.Points;
             
-            _applicationContext.StudentsPointsHistory.Add(pointsStudentHistoryEntity);
+            _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
@@ -110,14 +110,14 @@ public sealed class StudentService : IStudentService
                 TeacherGuid = teacherGuid
             };
 
-            var recordCopy = await _applicationContext.StudentsVisitsHistory.FindAsync(record.Date, record.StudentGuid);
+            var recordCopy = await _applicationContext.VisitsStudentsHistory.FindAsync(record.Date, record.StudentGuid);
 
             if (recordCopy is not null)
             {
                 return new Result<Unit>(new VisitAlreadyExistsException(date));
             }
 
-            _applicationContext.StudentsVisitsHistory.Add(record);
+            _applicationContext.VisitsStudentsHistory.Add(record);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
@@ -129,24 +129,24 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardsStudentHistoryEntity standardsStudentHistoryEntity)
+    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardStudentHistoryEntity standardStudentHistoryEntity)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardsStudentHistoryEntity.TeacherGuid, ADD_POINTD_FOR_STANDARDS_PERMISSIONS);
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardStudentHistoryEntity.TeacherGuid, ADD_POINTD_FOR_STANDARDS_PERMISSIONS);
            
-            var student = await _applicationContext.Students.FindAsync(standardsStudentHistoryEntity.StudentGuid);
+            var student = await _applicationContext.Students.FindAsync(standardStudentHistoryEntity.StudentGuid);
 
             if (student is null)
             {
-                return new Result<Unit>(new StudentNotFoundException(standardsStudentHistoryEntity.StudentGuid));
+                return new Result<Unit>(new StudentNotFoundException(standardStudentHistoryEntity.StudentGuid));
             }
 
-            _standardsValidator.ValidateStudentPointsForStandards(standardsStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
+            _standardsValidator.ValidateStudentPointsForStandards(standardStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
             
-            student.PointsForStandards += student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardsStudentHistoryEntity.Points;
+            student.PointsForStandards += student.PointsForStandards + standardStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardStudentHistoryEntity.Points;
             
-            _applicationContext.StudentsStandardsHistory.Add(standardsStudentHistoryEntity);
+            _applicationContext.StandardsStudentsHistory.Add(standardStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
@@ -226,16 +226,16 @@ public sealed class StudentService : IStudentService
         try
         {
 
-            await _applicationContext.StudentsVisitsHistory
+            await _applicationContext.VisitsStudentsHistory
                 .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
                 .ExecuteDeleteAsync();
         
-            await _applicationContext.StudentsPointsHistory
+            await _applicationContext.PointsStudentsHistory
                 .Where(h => h.StudentGuid == studentGuid)
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.IsArchived, true));
 
-            await _applicationContext.StudentsVisitsHistory
+            await _applicationContext.VisitsStudentsHistory
                 .Where(h => h.StudentGuid == studentGuid)
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.IsArchived, true));

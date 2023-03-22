@@ -5,7 +5,7 @@ using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class StandardsStudentHistoryEntity
+public class StandardStudentHistoryEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,8 +16,18 @@ public class StandardsStudentHistoryEntity
     public int Points { get; set; }
     
     [Column(TypeName = "date")]
-    [Required(AllowEmptyStrings = false)]
+    [Required]
     public DateOnly Date { get; set; }
+    
+    [Required(AllowEmptyStrings = false)]
+    [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
+    public string SemesterName { get; set; }
+    
+    [ForeignKey("SemesterName")]
+    public SemesterEntity Semester { get; set; }
+    
+    [DefaultValue(false)]
+    public bool IsArchived { get; set; }
     
     [Required]
     public StandardType StandardType { get; set; }
