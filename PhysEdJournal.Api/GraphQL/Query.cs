@@ -35,7 +35,7 @@ public class Query
     [UseFiltering]
     public IQueryable<PointsStudentHistoryEntity?> GetPointsHistory(ApplicationContext context)
     {
-        return context.StudentsPointsHistory;
+        return context.PointsStudentsHistory;
     }
 
     [UseOffsetPaging]
