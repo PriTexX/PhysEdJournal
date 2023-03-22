@@ -10,44 +10,11 @@ namespace PhysEdJournal.Infrastructure.Services.StaticFunctions;
 
 public static class StudentServiceFunctions
 {
-    public static (IEnumerable<TSource>, IEnumerable<TSource>) Partition<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
-    {
-        var matches = new List<TSource>();
-        var nonMatches = new List<TSource>();
-
-        foreach (var item in source)
-        {
-            if (predicate(item))
-            {
-                matches.Add(item);
-            }
-            else
-            {
-                nonMatches.Add(item);
-            }
-        }
-
-        return (matches, nonMatches);
-    }
-    
-    public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(
-        this IEnumerable<TSource> source,
-        Func<TSource, Task<TResult>> selector)
-    {
-        var results = new List<TResult>();
-        foreach (var item in source)
-        {
-            var result = await selector(item);
-            results.Add(result);
-        }
-        return results;
-    }
-    
     public static async IAsyncEnumerable<Student> GetAllStudentsAsync(string url, int pageSize)
     {
         var query = @"query($pageSize: Int!, $skipSize: Int!) {
-            students(take: $pageSize, skip: $skipSize, filter: ""!string.IsNullOrEmpty(group)"") {
-                hasNextPage
+            students(take: $pageSize, skip: $skipSize, where: {group: {neq: """"}}) {
+                pageInfo{hasNextPage}
                 items {
                     guid
                     fullName
@@ -77,7 +44,7 @@ public static class StudentServiceFunctions
                 yield return student;
             }
             
-            if(!response.Data.Students.HasNextPage)
+            if(!response.Data.Students.PageInfo.HasNextPage)
                 break;
 
             skipSize += pageSize;
@@ -104,11 +71,11 @@ public static class StudentServiceFunctions
         await applicationContext.SaveChangesAsync();
     }
 
-    public static (bool, StudentEntity) GetUpdatedOrCreatedStudentEntities(Student studentModel, StudentEntity? dbStudent)
+    public static (bool, StudentEntity) GetUpdatedOrCreatedStudentEntities(Student studentModel, StudentEntity? dbStudent, string currentSemesterName)
     {
         if (dbStudent is null)
         {
-            return (true, CreateStudentEntityFromStudentModel(studentModel)); // if it is newly created entity then return true otherwise false
+            return (true, CreateStudentEntityFromStudentModel(studentModel, currentSemesterName)); // if it is newly created entity then return true otherwise false
         }
 
         if (dbStudent.GroupNumber != studentModel.Group)
@@ -126,7 +93,7 @@ public static class StudentServiceFunctions
         return (false, dbStudent);
     }
 
-    private static StudentEntity CreateStudentEntityFromStudentModel(Student student)
+    private static StudentEntity CreateStudentEntityFromStudentModel(Student student, string currentSemesterName)
     {
         return new StudentEntity
         {
@@ -134,7 +101,8 @@ public static class StudentServiceFunctions
             FullName = student.FullName,
             GroupNumber = student.Group,
             Course = student.Course,
-            Department = student.Department
+            Department = student.Department,
+            CurrentSemesterName = currentSemesterName
         };
     }
 }

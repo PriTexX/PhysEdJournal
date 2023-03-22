@@ -309,7 +309,13 @@ public sealed class StudentService : IStudentService
         {
             await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, INCREASE_VISITS_PERMISSIONS);
             
-            await _groupService.UpdateGroupsInfoAsync(teacherGuid);
+            var res = await _groupService.UpdateGroupsInfoAsync(teacherGuid);
+            res.Match(_ => true, exception => throw exception);
+
+            var currentSemesterName = await _applicationContext.Semesters
+                .Where(s => s.IsCurrent)
+                .Select(s => s.Name)
+                .SingleAsync();
         
             const int batchSize = 500;
             var updateTasks = GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
@@ -329,7 +335,7 @@ public sealed class StudentService : IStudentService
                         s.dbStudents.GetValueOrDefault(actualStudentGuid)
                     )))
                 .Select(d => d
-                    .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2)))
+                    .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2, currentSemesterName)))
                 .Select(s => CommitChangesToContext(_applicationContext, s.ToList()));
 
             await foreach (var updateTask in updateTasks)
