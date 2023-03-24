@@ -20,7 +20,7 @@ public class StudentMutationExtensions
         [Service] ILogger<IStudentService> logger,
         string studentGuid, 
         int pointsAmount, DateOnly date, 
-        WorkType workType, string currentSemesterName,
+        WorkType workType,
         string? comment = null)
     {
         var pointsHistory = new PointsStudentHistoryEntity
@@ -30,7 +30,6 @@ public class StudentMutationExtensions
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
-            SemesterName = currentSemesterName,
             Comment = comment
         };
         var res = await studentService.AddPointsAsync(pointsHistory);
@@ -50,7 +49,7 @@ public class StudentMutationExtensions
         [Service] ILogger<IStudentService> logger,
         string studentGuid, 
         int pointsAmount, DateOnly date, 
-        StandardType standardType, string currentSemesterName)
+        StandardType standardType)
     {
         var pointsForStandardHistory = new StandardStudentHistoryEntity()
         {
@@ -59,7 +58,6 @@ public class StudentMutationExtensions
             Points = pointsAmount,
             Date = date,
             StandardType = standardType,
-            SemesterName = currentSemesterName,
         };
         var res = await studentService.AddPointsForStandardsAsync(pointsForStandardHistory);
 
@@ -97,15 +95,30 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPointsException))]
     public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
         [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal,
-        string studentGuid, string currentSemesterName, bool isForceMode = false)
+        string studentGuid, bool isForceMode = false)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var res = await studentService.ArchiveStudentAsync(teacherGuid, studentGuid, currentSemesterName, isForceMode);
+        var res = await studentService.ArchiveStudentAsync(teacherGuid, studentGuid, isForceMode);
 
         return res.Match(archivedStudent => archivedStudent, exception =>
         {
             logger.LogError(exception, "Error during archiving. Student guid: {studentGuid}", studentGuid);
+            throw exception;
+        });
+    }
+
+    public async Task<Success> UnArchiveStudent([Service] IStudentService studentService,
+        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal, 
+        string studentGuid, string semesterName)
+    {
+        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+
+        var res = await studentService.UnArchiveStudentAsync(teacherGuid, studentGuid, semesterName);
+        
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error during unarchiving. Student guid: {studentGuid}. Semester name: {semesterName}", studentGuid, semesterName);
             throw exception;
         });
     }

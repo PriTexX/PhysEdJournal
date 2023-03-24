@@ -61,7 +61,8 @@ public sealed class StudentService : IStudentService
             }
 
             student.AdditionalPoints += pointsStudentHistoryEntity.Points;
-            
+
+            pointsStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
             _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
@@ -142,7 +143,8 @@ public sealed class StudentService : IStudentService
             _standardsValidator.ValidateStudentPointsForStandardsAndThrow(standardStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
             
             student.PointsForStandards += student.PointsForStandards + standardStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardStudentHistoryEntity.Points;
-            
+
+            standardStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
             _applicationContext.StandardsStudentsHistory.Add(standardStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
@@ -155,7 +157,7 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, string currentSemesterName, bool isForceMode = false)
+    public async Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, bool isForceMode = false)
     {
         try
         {
@@ -164,20 +166,37 @@ public sealed class StudentService : IStudentService
             var student = await _applicationContext.Students
                 .AsNoTracking()
                 .Where(s => s.StudentGuid == studentGuid)
-                .Select(s => new {s.Group.VisitValue, s.Visits, s.AdditionalPoints, s.PointsForStandards, s.FullName, s.GroupNumber, s.HasDebtFromPreviousSemester, s.ArchivedVisitValue})
+                .Select(s => new {
+                    s.Group.VisitValue, s.Visits, s.AdditionalPoints, 
+                    s.PointsForStandards, s.FullName, s.GroupNumber, 
+                    s.HasDebtFromPreviousSemester, s.ArchivedVisitValue, s.CurrentSemesterName})
                 .FirstOrDefaultAsync();
 
             if (student is null)
             {
                 return new Result<ArchivedStudentEntity>(new StudentNotFoundException(studentGuid));
             }
+            
+            var activeSemester = await _applicationContext.Semesters
+                .Where(s => s.IsCurrent)
+                .Select(s => s.Name)
+                .SingleAsync();
+
+            if (student.CurrentSemesterName == activeSemester)
+                return new Result<ArchivedStudentEntity>(new CannotMigrateToNewSemesterException(activeSemester));
 
             if (isForceMode || 
                 (student.Visits * student.VisitValue + student.AdditionalPoints + student.PointsForStandards) > POINT_AMOUNT) // если превысил порог по баллам
             {
                 var totalPoints = student.Visits * student.VisitValue + student.AdditionalPoints +
                                   student.PointsForStandards;
-                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, totalPoints, currentSemesterName);
+
+                await _applicationContext.Students
+                    .Where(s => s.StudentGuid == studentGuid)
+                    .ExecuteUpdateAsync(p => p
+                        .SetProperty(s => s.CurrentSemesterName, activeSemester));
+                    
+                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, totalPoints, student.CurrentSemesterName);
             }
 
             await _applicationContext.Students
@@ -294,6 +313,26 @@ public sealed class StudentService : IStudentService
             student.HasDebtFromPreviousSemester = false;
             student.ArchivedVisitValue = 0;
             student.Visits = archivedStudent.Visits;
+
+            _applicationContext.Students.Update(student);
+            await _applicationContext.SaveChangesAsync();
+
+            await _applicationContext.VisitsStudentsHistory
+                .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(s => s.IsArchived, false));
+
+            await _applicationContext.PointsStudentsHistory
+                .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(s => s.SemesterName, student.CurrentSemesterName)
+                    .SetProperty(s => s.IsArchived, false));
+            
+            await _applicationContext.StandardsStudentsHistory
+                .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(s => s.SemesterName, student.CurrentSemesterName)
+                    .SetProperty(s => s.IsArchived, false));
             
             return Unit.Default;
         }
