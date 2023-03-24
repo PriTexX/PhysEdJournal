@@ -5,6 +5,8 @@ using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
+using PhysEdJournal.Infrastructure.Validators.Permissions;
+using PhysEdJournal.Infrastructure.Validators.Standards;
 
 namespace PhysEdJournal.Infrastructure.DI;
 
@@ -15,6 +17,9 @@ public static class DependencyInjectionExtensions
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+        services.AddSingleton<StandardsValidator>();
+        services.AddScoped<PermissionValidator>();
+        
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<ISemesterService, SemesterService>();
         services.AddScoped<IStudentService, StudentService>();

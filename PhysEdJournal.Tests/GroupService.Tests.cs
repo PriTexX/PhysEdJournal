@@ -6,12 +6,13 @@ using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
+using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Tests;
 
 public class GroupServiceTests
 {
-    private readonly DbContextOptions<ApplicationContext> _contextOptions;
+    /*private readonly DbContextOptions<ApplicationContext> _contextOptions;
 
     private ApplicationContext CreateContext()
     {
@@ -24,8 +25,9 @@ public class GroupServiceTests
         {
             UserInfoServerURL = null,
             PageSizeToQueryUserInfoServer = 0,
-            PointBorderForSemester = 0
-        }));
+            PointBorderForSemester = 0,
+            RsaPublicKey = null
+        }), new PermissionValidator(context));
     }
 
     public GroupServiceTests()
@@ -108,5 +110,5 @@ public class GroupServiceTests
         var group = new GroupEntity {GroupName = groupName};
 
         return group;
-    }
+    }*/
 }

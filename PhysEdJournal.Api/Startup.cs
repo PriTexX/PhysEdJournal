@@ -9,7 +9,6 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Api;
 
@@ -48,10 +47,10 @@ public class Startup
             });
         
         services.AddAuthorization();
+        services.AddCors();
 
         services.AddInfrastructure(Configuration);
-        services.AddScoped<PermissionValidator>();
-        
+
         services
             .AddGraphQLServer()
             .AddAuthorization()
@@ -89,6 +88,7 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
+        app.UseCors(builder => { builder.AllowAnyOrigin(); builder.AllowAnyHeader(); });
         app.UseRouting();
 
         app.UseAuthentication();

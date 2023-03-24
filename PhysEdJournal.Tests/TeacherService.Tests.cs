@@ -12,7 +12,7 @@ namespace PhysEdJournal.Tests;
 
 public class TeacherServiceTests
 {
-    private readonly DbContextOptions<ApplicationContext> _contextOptions;
+    /*private readonly DbContextOptions<ApplicationContext> _contextOptions;
 
     private ApplicationContext CreateContext()
     {
@@ -135,5 +135,5 @@ public class TeacherServiceTests
             Permissions = permissions
         };
         return teacher;
-    }
+    }*/
 }

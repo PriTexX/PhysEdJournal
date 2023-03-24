@@ -5,6 +5,7 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -40,10 +41,41 @@ public class StudentMutationExtensions
             throw exception;
         });
     }
+    
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(OverAbundanceOfPointsForStudentException))]
+    public async Task<Success> AddPointsForStandardToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
+        [Service] ILogger<IStudentService> logger,
+        string studentGuid, 
+        int pointsAmount, DateOnly date, 
+        StandardType standardType, string currentSemesterName)
+    {
+        var pointsForStandardHistory = new StandardStudentHistoryEntity()
+        {
+            StudentGuid = studentGuid,
+            TeacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid"),
+            Points = pointsAmount,
+            Date = date,
+            StandardType = standardType,
+            SemesterName = currentSemesterName,
+        };
+        var res = await studentService.AddPointsForStandardsAsync(pointsForStandardHistory);
+
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error adding points for standard to student with guid: {studentGuid}. With points history entity: {pointsHistory}", pointsForStandardHistory.StudentGuid, pointsForStandardHistory);
+            throw exception;
+        });
+    }
 
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(VisitExpiredException))]
+    [Error(typeof(VisitAlreadyExistsException))]
+    [Error(typeof(DayOfVisitBiggerThanNowException))]
     public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date,  
         [Service] IStudentService studentService, 
         [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal)
@@ -62,6 +94,7 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(NotEnoughPointsException))]
     public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
         [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal,
         string studentGuid, string currentSemesterName, bool isForceMode = false)
