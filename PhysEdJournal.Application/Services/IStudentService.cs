@@ -13,9 +13,9 @@ public interface IStudentService
 
     public Task<Result<Unit>> AddPointsForStandardsAsync(StandardStudentHistoryEntity standardStudentHistoryEntity);
 
-    public Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, string currentSemesterName, bool isForceMode = false);
+    public Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, bool isForceMode = false);
 
-    public Task<Result<Unit>> UnArchiveStudentAsync(string teacherGuid, string studentGuid, string currentSemesterName);
+    public Task<Result<Unit>> UnArchiveStudentAsync(string teacherGuid, string studentGuid, string semesterName);
 
     public Task<Result<Unit>> UpdateStudentsInfoAsync(string teacherGuid);
 }
