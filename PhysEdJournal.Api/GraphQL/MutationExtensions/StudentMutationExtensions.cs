@@ -45,6 +45,7 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(OverAbundanceOfPointsForStudentException))]
+    [Error(typeof(NonRegularPointsValueException))]
     public async Task<Success> AddPointsForStandardToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
         [Service] ILogger<IStudentService> logger,
         string studentGuid, 
