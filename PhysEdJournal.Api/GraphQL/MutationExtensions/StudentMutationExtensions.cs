@@ -94,6 +94,7 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
+    [Error(typeof(CannotMigrateToNewSemesterException))]
     public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
         [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal,
         string studentGuid, bool isForceMode = false)
