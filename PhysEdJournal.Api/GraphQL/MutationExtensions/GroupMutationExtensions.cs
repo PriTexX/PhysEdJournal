@@ -3,7 +3,6 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -12,6 +11,7 @@ public class GroupMutationExtensions
 {
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(GroupNotFoundException))]
     public async Task<Success> AssignCuratorToGroup(string groupName, string teacherGuid, 
         [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
