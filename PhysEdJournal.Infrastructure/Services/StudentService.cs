@@ -35,6 +35,16 @@ public sealed class StudentService : IStudentService
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
+    private static bool CheckIfStudentHasDebtAndEnoughPoints(StudentEntity student)
+    {
+        if (!student.HasDebtFromPreviousSemester)
+            return false;
+        
+        var totalPoints = student.Visits * student.ArchivedVisitValue + student.AdditionalPoints +
+                          student.PointsForStandards;
+        return totalPoints >= POINT_AMOUNT;
+    }
+
     public async Task<Result<Unit>> AddPointsAsync(PointsStudentHistoryEntity pointsStudentHistoryEntity)
     {
         try
@@ -66,6 +76,13 @@ public sealed class StudentService : IStudentService
             _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
+
+            var hasDebtAndEnoughPoints = CheckIfStudentHasDebtAndEnoughPoints(student);
+            if (hasDebtAndEnoughPoints)
+            {
+                var res = await ArchiveStudentAsync(pointsStudentHistoryEntity.TeacherGuid, student.StudentGuid);
+                res.Match(_ => true, exception => throw exception);
+            }
 
             return Unit.Default;
         }
@@ -118,6 +135,13 @@ public sealed class StudentService : IStudentService
             _applicationContext.VisitsStudentsHistory.Add(record);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
+            
+            var hasDebtAndEnoughPoints = CheckIfStudentHasDebtAndEnoughPoints(student);
+            if (hasDebtAndEnoughPoints)
+            {
+                var res = await ArchiveStudentAsync(teacherGuid, student.StudentGuid);
+                res.Match(_ => true, exception => throw exception);
+            }
 
             return Unit.Default;
         }
@@ -148,6 +172,13 @@ public sealed class StudentService : IStudentService
             _applicationContext.StandardsStudentsHistory.Add(standardStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
+            
+            var hasDebtAndEnoughPoints = CheckIfStudentHasDebtAndEnoughPoints(student);
+            if (hasDebtAndEnoughPoints)
+            {
+                var res = await ArchiveStudentAsync(standardStudentHistoryEntity.TeacherGuid, student.StudentGuid);
+                res.Match(_ => true, exception => throw exception);
+            }
 
             return Unit.Default;
         }
@@ -243,7 +274,6 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-
             await _applicationContext.VisitsStudentsHistory
                 .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
                 .ExecuteDeleteAsync();
