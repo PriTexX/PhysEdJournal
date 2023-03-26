@@ -1,4 +1,4 @@
-﻿namespace PhysEdJournal.Core.Exceptions.StudentExceptions;
+﻿namespace PhysEdJournal.Core.Exceptions.StandardExceptions;
 
 public class NonRegularPointsValueException : Exception
 {

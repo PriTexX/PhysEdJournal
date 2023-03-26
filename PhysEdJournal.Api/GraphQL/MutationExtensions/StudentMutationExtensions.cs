@@ -3,6 +3,8 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions.DateExceptions;
+using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
@@ -16,6 +18,7 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(ActionFromFutureException))]
     public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
         [Service] ILogger<IStudentService> logger,
         string studentGuid, 
@@ -46,6 +49,8 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(OverAbundanceOfPointsForStudentException))]
     [Error(typeof(NonRegularPointsValueException))]
+    [Error(typeof(StandardAlreadyExistsException))]
+    [Error(typeof(ActionFromFutureException))]
     public async Task<Success> AddPointsForStandardToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
         [Service] ILogger<IStudentService> logger,
         string studentGuid, 
@@ -74,7 +79,7 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(VisitExpiredException))]
     [Error(typeof(VisitAlreadyExistsException))]
-    [Error(typeof(DayOfVisitBiggerThanNowException))]
+    [Error(typeof(ActionFromFutureException))]
     public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date,  
         [Service] IStudentService studentService, 
         [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal)
