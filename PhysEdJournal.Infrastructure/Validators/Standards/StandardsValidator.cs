@@ -1,4 +1,7 @@
-﻿using PhysEdJournal.Core.Exceptions.StudentExceptions;
+﻿using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions.StandardExceptions;
+using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 namespace PhysEdJournal.Infrastructure.Validators.Standards;
 
@@ -25,4 +28,8 @@ public class StandardsValidator
 
         return true;
     }
+
+    // public LanguageExt.Common.Result<bool> IsNewStandard(StandardType type, StandardStudentHistoryEntity standardHistory)
+    // {
+    // }
 }

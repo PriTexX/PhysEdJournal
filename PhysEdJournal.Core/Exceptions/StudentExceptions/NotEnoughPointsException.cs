@@ -2,5 +2,5 @@
 
 public sealed class NotEnoughPointsException : Exception
 {
-    public NotEnoughPointsException(string guid) : base($"Student with guid: {guid} does not have enough points"){}
+    public NotEnoughPointsException(string guid, double points) : base($"Student with guid: {guid} does not have enough points. Current points: {points}"){}
 }
