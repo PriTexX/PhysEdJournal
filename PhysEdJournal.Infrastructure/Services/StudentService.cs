@@ -176,25 +176,39 @@ public sealed class StudentService : IStudentService
         {
             await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, ARCHIVE_PERMISSIONS);
             
-            var student = await _applicationContext.Students
+            var studentFromDb = await _applicationContext.Students
                 .AsNoTracking()
                 .Where(s => s.StudentGuid == studentGuid)
-                .Select(s => new StudentEntity() {
-                    Group = s.Group, 
-                    Visits = s.Visits, 
-                    AdditionalPoints = s.AdditionalPoints, 
-                    PointsForStandards = s.PointsForStandards, 
-                    FullName = s.FullName, 
-                    GroupNumber = s.GroupNumber, 
-                    HasDebtFromPreviousSemester = s.HasDebtFromPreviousSemester, 
-                    ArchivedVisitValue = s.ArchivedVisitValue, 
-                    CurrentSemesterName = s.CurrentSemesterName})
+                .Select(s => new  {
+                    s.Group.VisitValue, 
+                    s.Visits, 
+                    s.AdditionalPoints, 
+                    s.PointsForStandards, 
+                    s.FullName, 
+                    s.GroupNumber, 
+                    s.HasDebtFromPreviousSemester, 
+                    s.ArchivedVisitValue, 
+                    s.CurrentSemesterName})
                 .FirstOrDefaultAsync();
 
-            if (student is null)
+            if (studentFromDb is null)
             {
                 return new Result<ArchivedStudentEntity>(new StudentNotFoundException(studentGuid));
             }
+
+            var student = new StudentEntity
+            {
+                Group = new GroupEntity {VisitValue = studentFromDb.VisitValue},
+                Visits = studentFromDb.Visits,
+                AdditionalPoints = studentFromDb.AdditionalPoints,
+                PointsForStandards = studentFromDb.PointsForStandards,
+                FullName = studentFromDb.FullName,
+                StudentGuid = studentGuid,
+                GroupNumber = studentFromDb.GroupNumber,
+                HasDebtFromPreviousSemester = studentFromDb.HasDebtFromPreviousSemester,
+                ArchivedVisitValue = studentFromDb.ArchivedVisitValue,
+                CurrentSemesterName = studentFromDb.CurrentSemesterName
+            };
             
             var activeSemester = await _applicationContext.Semesters
                 .Where(s => s.IsCurrent)
@@ -221,8 +235,7 @@ public sealed class StudentService : IStudentService
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.HasDebtFromPreviousSemester, true)
                     .SetProperty(s => s.ArchivedVisitValue, student.Group.VisitValue));
-            return new Result<ArchivedStudentEntity>(new NotEnoughPointsException(studentGuid, student.Visits * student.Group.VisitValue + student.AdditionalPoints +
-                student.PointsForStandards));
+            return new Result<ArchivedStudentEntity>(new NotEnoughPointsException(studentGuid, CalculateTotalPoints(student)));
         }
         catch (Exception e)
         {
