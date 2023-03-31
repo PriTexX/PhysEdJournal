@@ -52,7 +52,7 @@ public class PermissionValidator
 
     private static bool HasEnoughPermissions(TeacherPermissions permissions, TeacherPermissions requiredPermissions)
     {
-        if (permissions.HasFlag(TeacherPermissions.AdminAccess))
+        if (permissions.HasFlag(TeacherPermissions.SuperUser))
             return true;
 
         if (requiredPermissions == 0)
