@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
@@ -32,6 +33,9 @@ public sealed class StudentEntity
     [ForeignKey("GroupNumber")]
     public GroupEntity? Group { get; set; }
 
+    [DefaultValue(true)] 
+    public bool IsActive { get; set; } = true;
+
     [DefaultValue(0)]
     public int Visits { get; set; }
     
@@ -45,7 +49,8 @@ public sealed class StudentEntity
     [ForeignKey("CurrentSemesterName")]
     public SemesterEntity Semester { get; set; }
     
-    public int? HealthGroup { get; set; }
+    [DefaultValue(HealthGroupType.None)]
+    public HealthGroupType HealthGroup { get; set; }
 
     public string? Department { get; set; }
     
