@@ -18,4 +18,8 @@ public interface IStudentService
     public Task<Result<Unit>> UnArchiveStudentAsync(string teacherGuid, string studentGuid, string semesterName);
 
     public Task<Result<Unit>> UpdateStudentsInfoAsync(string teacherGuid);
+
+    public Task<Result<Unit>> DeActivateStudentAsync(string teacherGuid, string studentGuid);
+    
+    public Task<Result<Unit>> ActivateStudentAsync(string teacherGuid, string studentGuid);
 }

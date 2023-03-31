@@ -352,7 +352,59 @@ public sealed class StudentService : IStudentService
             return new Result<Unit>(e);
         }
     }
-    
+
+    public async Task<Result<Unit>> DeActivateStudentAsync(string teacherGuid, string studentGuid)
+    {
+        try
+        {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+
+            try
+            {
+                await _applicationContext.Students
+                    .Where(s => s.StudentGuid == studentGuid)
+                    .ExecuteUpdateAsync(p => p
+                        .SetProperty(s => s.IsActive, false));
+            }
+            catch (Exception e)
+            {
+                return new Result<Unit>(new StudentNotFoundException(studentGuid));
+            }
+
+            return Unit.Default;
+        }
+        catch (Exception e)
+        {
+            return new Result<Unit>(e);
+        }
+    }
+
+    public async Task<Result<Unit>> ActivateStudentAsync(string teacherGuid, string studentGuid)
+    {
+        try
+        {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+
+            try
+            {
+                await _applicationContext.Students
+                    .Where(s => s.StudentGuid == studentGuid)
+                    .ExecuteUpdateAsync(p => p
+                        .SetProperty(s => s.IsActive, true));
+            }
+            catch (Exception e)
+            {
+                return new Result<Unit>(new StudentNotFoundException(studentGuid));
+            }
+
+            return Unit.Default;
+        }
+        catch (Exception e)
+        {
+            return new Result<Unit>(e);
+        }
+    }
+
     private async Task TryValidatePermissions(string teacherGuid, WorkType workType)
     {
         switch (workType)

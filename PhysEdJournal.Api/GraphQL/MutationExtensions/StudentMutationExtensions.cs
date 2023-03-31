@@ -146,4 +146,40 @@ public class StudentMutationExtensions
             throw exception;
         });
     }
+
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(StudentNotFoundException))]
+    public async Task<Success> ActivateStudent([Service] IStudentService studentService,
+        [Service] ILogger<IStudentService> logger,
+        ClaimsPrincipal claimsPrincipal, string studentGuid)
+    {
+        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        
+        var res = await studentService.ActivateStudentAsync(teacherGuid, studentGuid);
+
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error during activating student with guid: {studentGuid}", studentGuid);
+            throw exception;
+        });
+    }
+    
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(StudentNotFoundException))]
+    public async Task<Success> DeActivateStudent([Service] IStudentService studentService,
+        [Service] ILogger<IStudentService> logger,
+        ClaimsPrincipal claimsPrincipal, string studentGuid)
+    {
+        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        
+        var res = await studentService.DeActivateStudentAsync(teacherGuid, studentGuid);
+
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error during deactivating student with guid: {studentGuid}", studentGuid);
+            throw exception;
+        });
+    }
 }
