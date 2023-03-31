@@ -27,9 +27,16 @@ public sealed class TeacherService : ITeacherService
     
     public async Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid, string teacherGuid, TeacherPermissions type)
     {
+        if (type == TeacherPermissions.SuperUser)
+            return new Result<TeacherEntity>(new CannotGrantSuperUserPermissionsException(teacherGuid));
+        
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            var requiredPermissions = type == TeacherPermissions.AdminAccess
+                ? FOR_ONLY_SUPERUSER_USE_PERMISSIONS
+                : FOR_ONLY_ADMIN_USE_PERMISSIONS;
+            
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, requiredPermissions);
             
             var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
 
