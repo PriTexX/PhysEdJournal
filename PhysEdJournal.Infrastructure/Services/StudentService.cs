@@ -232,12 +232,20 @@ public sealed class StudentService : IStudentService
             var totalPoints = CalculateTotalPoints(student);
             if (isForceMode || totalPoints > POINT_AMOUNT) // если превысил порог по баллам
             {
+                await using var transaction = await _applicationContext.Database.BeginTransactionAsync();
+                
                 await _applicationContext.Students
                     .Where(s => s.StudentGuid == studentGuid)
                     .ExecuteUpdateAsync(p => p
                         .SetProperty(s => s.CurrentSemesterName, activeSemester.Name));
-                    
-                return await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, totalPoints, student.CurrentSemesterName);
+                
+                var archiveResult = await ArchiveAsync(studentGuid, student.FullName, student.GroupNumber, student.Visits, totalPoints, student.CurrentSemesterName);
+
+                return await archiveResult.Match<Task<Result<ArchivedStudentEntity>>>(async archivedStudent =>
+                {
+                    await transaction.CommitAsync();
+                    return archivedStudent;
+                }, async exception => new Result<ArchivedStudentEntity>(exception));
             }
 
             await _applicationContext.Students
@@ -267,7 +275,7 @@ public sealed class StudentService : IStudentService
                 Visits = visitsAmount
             };
 
-            _applicationContext.ArchivedStudents.Add(archivedStudent); // TODO make transaction here
+            _applicationContext.ArchivedStudents.Add(archivedStudent); 
             await _applicationContext.SaveChangesAsync();
 
             var res = await ArchiveCurrentSemesterHistoryAsync(studentGuid, semesterName);
@@ -337,7 +345,9 @@ public sealed class StudentService : IStudentService
             {
                 return new Result<Unit>(new ArchivedStudentNotFound(studentGuid, semesterName));
             }
-    
+
+            await using var transaction = await _applicationContext.Database.BeginTransactionAsync();
+            
             var pointsStudentHistory = await _applicationContext.PointsStudentsHistory
                 .Where(h => h.StudentGuid == studentGuid && h.SemesterName == semesterName)
                 .ToListAsync();
@@ -373,7 +383,8 @@ public sealed class StudentService : IStudentService
                 .ExecuteUpdateAsync(p => p
                     .SetProperty(s => s.SemesterName, student.CurrentSemesterName)
                     .SetProperty(s => s.IsArchived, false));
-            
+
+            await transaction.CommitAsync();
             return Unit.Default;
         }
         catch (Exception e)
@@ -391,10 +402,7 @@ public sealed class StudentService : IStudentService
             var res = await _groupService.UpdateGroupsInfoAsync(teacherGuid);
             res.Match(_ => true, exception => throw exception);
 
-            var currentSemesterName = await _applicationContext.Semesters
-                .Where(s => s.IsCurrent)
-                .Select(s => s.Name)
-                .SingleAsync();
+            var currentSemesterName = (await _applicationContext.GetActiveSemester()).Name;
         
             const int batchSize = 500;
             var updateTasks = GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
