@@ -2,6 +2,7 @@
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
@@ -15,11 +16,13 @@ public sealed class SemesterService : ISemesterService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;
+    private readonly IMemoryCache _memoryCache;
 
-    public SemesterService(ApplicationContext applicationContext, PermissionValidator permissionValidator)
+    public SemesterService(ApplicationContext applicationContext, PermissionValidator permissionValidator, IMemoryCache memoryCache)
     {
         _applicationContext = applicationContext;
         _permissionValidator = permissionValidator;
+        _memoryCache = memoryCache;
     }
 
     public async Task<Result<Unit>> StartNewSemesterAsync(string teacherGuid, string semesterName)
@@ -40,8 +43,14 @@ public sealed class SemesterService : ISemesterService
                 _applicationContext.Update(currentSemester);
             }
 
-            _applicationContext.Add(new SemesterEntity{Name = semesterName, IsCurrent = true});
+            var semester = new SemesterEntity { Name = semesterName, IsCurrent = true };
+            
+            _applicationContext.Add(semester);
             await _applicationContext.SaveChangesAsync();
+            
+            using var entry = _memoryCache.CreateEntry("activeSemester");
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            entry.Value = semester;
 
             return Unit.Default;
         }
