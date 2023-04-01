@@ -18,21 +18,17 @@ public sealed class TeacherService : ITeacherService
     private readonly PermissionValidator _permissionValidator;
     private readonly IMemoryCache _memoryCache;
 
-    public TeacherService(ApplicationContext applicationContext, PermissionValidator permissionValidator)
+    public TeacherService(ApplicationContext applicationContext, PermissionValidator permissionValidator, IMemoryCache memoryCache)
     {
         _applicationContext = applicationContext;
         _permissionValidator = permissionValidator;
+        _memoryCache = memoryCache;
     }
     
-    public async Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid, string teacherGuid, TeacherPermissions type) // TODO может стоит создать роль суперадмина для таких действий
+    public async Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid, string teacherGuid, TeacherPermissions type)
     {
         try
         {
-            // if (callerGuid == teacherGuid)
-            // {
-            //     throw new ArgumentException("Cannot update your own permissions");
-            // }
-            
             await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
             
             var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);

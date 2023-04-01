@@ -17,8 +17,7 @@ public class PermissionValidator
         _memoryCache = memoryCache;
     }
 
-    public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions) // TODO Заменил Task на ValueTask,
-                                                                                                                                                   // т.к. в будущем планируется добавить кэширование
+    public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions)
     {
         _memoryCache.TryGetValue(teacherGuid, out TeacherEntity? teacher);
 
