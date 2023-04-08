@@ -144,7 +144,7 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardStudentHistoryEntity.TeacherGuid, ADD_POINTD_FOR_STANDARDS_PERMISSIONS);
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardStudentHistoryEntity.TeacherGuid, ADD_POINTS_FOR_STANDARDS_PERMISSIONS);
             
             if (standardStudentHistoryEntity.Date > DateOnly.FromDateTime(DateTime.Now))
             {
