@@ -4,7 +4,8 @@
 public enum TeacherPermissions
 {
     DefaultAccess = 0,
-    AdminAccess = 1,
-    SecretaryAccess = 2,
-    OnlineCourseAccess = 4
+    SuperUser = 1,
+    AdminAccess = 2,
+    SecretaryAccess = 4,
+    OnlineCourseAccess = 8
 }

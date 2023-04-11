@@ -42,6 +42,7 @@ public class TeacherMutationExtensions
 
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(CannotGrantSuperUserPermissionsException))]
     public async Task<Success> GivePermissionsToTeacherAsync(string teacherGuid, IEnumerable<TeacherPermissions> permissions, 
         [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
     {

@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
@@ -15,18 +16,27 @@ public sealed class TeacherService : ITeacherService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;
+    private readonly IMemoryCache _memoryCache;
 
-    public TeacherService(ApplicationContext applicationContext, PermissionValidator permissionValidator)
+    public TeacherService(ApplicationContext applicationContext, PermissionValidator permissionValidator, IMemoryCache memoryCache)
     {
         _applicationContext = applicationContext;
         _permissionValidator = permissionValidator;
+        _memoryCache = memoryCache;
     }
     
     public async Task<Result<TeacherEntity>> GivePermissionsAsync(string callerGuid, string teacherGuid, TeacherPermissions type)
     {
+        if (type == TeacherPermissions.SuperUser)
+            return new Result<TeacherEntity>(new CannotGrantSuperUserPermissionsException(teacherGuid));
+        
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            var requiredPermissions = type == TeacherPermissions.AdminAccess
+                ? FOR_ONLY_SUPERUSER_USE_PERMISSIONS
+                : FOR_ONLY_ADMIN_USE_PERMISSIONS;
+            
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, requiredPermissions);
             
             var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
 
@@ -36,6 +46,11 @@ public sealed class TeacherService : ITeacherService
             }
 
             teacher.Permissions = type;
+            
+            using var entry = _memoryCache.CreateEntry(teacherGuid);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            entry.Value = teacher;
+            
             _applicationContext.Teachers.Update(teacher);
             await _applicationContext.SaveChangesAsync();
 

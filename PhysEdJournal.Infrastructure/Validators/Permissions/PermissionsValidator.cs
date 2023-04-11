@@ -1,4 +1,6 @@
-﻿using PhysEdJournal.Core.Entities.Types;
+﻿using Microsoft.Extensions.Caching.Memory;
+using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
 
@@ -7,21 +9,31 @@ namespace PhysEdJournal.Infrastructure.Validators.Permissions;
 public class PermissionValidator
 {
     private readonly ApplicationContext _applicationContext;
+    private readonly IMemoryCache _memoryCache;
 
-    public PermissionValidator(ApplicationContext applicationContext)
+    public PermissionValidator(ApplicationContext applicationContext, IMemoryCache memoryCache)
     {
         _applicationContext = applicationContext;
+        _memoryCache = memoryCache;
     }
 
-    public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions) // TODO Заменил Task на ValueTask,
-                                                                                                                                                   // т.к. в будущем планируется добавить кэширование
+    public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions)
     {
-        var teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
+        _memoryCache.TryGetValue(teacherGuid, out TeacherEntity? teacher);
 
         if (teacher is null)
         {
-            return new LanguageExt.Common.Result<bool>(new TeacherNotFoundException(teacherGuid));
+            teacher = await _applicationContext.Teachers.FindAsync(teacherGuid);
+            
+            if (teacher is null)
+            {
+                return new LanguageExt.Common.Result<bool>(new TeacherNotFoundException(teacherGuid));
+            }
+            
+            _memoryCache.Set(teacherGuid, teacher,
+                new MemoryCacheEntryOptions{AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)});
         }
+        
         
         var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);
 
@@ -40,7 +52,7 @@ public class PermissionValidator
 
     private static bool HasEnoughPermissions(TeacherPermissions permissions, TeacherPermissions requiredPermissions)
     {
-        if (permissions.HasFlag(TeacherPermissions.AdminAccess))
+        if (permissions.HasFlag(TeacherPermissions.SuperUser))
             return true;
 
         if (requiredPermissions == 0)
