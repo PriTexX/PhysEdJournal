@@ -2,9 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhysEdJournal.Application.Services;
-using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
+using PhysEdJournal.Infrastructure.Validators.Permissions;
+using PhysEdJournal.Infrastructure.Validators.Standards;
 
 namespace PhysEdJournal.Infrastructure.DI;
 
@@ -14,6 +15,10 @@ public static class DependencyInjectionExtensions
     {
         services.AddDbContext<ApplicationContext>(options => 
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddMemoryCache();
+        services.AddScoped<PermissionValidator>();
+        services.AddScoped<StandardsValidator>();
 
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<ISemesterService, SemesterService>();
