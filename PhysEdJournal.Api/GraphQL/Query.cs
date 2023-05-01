@@ -17,6 +17,7 @@ public class Query
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
+    [UseSorting]
     public IQueryable<StudentEntity> GetStudents(ApplicationContext context)
     {
         return context.Students;
@@ -25,6 +26,7 @@ public class Query
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
+    [UseSorting]
     public IQueryable<ArchivedStudentEntity> GetArchivedStudents(ApplicationContext context)
     {
         return context.ArchivedStudents;
@@ -33,6 +35,7 @@ public class Query
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
+    [UseSorting]
     public IQueryable<PointsStudentHistoryEntity?> GetPointsHistory(ApplicationContext context)
     {
         return context.PointsStudentsHistory;
@@ -41,6 +44,7 @@ public class Query
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
+    [UseSorting]
     public IQueryable<GroupEntity> GetGroups(ApplicationContext context)
     {
         return context.Groups;
@@ -57,9 +61,19 @@ public class Query
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
+    [UseSorting]
     public IQueryable<TeacherEntity> GetTeachers(ApplicationContext context)
     {
         return context.Teachers;
+    }
+
+    [UseOffsetPaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public IQueryable<SemesterEntity> GetSemesters(ApplicationContext context)
+    {
+        return context.Semesters;
     }
 
     public async Task<string> GetCurrentSemesterAsync(ApplicationContext context, [Service] ILogger<Query> logger)
