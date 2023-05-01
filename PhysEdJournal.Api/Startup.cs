@@ -1,7 +1,10 @@
 ﻿using System.Security.Cryptography;
+using HotChocolate.Data.Filters;
+using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PhysEdJournal.Api.FilterExtensions;
 using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
@@ -74,6 +77,8 @@ public class Startup
             
             .AddProjections()
             .AddFiltering()
+            .AddConvention<IFilterConvention>(new FilterConventionExtension(x => x.AddProviderExtension(
+                new QueryableFilterProviderExtension(y => y.AddFieldHandler<QueryableStringInvariantContainsHandler>()))))
             .AddSorting()
             .SetPagingOptions(new PagingOptions
             {
