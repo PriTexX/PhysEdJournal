@@ -14,9 +14,6 @@ public sealed class VisitStudentHistoryEntity
     [Column(TypeName = "date")]
     [Required(AllowEmptyStrings = false)]
     public DateOnly Date { get; set; }
-    
-    [Required]
-    public SportType Sport { get; set; }
 
     [Required(AllowEmptyStrings = false)]
     public string TeacherGuid { get; set; }
