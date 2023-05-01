@@ -1,0 +1,12 @@
+﻿version: "3"
+
+services:
+  bot:
+    image: "ghcr.io/pritexx/physedjournal:latest"
+    restart: always
+    container_name: physedjournal
+    environment:
+      ConnectionStrings:DefaultConnection: ""
+    ports:
+      - "3333:80"
+      - "3334:443"
