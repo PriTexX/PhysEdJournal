@@ -43,7 +43,7 @@ public sealed class StudentService : IStudentService
         {
             switch (pointsStudentHistoryEntity.WorkType)
             {
-                case WorkType.InternalTeam or WorkType.Activist:
+                case WorkType.InternalTeam or WorkType.Activist or WorkType.Competition:
                 {
                     await _permissionValidator.ValidateTeacherPermissionsAndThrow(pointsStudentHistoryEntity.TeacherGuid,
                         ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS);
@@ -188,7 +188,7 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, ARCHIVE_PERMISSIONS);
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, ARCHIVE_PERMISSIONS); // TODO обернуть в транзакцию
             
             var studentFromDb = await _applicationContext.Students
                 .AsNoTracking()
@@ -397,7 +397,7 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, INCREASE_VISITS_PERMISSIONS);
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
             
             var res = await _groupService.UpdateGroupsInfoAsync(teacherGuid);
             res.Match(_ => true, exception => throw exception);

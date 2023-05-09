@@ -5,8 +5,8 @@ namespace PhysEdJournal.Core.Constants;
 public static class PermissionConstants
 {
     public const TeacherPermissions ADD_POINTS_PERMISSIONS = TeacherPermissions.DefaultAccess;
-    public const TeacherPermissions ADD_POINTS_FOR_LMS_PERMISSIONS = TeacherPermissions.OnlineCourseAccess;
-    public const TeacherPermissions ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS = TeacherPermissions.SecretaryAccess;
+    public const TeacherPermissions ADD_POINTS_FOR_LMS_PERMISSIONS = TeacherPermissions.OnlineCourseAccess | TeacherPermissions.AdminAccess;
+    public const TeacherPermissions ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS = TeacherPermissions.SecretaryAccess | TeacherPermissions.AdminAccess;
     public const TeacherPermissions INCREASE_VISITS_PERMISSIONS = TeacherPermissions.DefaultAccess;
     public const TeacherPermissions ADD_POINTS_FOR_STANDARDS_PERMISSIONS = TeacherPermissions.DefaultAccess;
     public const TeacherPermissions ARCHIVE_PERMISSIONS = FOR_ONLY_ADMIN_USE_PERMISSIONS;
