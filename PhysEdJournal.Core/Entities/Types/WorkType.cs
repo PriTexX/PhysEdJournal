@@ -7,5 +7,6 @@ public enum WorkType
     Science,
     OnlineWork, // СДО
     InternalTeam, // Сборная
-    Activist
+    Activist,
+    Competition
 }
