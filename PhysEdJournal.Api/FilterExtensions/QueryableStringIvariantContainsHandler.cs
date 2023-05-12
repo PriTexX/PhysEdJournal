@@ -15,7 +15,7 @@ public class QueryableStringInvariantContainsHandler : QueryableStringOperationH
             x => x.Name == nameof(string.ToLower) &&
                  x.GetParameters().Length == 0);
 
-    // This is used to match the handler to all `eq` fields
+    // This is used to match the handler to all `contains` fields
     protected override int Operation => DefaultFilterOperations.Contains;
 
     public override Expression HandleOperation(

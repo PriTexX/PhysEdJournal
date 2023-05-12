@@ -57,4 +57,35 @@ public class TeacherMutationExtensions
             throw exception;
         });
     }
+
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    public async Task<Success> CreateCompetition(string competitionName, [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
+    {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+
+        var result = await teacherService.CreateCompetitionAsync(callerGuid, competitionName);
+
+        return result.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error during creating competition with name: {competitionName}", competitionName);
+            throw exception;
+        });
+    }
+    
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(NotEnoughPermissionsException))]
+    [Error(typeof(CompetitionNotFoundException))]
+    public async Task<Success> DeleteCompetition(string competitionName, [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
+    {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+
+        var result = await teacherService.DeleteCompetitionAsync(callerGuid, competitionName);
+
+        return result.Match(_ => true, exception =>
+        {
+            logger.LogError(exception, "Error during deleting competitions with name: {competitionName}", competitionName);
+            throw exception;
+        });
+    }
 }

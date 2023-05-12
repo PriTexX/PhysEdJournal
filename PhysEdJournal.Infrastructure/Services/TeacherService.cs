@@ -87,4 +87,45 @@ public sealed class TeacherService : ITeacherService
             return new Result<Unit>(err);
         }
     }
+
+    public async Task<Result<Unit>> CreateCompetitionAsync(string callerGuid, string competitionName)
+    {
+        try
+        {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            
+            var comp = new CompetitionEntity{CompetitionName = competitionName};
+
+            _applicationContext.Competitions.Add(comp);
+            await _applicationContext.SaveChangesAsync();
+
+            return Unit.Default;
+        }
+        catch (Exception err)
+        {
+            return new Result<Unit>(err);
+        }
+    }
+
+    public async Task<Result<Unit>> DeleteCompetitionAsync(string callerGuid, string competitionName)
+    {
+        try
+        {
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+            
+            var comp = await _applicationContext.Competitions.FindAsync(competitionName);
+
+            if (comp is null)
+                return new Result<Unit>(new CompetitionNotFoundException(competitionName));
+
+            _applicationContext.Competitions.Remove(comp);
+            await _applicationContext.SaveChangesAsync();
+
+            return Unit.Default;
+        }
+        catch (Exception err)
+        {
+            return new Result<Unit>(err);
+        }
+    }
 }

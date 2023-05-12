@@ -89,4 +89,18 @@ public class Query
             throw;
         }
     }
+
+    [UseSorting]
+    public async Task<IEnumerable<string>> GetCompetitions(ApplicationContext context, [Service] ILogger<Query> logger)
+    {
+        try
+        {
+            return await context.Competitions.Select(c => c.CompetitionName).ToListAsync();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error happened during querying competitions");
+            throw;
+        }
+    }
 }
