@@ -89,13 +89,15 @@ public class Query
             throw;
         }
     }
-
-    [UseSorting]
+    
     public async Task<IEnumerable<string>> GetCompetitions(ApplicationContext context, [Service] ILogger<Query> logger)
     {
         try
         {
-            return await context.Competitions.Select(c => c.CompetitionName).ToListAsync();
+            return await context.Competitions
+                .Select(c => c.CompetitionName)
+                .OrderBy(name => name)
+                .ToListAsync();
         }
         catch (Exception e)
         {
