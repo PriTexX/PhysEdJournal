@@ -140,41 +140,41 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardStudentHistoryEntity standardStudentHistoryEntity)
+    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardsStudentHistoryEntity standardsStudentHistoryEntity)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardStudentHistoryEntity.TeacherGuid, ADD_POINTS_FOR_STANDARDS_PERMISSIONS);
+            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardsStudentHistoryEntity.TeacherGuid, ADD_POINTS_FOR_STANDARDS_PERMISSIONS);
             
-            if (standardStudentHistoryEntity.Date > DateOnly.FromDateTime(DateTime.Now))
+            if (standardsStudentHistoryEntity.Date > DateOnly.FromDateTime(DateTime.Now))
             {
-                return new Result<Unit>(new ActionFromFutureException(standardStudentHistoryEntity.Date));
+                return new Result<Unit>(new ActionFromFutureException(standardsStudentHistoryEntity.Date));
             }
            
-            var student = await _applicationContext.Students.FindAsync(standardStudentHistoryEntity.StudentGuid);
+            var student = await _applicationContext.Students.FindAsync(standardsStudentHistoryEntity.StudentGuid);
 
             if (student is null)
             {
-                return new Result<Unit>(new StudentNotFoundException(standardStudentHistoryEntity.StudentGuid));
+                return new Result<Unit>(new StudentNotFoundException(standardsStudentHistoryEntity.StudentGuid));
             }
 
             var allHistory = _applicationContext.StandardsStudentsHistory.ToList();
-            if (allHistory.FirstOrDefault(s => s.StandardType == standardStudentHistoryEntity.StandardType) != null)
+            if (allHistory.FirstOrDefault(s => s.StandardType == standardsStudentHistoryEntity.StandardType) != null)
             {
-                return new Result<Unit>(new StandardAlreadyExistsException(standardStudentHistoryEntity.StudentGuid,
-                    standardStudentHistoryEntity.StandardType));
+                return new Result<Unit>(new StandardAlreadyExistsException(standardsStudentHistoryEntity.StudentGuid,
+                    standardsStudentHistoryEntity.StandardType));
             }
 
-            _standardsValidator.ValidateStudentPointsForStandardsAndThrow(standardStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
+            _standardsValidator.ValidateStudentPointsForStandardsAndThrow(standardsStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
             
-            student.PointsForStandards += student.PointsForStandards + standardStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardStudentHistoryEntity.Points;
+            student.PointsForStandards += student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardsStudentHistoryEntity.Points;
 
-            standardStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
-            _applicationContext.StandardsStudentsHistory.Add(standardStudentHistoryEntity);
+            standardsStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
+            _applicationContext.StandardsStudentsHistory.Add(standardsStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
             
-            await TryArchiveStudentWithDebt(standardStudentHistoryEntity.TeacherGuid, student);
+            await TryArchiveStudentWithDebt(standardsStudentHistoryEntity.TeacherGuid, student);
 
             return Unit.Default;
         }

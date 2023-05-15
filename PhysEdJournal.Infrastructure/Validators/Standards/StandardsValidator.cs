@@ -29,7 +29,7 @@ public class StandardsValidator
         return true;
     }
 
-    // public LanguageExt.Common.Result<bool> IsNewStandard(StandardType type, StandardStudentHistoryEntity standardHistory)
+    // public LanguageExt.Common.Result<bool> IsNewStandard(StandardType type, StandardsStudentHistoryEntity standardHistory)
     // {
     // }
 }

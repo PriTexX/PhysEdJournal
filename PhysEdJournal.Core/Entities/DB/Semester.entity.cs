@@ -12,5 +12,5 @@ public sealed class SemesterEntity
     public bool IsCurrent { get; set; }
 
     public ICollection<ArchivedStudentEntity> ArchivedStudents { get; set; }
-    public ICollection<PointsStudentHistoryEntity> StudentPointsHistories { get; set; }
+    public ICollection<PointsStudentHistoryEntity> StudentPointsHistory { get; set; }
 }

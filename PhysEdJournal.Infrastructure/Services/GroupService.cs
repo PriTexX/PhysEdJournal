@@ -68,7 +68,7 @@ public sealed class GroupService : IGroupService
         {
             await _permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
             
-            if (newVisitValue < 0)
+            if (newVisitValue <= 0)
             {
                 return new Result<Unit>(new NullVisitValueException(newVisitValue));
             }

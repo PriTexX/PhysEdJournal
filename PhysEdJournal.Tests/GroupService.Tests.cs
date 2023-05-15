@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure;
@@ -12,23 +14,7 @@ namespace PhysEdJournal.Tests;
 
 public class GroupServiceTests
 {
-    /*private readonly DbContextOptions<ApplicationContext> _contextOptions;
-
-    private ApplicationContext CreateContext()
-    {
-        return new ApplicationContext(_contextOptions);
-    }
-
-    private GroupService CreateGroupService(ApplicationContext context)
-    {
-        return new GroupService(context, Options.Create(new ApplicationOptions
-        {
-            UserInfoServerURL = null,
-            PageSizeToQueryUserInfoServer = 0,
-            PointBorderForSemester = 0,
-            RsaPublicKey = null
-        }), new PermissionValidator(context));
-    }
+    private readonly DbContextOptions<ApplicationContext> _contextOptions;
 
     public GroupServiceTests()
     {
@@ -43,14 +29,16 @@ public class GroupServiceTests
         // Arrange
         var context = CreateContext();
         var groupService = CreateGroupService(context);
+        var caller = new TeacherEntity() {TeacherGuid = Guid.NewGuid().ToString(), FullName = "caller", Permissions = TeacherPermissions.SuperUser};
         var teacher = new TeacherEntity { TeacherGuid = Guid.NewGuid().ToString(), FullName = "teacher"};
         var group = DefaultGroupEntity();
+        context.Teachers.Add(caller);
         context.Teachers.Add(teacher);
         context.Groups.Add(group);
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignCuratorAsync(group.GroupName, teacher.TeacherGuid);
+        var result = await groupService.AssignCuratorAsync(caller.TeacherGuid ,group.GroupName, teacher.TeacherGuid);
         group = await context.Groups.FindAsync(group.GroupName);
 
         // Assert
@@ -64,14 +52,16 @@ public class GroupServiceTests
         // Arrange
         var context = CreateContext();
         var groupService = CreateGroupService(context);
+        var caller = new TeacherEntity() {TeacherGuid = Guid.NewGuid().ToString(), FullName = "caller", Permissions = TeacherPermissions.SuperUser};
         var teacher = new TeacherEntity { TeacherGuid = Guid.NewGuid().ToString(), FullName = "Teacher1"};
         var groupName = "non-existing-group";
-        
+
+        context.Teachers.Add(caller);
         context.Teachers.Add(teacher);
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignCuratorAsync(groupName, teacher.TeacherGuid);
+        var result = await groupService.AssignCuratorAsync(caller.TeacherGuid, groupName, teacher.TeacherGuid);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -88,13 +78,15 @@ public class GroupServiceTests
         // Arrange
         var context = CreateContext();
         var groupService = CreateGroupService(context);
+        var caller = new TeacherEntity() {TeacherGuid = Guid.NewGuid().ToString(), FullName = "caller", Permissions = TeacherPermissions.SuperUser};
         var teacherGuid = Guid.NewGuid().ToString();
         var group = DefaultGroupEntity();
+        context.Teachers.Add(caller);
         context.Groups.Add(group);
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignCuratorAsync(group.GroupName, teacherGuid);
+        var result = await groupService.AssignCuratorAsync(caller.TeacherGuid, group.GroupName, teacherGuid);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -105,10 +97,83 @@ public class GroupServiceTests
         });
     }
     
+    [Theory]
+    [InlineData(5)]
+    [InlineData(double.MaxValue)]
+    [InlineData(4)]
+    public async Task AssignVisitValueAsync_WithValidValue_ShouldAssignVisitValue(double visitValue)
+    {
+        // Arrange
+        var context = CreateContext();
+        var groupService = CreateGroupService(context);
+        var caller = new TeacherEntity {TeacherGuid = Guid.NewGuid().ToString(), FullName = "caller", Permissions = TeacherPermissions.SuperUser};
+        var group = DefaultGroupEntity();
+        context.Teachers.Add(caller);
+        context.Groups.Add(group);
+        await context.SaveChangesAsync();
+
+        // Act
+        var result = await groupService.AssignVisitValueAsync(caller.TeacherGuid, group.GroupName, visitValue);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        var groupFromDb = await context.Groups.FindAsync(group.GroupName);
+        Assert.NotNull(groupFromDb);
+        Assert.Equal(visitValue, groupFromDb.VisitValue);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(double.MinValue)]
+    public async Task AssignVisitValueAsync_WithInvalidValue_ShouldReturnNullVisitValueException(double visitValue)
+    {
+        // Arrange
+        var context = CreateContext();
+        var groupService = CreateGroupService(context);
+        var caller = new TeacherEntity {TeacherGuid = Guid.NewGuid().ToString(), FullName = "caller", Permissions = TeacherPermissions.SuperUser};
+        var group = DefaultGroupEntity();
+        context.Teachers.Add(caller);
+        context.Groups.Add(group);
+        await context.SaveChangesAsync();
+
+        // Act
+        var result = await groupService.AssignVisitValueAsync(caller.TeacherGuid, group.GroupName, visitValue);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        result.Match(_ => true, exception =>
+        {
+            Assert.IsType<NullVisitValueException>(exception);
+            return true;
+        });
+    }
+
+    private ApplicationContext CreateContext()
+    {
+        return new ApplicationContext(_contextOptions, CreateMemoryCache());
+    }
+    
+    private MemoryCache CreateMemoryCache()
+    {
+        return new MemoryCache(new MemoryCacheOptions());
+    }
+
     private GroupEntity DefaultGroupEntity(string groupName = "DefaultName")
     {
         var group = new GroupEntity {GroupName = groupName};
 
         return group;
-    }*/
+    }
+    
+    private GroupService CreateGroupService(ApplicationContext context)
+    {
+        return new GroupService(context, Options.Create(new ApplicationOptions
+        {
+            UserInfoServerURL = null,
+            PageSizeToQueryUserInfoServer = 0,
+            PointBorderForSemester = 0,
+            RsaPublicKey = null
+        }), new PermissionValidator(context, CreateMemoryCache()));
+    }
 }

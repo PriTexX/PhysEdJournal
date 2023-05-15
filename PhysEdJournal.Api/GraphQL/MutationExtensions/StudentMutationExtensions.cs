@@ -57,7 +57,7 @@ public class StudentMutationExtensions
         int pointsAmount, DateOnly date, 
         StandardType standardType)
     {
-        var pointsForStandardHistory = new StandardStudentHistoryEntity()
+        var pointsForStandardHistory = new StandardsStudentHistoryEntity()
         {
             StudentGuid = studentGuid,
             TeacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid"),

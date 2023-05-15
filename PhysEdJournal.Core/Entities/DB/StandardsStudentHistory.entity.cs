@@ -5,7 +5,7 @@ using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class StandardStudentHistoryEntity
+public class StandardsStudentHistoryEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
