@@ -5,7 +5,6 @@ using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Tests;
 
@@ -32,7 +31,7 @@ public class SemesterServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await semesterService.StartNewSemesterAsync(caller.TeacherGuid, validSemesterName);
+        var result = await semesterService.StartNewSemesterAsync(validSemesterName);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -55,7 +54,7 @@ public class SemesterServiceTests
         await context.SaveChangesAsync();
     
         // Act
-        var result = await semesterService.StartNewSemesterAsync(caller.TeacherGuid, semesterName);
+        var result = await semesterService.StartNewSemesterAsync(semesterName);
     
         // Assert
         Assert.False(result.IsSuccess);
@@ -78,6 +77,6 @@ public class SemesterServiceTests
 
     private SemesterService CreateSemesterService(ApplicationContext context)
     {
-        return new SemesterService(context, new PermissionValidator(context, CreateMemoryCache()), CreateMemoryCache());
+        return new SemesterService(context, CreateMemoryCache());
     }
 }

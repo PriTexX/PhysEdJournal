@@ -8,7 +8,6 @@ using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Tests;
 
@@ -38,7 +37,7 @@ public class GroupServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignCuratorAsync(caller.TeacherGuid ,group.GroupName, teacher.TeacherGuid);
+        var result = await groupService.AssignCuratorAsync(group.GroupName, teacher.TeacherGuid);
         group = await context.Groups.FindAsync(group.GroupName);
 
         // Assert
@@ -61,7 +60,7 @@ public class GroupServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignCuratorAsync(caller.TeacherGuid, groupName, teacher.TeacherGuid);
+        var result = await groupService.AssignCuratorAsync(groupName, teacher.TeacherGuid);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -86,7 +85,7 @@ public class GroupServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignCuratorAsync(caller.TeacherGuid, group.GroupName, teacherGuid);
+        var result = await groupService.AssignCuratorAsync(group.GroupName, teacherGuid);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -113,7 +112,7 @@ public class GroupServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignVisitValueAsync(caller.TeacherGuid, group.GroupName, visitValue);
+        var result = await groupService.AssignVisitValueAsync(group.GroupName, visitValue);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -138,7 +137,7 @@ public class GroupServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await groupService.AssignVisitValueAsync(caller.TeacherGuid, group.GroupName, visitValue);
+        var result = await groupService.AssignVisitValueAsync(group.GroupName, visitValue);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -174,6 +173,6 @@ public class GroupServiceTests
             PageSizeToQueryUserInfoServer = 0,
             PointBorderForSemester = 0,
             RsaPublicKey = null
-        }), new PermissionValidator(context, CreateMemoryCache()));
+        }));
     }
 }

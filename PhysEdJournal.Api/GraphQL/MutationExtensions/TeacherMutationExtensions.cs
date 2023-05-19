@@ -19,7 +19,7 @@ public class TeacherMutationExtensions
         )
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        var result = await teacherService.CreateTeacherAsync(callerGuid, new TeacherEntity
+        var result = await teacherService.CreateTeacherAsync(new TeacherEntity
         {
             TeacherGuid = teacherGuid,
             FullName = fullName,
@@ -48,7 +48,7 @@ public class TeacherMutationExtensions
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         
         var teacherPermissions = permissions.Aggregate((prev, next) => prev | next);
-        var result = await teacherService.GivePermissionsAsync(callerGuid, teacherGuid, teacherPermissions);
+        var result = await teacherService.GivePermissionsAsync(teacherGuid, teacherPermissions);
         
         return result.Match(_ => true, exception =>
         {
@@ -63,7 +63,7 @@ public class TeacherMutationExtensions
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var result = await teacherService.CreateCompetitionAsync(callerGuid, competitionName);
+        var result = await teacherService.CreateCompetitionAsync(competitionName);
 
         return result.Match(_ => true, exception =>
         {
@@ -79,7 +79,7 @@ public class TeacherMutationExtensions
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var result = await teacherService.DeleteCompetitionAsync(callerGuid, competitionName);
+        var result = await teacherService.DeleteCompetitionAsync(competitionName);
 
         return result.Match(_ => true, exception =>
         {

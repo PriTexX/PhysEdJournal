@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 using PhysEdJournal.Infrastructure.Validators.Standards;
 
 namespace PhysEdJournal.Infrastructure.DI;
@@ -16,7 +15,6 @@ public static class DependencyInjectionExtensions
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddSingleton<StandardsValidator>();
-        services.AddScoped<PermissionValidator>();
 
         services.AddMemoryCache();
             

@@ -30,4 +30,8 @@
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Validators\Permissions\" />
+    </ItemGroup>
+
 </Project>

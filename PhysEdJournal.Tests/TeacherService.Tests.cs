@@ -5,7 +5,6 @@ using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Tests;
 
@@ -38,7 +37,7 @@ public class TeacherServiceTests
         await context.SaveChangesAsync();
 
          // Act
-        var result = await teacherService.GivePermissionsAsync(caller.TeacherGuid, teacher.TeacherGuid, permissions);
+        var result = await teacherService.GivePermissionsAsync(teacher.TeacherGuid, permissions);
 
          // Assert
         Assert.True(result.IsSuccess);
@@ -61,7 +60,7 @@ public class TeacherServiceTests
          await context.SaveChangesAsync();
 
          // Act
-         var result = await teacherService.GivePermissionsAsync(caller.TeacherGuid, teacher.TeacherGuid, permissions);
+         var result = await teacherService.GivePermissionsAsync(teacher.TeacherGuid, permissions);
 
          // Assert
          Assert.False(result.IsSuccess);
@@ -88,7 +87,7 @@ public class TeacherServiceTests
          await context.SaveChangesAsync();
      
          // Act
-         var result = await teacherService.GivePermissionsAsync(caller.TeacherGuid, teacher.TeacherGuid, permissions);
+         var result = await teacherService.GivePermissionsAsync(teacher.TeacherGuid, permissions);
      
          // Assert
          Assert.False(result.IsSuccess);
@@ -111,7 +110,7 @@ public class TeacherServiceTests
          await context.SaveChangesAsync();
 
          // Act
-         var result = await teacherService.CreateCompetitionAsync(caller.TeacherGuid, competitionName);
+         var result = await teacherService.CreateCompetitionAsync(competitionName);
 
          // Assert
          Assert.True(result.IsSuccess);
@@ -134,7 +133,7 @@ public class TeacherServiceTests
          await context.SaveChangesAsync();
 
          // Act
-         var result = await teacherService.CreateCompetitionAsync(caller.TeacherGuid, competitionName);
+         var result = await teacherService.CreateCompetitionAsync(competitionName);
 
          // Assert
          Assert.False(result.IsSuccess);
@@ -159,7 +158,7 @@ public class TeacherServiceTests
          await context.SaveChangesAsync();
 
          // Act
-         var result = await teacherService.DeleteCompetitionAsync(caller.TeacherGuid, competitionName);
+         var result = await teacherService.DeleteCompetitionAsync(competitionName);
 
          // Assert
          Assert.True(result.IsSuccess);
@@ -179,7 +178,7 @@ public class TeacherServiceTests
          await context.SaveChangesAsync();
 
          // Act
-         var result = await teacherService.DeleteCompetitionAsync(caller.TeacherGuid, competitionName);
+         var result = await teacherService.DeleteCompetitionAsync(competitionName);
 
          // Assert
          Assert.False(result.IsSuccess);
@@ -213,7 +212,7 @@ public class TeacherServiceTests
 
      private TeacherService CreateTeacherService(ApplicationContext context)
      {
-         var teacherService = new TeacherService(context, new PermissionValidator(context, CreateMemoryCache()), CreateMemoryCache());
+         var teacherService = new TeacherService(context, CreateMemoryCache());
 
          return teacherService;
      }

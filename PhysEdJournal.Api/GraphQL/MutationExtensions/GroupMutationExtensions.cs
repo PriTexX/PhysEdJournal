@@ -16,7 +16,7 @@ public class GroupMutationExtensions
         [Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        var res = await groupService.AssignCuratorAsync(callerGuid, groupName, teacherGuid);
+        var res = await groupService.AssignCuratorAsync(groupName, teacherGuid);
         
         return res.Match(_ => true, exception =>
         {
@@ -32,7 +32,7 @@ public class GroupMutationExtensions
         [Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        var res = await groupService.AssignVisitValueAsync( callerGuid, groupName, newVisitValue);
+        var res = await groupService.AssignVisitValueAsync( groupName, newVisitValue);
 
         return res.Match(_ => true, exception =>
         {
@@ -46,7 +46,7 @@ public class GroupMutationExtensions
     public async Task<Success> UpdateGroupsInfo([Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        var res = await groupService.UpdateGroupsInfoAsync(callerGuid);
+        var res = await groupService.UpdateGroupsInfoAsync();
         
         return res.Match(_ => true, exception =>
         {

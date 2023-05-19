@@ -10,7 +10,6 @@ using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 using PhysEdJournal.Infrastructure.Validators.Standards;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
@@ -489,9 +488,9 @@ public class StudentServiceTests
             PageSizeToQueryUserInfoServer = 0,
             PointBorderForSemester = 0,
             RsaPublicKey = null
-        }), new PermissionValidator(context, CreateMemoryCache()));
+        }));
         
-        var studentService = new StudentService(context, serviceOptions, groupService, new PermissionValidator(context, CreateMemoryCache()), new StandardsValidator());
+        var studentService = new StudentService(context, serviceOptions, groupService, new StandardsValidator());
 
         return studentService;
     }

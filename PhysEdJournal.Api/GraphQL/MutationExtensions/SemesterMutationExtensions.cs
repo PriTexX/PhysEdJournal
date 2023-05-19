@@ -16,7 +16,7 @@ public class SemesterMutationExtensions
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var res = await semesterService.StartNewSemesterAsync(teacherGuid, semesterName);
+        var res = await semesterService.StartNewSemesterAsync(semesterName);
         
         return res.Match(_ => true, exception =>
         {

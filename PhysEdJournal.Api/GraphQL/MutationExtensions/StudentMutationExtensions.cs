@@ -106,7 +106,7 @@ public class StudentMutationExtensions
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var res = await studentService.ArchiveStudentAsync(teacherGuid, studentGuid, isForceMode);
+        var res = await studentService.ArchiveStudentAsync(studentGuid, isForceMode);
 
         return res.Match(archivedStudent => archivedStudent, exception =>
         {
@@ -121,7 +121,7 @@ public class StudentMutationExtensions
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var res = await studentService.UnArchiveStudentAsync(teacherGuid, studentGuid, semesterName);
+        var res = await studentService.UnArchiveStudentAsync(studentGuid, semesterName);
         
         return res.Match(_ => true, exception =>
         {
@@ -138,7 +138,7 @@ public class StudentMutationExtensions
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
-        var res = await studentService.UpdateStudentsInfoAsync(teacherGuid);
+        var res = await studentService.UpdateStudentsInfoAsync();
 
         return res.Match(_ => true, exception =>
         {
@@ -156,7 +156,7 @@ public class StudentMutationExtensions
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         
-        var res = await studentService.ActivateStudentAsync(teacherGuid, studentGuid);
+        var res = await studentService.ActivateStudentAsync(studentGuid);
 
         return res.Match(_ => true, exception =>
         {
@@ -174,7 +174,7 @@ public class StudentMutationExtensions
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         
-        var res = await studentService.DeActivateStudentAsync(teacherGuid, studentGuid);
+        var res = await studentService.DeActivateStudentAsync(studentGuid);
 
         return res.Match(_ => true, exception =>
         {
