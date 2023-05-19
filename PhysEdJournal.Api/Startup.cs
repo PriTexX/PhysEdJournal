@@ -12,7 +12,6 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 
 namespace PhysEdJournal.Api;
 

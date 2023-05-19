@@ -12,8 +12,12 @@ public class GroupMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(GroupNotFoundException))]
-    public async Task<Success> AssignCuratorToGroup(string groupName, string teacherGuid, 
-        [Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> AssignCuratorToGroup(
+        string groupName, string teacherGuid, 
+        [Service] GroupService groupService, 
+        [Service] ILogger<GroupService> logger,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         var res = await groupService.AssignCuratorAsync(groupName, teacherGuid);
@@ -28,8 +32,12 @@ public class GroupMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NullVisitValueException))]
-    public async Task<Success> AssignVisitValue(string groupName, double newVisitValue,
-        [Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> AssignVisitValue(
+        string groupName, double newVisitValue,
+        [Service] GroupService groupService, 
+        [Service] ILogger<GroupService> logger, 
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         var res = await groupService.AssignVisitValueAsync( groupName, newVisitValue);
@@ -43,7 +51,11 @@ public class GroupMutationExtensions
     
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> UpdateGroupsInfo([Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> UpdateGroupsInfo(
+        [Service] GroupService groupService, 
+        [Service] ILogger<GroupService> logger,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         var res = await groupService.UpdateGroupsInfoAsync();

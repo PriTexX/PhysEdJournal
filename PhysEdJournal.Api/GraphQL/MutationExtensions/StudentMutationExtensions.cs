@@ -8,6 +8,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Services;
+using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -19,17 +20,37 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(ActionFromFutureException))]
-    public async Task<Success> AddPointsToStudent([Service] StudentService studentService, ClaimsPrincipal claimsPrincipal, 
+    public async Task<Success> AddPointsToStudent(
+        [Service] StudentService studentService, 
         [Service] ILogger<StudentService> logger,
-        string studentGuid, 
-        int pointsAmount, DateOnly date, 
-        WorkType workType,
-        string? comment = null)
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal,
+        string studentGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
     {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+
+        switch (workType)
+        {
+            case WorkType.InternalTeam or WorkType.Activist or WorkType.Competition:
+            {
+                await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid,
+                    ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS);
+                break;
+            }
+            
+            case WorkType.OnlineWork:
+            {
+                await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid,
+                    ADD_POINTS_FOR_LMS_PERMISSIONS);
+                break;
+            }
+        }
+
         var pointsHistory = new PointsStudentHistoryEntity
         {
             StudentGuid = studentGuid,
-            TeacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid"),
+            TeacherGuid = callerGuid,
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
@@ -51,16 +72,22 @@ public class StudentMutationExtensions
     [Error(typeof(NonRegularPointsValueException))]
     [Error(typeof(StandardAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
-    public async Task<Success> AddPointsForStandardToStudent([Service] StudentService studentService, ClaimsPrincipal claimsPrincipal, 
+    public async Task<Success> AddPointsForStandardToStudent(
+        string studentGuid, int pointsAmount, DateOnly date, StandardType standardType,
+        [Service] StudentService studentService, 
         [Service] ILogger<StudentService> logger,
-        string studentGuid, 
-        int pointsAmount, DateOnly date, 
-        StandardType standardType)
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, TeacherPermissions.DefaultAccess);
+        
         var pointsForStandardHistory = new StandardsStudentHistoryEntity()
         {
             StudentGuid = studentGuid,
-            TeacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid"),
+            TeacherGuid = callerGuid,
             Points = pointsAmount,
             Date = date,
             StandardType = standardType,
@@ -80,17 +107,23 @@ public class StudentMutationExtensions
     [Error(typeof(VisitExpiredException))]
     [Error(typeof(VisitAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
-    public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date,  
+    public async Task<Success> IncreaseStudentVisits(
+        string studentGuid, DateOnly date,  
         [Service] StudentService studentService, 
-        [Service] ILogger<StudentService> logger, ClaimsPrincipal claimsPrincipal)
+        [Service] ILogger<StudentService> logger,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, TeacherPermissions.DefaultAccess);
 
-        var res = await studentService.IncreaseVisitsAsync(studentGuid, date, teacherGuid);
+        var res = await studentService.IncreaseVisitsAsync(studentGuid, date, callerGuid);
 
         return res.Match(_ => true, exception =>
         {
-            logger.LogError(exception, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, teacherGuid);
+            logger.LogError(exception, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, callerGuid);
             throw exception;
         });
     }
@@ -100,11 +133,17 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
     [Error(typeof(CannotMigrateToNewSemesterException))]
-    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] StudentService studentService, 
-        [Service] ILogger<StudentService> logger, ClaimsPrincipal claimsPrincipal,
+    public async Task<ArchivedStudentEntity> ArchiveStudent(
+        [Service] StudentService studentService, 
+        [Service] ILogger<StudentService> logger,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal,
         string studentGuid, bool isForceMode = false)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
         var res = await studentService.ArchiveStudentAsync(studentGuid, isForceMode);
 
@@ -115,11 +154,17 @@ public class StudentMutationExtensions
         });
     }
 
-    public async Task<Success> UnArchiveStudent([Service] StudentService studentService,
-        [Service] ILogger<StudentService> logger, ClaimsPrincipal claimsPrincipal, 
-        string studentGuid, string semesterName)
+    public async Task<Success> UnArchiveStudent(
+        string studentGuid, string semesterName,
+        [Service] StudentService studentService,
+        [Service] ILogger<StudentService> logger,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
         var res = await studentService.UnArchiveStudentAsync(studentGuid, semesterName);
         
@@ -132,11 +177,16 @@ public class StudentMutationExtensions
     
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> UpdateStudentsInfo([Service] StudentService studentService, 
+    public async Task<Success> UpdateStudentsInfo(
+        [Service] StudentService studentService, 
         [Service] ILogger<StudentService> logger,
+        [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
         var res = await studentService.UpdateStudentsInfoAsync();
 
@@ -150,11 +200,17 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(StudentNotFoundException))]
-    public async Task<Success> ActivateStudent([Service] StudentService studentService,
+    public async Task<Success> ActivateStudent(
+        string studentGuid,
+        [Service] StudentService studentService,
         [Service] ILogger<StudentService> logger,
-        ClaimsPrincipal claimsPrincipal, string studentGuid)
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
         
         var res = await studentService.ActivateStudentAsync(studentGuid);
 
@@ -168,11 +224,17 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(StudentNotFoundException))]
-    public async Task<Success> DeActivateStudent([Service] StudentService studentService,
+    public async Task<Success> DeActivateStudent(
+        string studentGuid,
+        [Service] StudentService studentService,
         [Service] ILogger<StudentService> logger,
-        ClaimsPrincipal claimsPrincipal, string studentGuid)
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
         
         var res = await studentService.DeActivateStudentAsync(studentGuid);
 
@@ -181,5 +243,13 @@ public class StudentMutationExtensions
             logger.LogError(exception, "Error during deactivating student with guid: {studentGuid}", studentGuid);
             throw exception;
         });
+    }
+
+    private static void ThrowIfCallerGuidIsNull(string? callerGuid)
+    {
+        if (callerGuid is null)
+        {
+            throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
+        }
     }
 }

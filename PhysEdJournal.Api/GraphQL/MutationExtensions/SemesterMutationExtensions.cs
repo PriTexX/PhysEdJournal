@@ -12,7 +12,12 @@ public class SemesterMutationExtensions
     [Error(typeof(SemesterNameValidationException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> StartNewSemester(string semesterName, [Service] SemesterService semesterService, [Service] ILogger<SemesterService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> StartNewSemester(
+        string semesterName, 
+        [Service] SemesterService semesterService, 
+        [Service] ILogger<SemesterService> logger,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
