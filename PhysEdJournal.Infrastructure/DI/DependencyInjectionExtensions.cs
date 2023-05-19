@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
 using PhysEdJournal.Infrastructure.Validators.Permissions;
@@ -21,10 +20,10 @@ public static class DependencyInjectionExtensions
 
         services.AddMemoryCache();
             
-        services.AddScoped<IGroupService, GroupService>();
-        services.AddScoped<ISemesterService, SemesterService>();
-        services.AddScoped<IStudentService, StudentService>();
-        services.AddScoped<ITeacherService, TeacherService>();
+        services.AddScoped<GroupService>();
+        services.AddScoped<SemesterService>();
+        services.AddScoped<StudentService>();
+        services.AddScoped<TeacherService>();
 
         return services;
     }
