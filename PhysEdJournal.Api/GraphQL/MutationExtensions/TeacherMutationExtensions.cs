@@ -1,10 +1,9 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
+using PhysEdJournal.Infrastructure.Services;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -16,7 +15,7 @@ public class TeacherMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     public async Task<TeacherEntity> CreateTeacherAsync(string teacherGuid, string fullName, 
-        [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal
+        [Service] TeacherService teacherService, [Service] ILogger<TeacherService> logger, ClaimsPrincipal claimsPrincipal
         )
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -44,7 +43,7 @@ public class TeacherMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(CannotGrantSuperUserPermissionsException))]
     public async Task<Success> GivePermissionsToTeacherAsync(string teacherGuid, IEnumerable<TeacherPermissions> permissions, 
-        [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
+        [Service] TeacherService teacherService, [Service] ILogger<TeacherService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         
@@ -60,7 +59,7 @@ public class TeacherMutationExtensions
 
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
-    public async Task<Success> CreateCompetition(string competitionName, [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> CreateCompetition(string competitionName, [Service] TeacherService teacherService, [Service] ILogger<TeacherService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
@@ -76,7 +75,7 @@ public class TeacherMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(CompetitionNotFoundException))]
-    public async Task<Success> DeleteCompetition(string competitionName, [Service] ITeacherService teacherService, [Service] ILogger<ITeacherService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> DeleteCompetition(string competitionName, [Service] TeacherService teacherService, [Service] ILogger<TeacherService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 

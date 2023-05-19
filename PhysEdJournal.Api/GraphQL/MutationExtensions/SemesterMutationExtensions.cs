@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Infrastructure.Services;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -12,7 +12,7 @@ public class SemesterMutationExtensions
     [Error(typeof(SemesterNameValidationException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> StartNewSemester(string semesterName, [Service] ISemesterService semesterService, [Service] ILogger<ISemesterService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> StartNewSemester(string semesterName, [Service] SemesterService semesterService, [Service] ILogger<SemesterService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 

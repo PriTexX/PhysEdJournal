@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Infrastructure.Services;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -13,7 +13,7 @@ public class GroupMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(GroupNotFoundException))]
     public async Task<Success> AssignCuratorToGroup(string groupName, string teacherGuid, 
-        [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
+        [Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         var res = await groupService.AssignCuratorAsync(callerGuid, groupName, teacherGuid);
@@ -29,7 +29,7 @@ public class GroupMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NullVisitValueException))]
     public async Task<Success> AssignVisitValue(string groupName, double newVisitValue,
-        [Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
+        [Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         var res = await groupService.AssignVisitValueAsync( callerGuid, groupName, newVisitValue);
@@ -43,7 +43,7 @@ public class GroupMutationExtensions
     
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> UpdateGroupsInfo([Service] IGroupService groupService, [Service] ILogger<IGroupService> logger, ClaimsPrincipal claimsPrincipal)
+    public async Task<Success> UpdateGroupsInfo([Service] GroupService groupService, [Service] ILogger<GroupService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         var res = await groupService.UpdateGroupsInfoAsync(callerGuid);

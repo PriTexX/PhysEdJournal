@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -8,6 +7,7 @@ using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
+using PhysEdJournal.Infrastructure.Services;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -19,8 +19,8 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(ActionFromFutureException))]
-    public async Task<Success> AddPointsToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
-        [Service] ILogger<IStudentService> logger,
+    public async Task<Success> AddPointsToStudent([Service] StudentService studentService, ClaimsPrincipal claimsPrincipal, 
+        [Service] ILogger<StudentService> logger,
         string studentGuid, 
         int pointsAmount, DateOnly date, 
         WorkType workType,
@@ -51,8 +51,8 @@ public class StudentMutationExtensions
     [Error(typeof(NonRegularPointsValueException))]
     [Error(typeof(StandardAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
-    public async Task<Success> AddPointsForStandardToStudent([Service] IStudentService studentService, ClaimsPrincipal claimsPrincipal, 
-        [Service] ILogger<IStudentService> logger,
+    public async Task<Success> AddPointsForStandardToStudent([Service] StudentService studentService, ClaimsPrincipal claimsPrincipal, 
+        [Service] ILogger<StudentService> logger,
         string studentGuid, 
         int pointsAmount, DateOnly date, 
         StandardType standardType)
@@ -81,8 +81,8 @@ public class StudentMutationExtensions
     [Error(typeof(VisitAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
     public async Task<Success> IncreaseStudentVisits(string studentGuid, DateOnly date,  
-        [Service] IStudentService studentService, 
-        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal)
+        [Service] StudentService studentService, 
+        [Service] ILogger<StudentService> logger, ClaimsPrincipal claimsPrincipal)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
 
@@ -100,8 +100,8 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
     [Error(typeof(CannotMigrateToNewSemesterException))]
-    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] IStudentService studentService, 
-        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal,
+    public async Task<ArchivedStudentEntity> ArchiveStudent([Service] StudentService studentService, 
+        [Service] ILogger<StudentService> logger, ClaimsPrincipal claimsPrincipal,
         string studentGuid, bool isForceMode = false)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -115,8 +115,8 @@ public class StudentMutationExtensions
         });
     }
 
-    public async Task<Success> UnArchiveStudent([Service] IStudentService studentService,
-        [Service] ILogger<IStudentService> logger, ClaimsPrincipal claimsPrincipal, 
+    public async Task<Success> UnArchiveStudent([Service] StudentService studentService,
+        [Service] ILogger<StudentService> logger, ClaimsPrincipal claimsPrincipal, 
         string studentGuid, string semesterName)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -132,8 +132,8 @@ public class StudentMutationExtensions
     
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> UpdateStudentsInfo([Service] IStudentService studentService, 
-        [Service] ILogger<IStudentService> logger,
+    public async Task<Success> UpdateStudentsInfo([Service] StudentService studentService, 
+        [Service] ILogger<StudentService> logger,
         ClaimsPrincipal claimsPrincipal)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -150,8 +150,8 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(StudentNotFoundException))]
-    public async Task<Success> ActivateStudent([Service] IStudentService studentService,
-        [Service] ILogger<IStudentService> logger,
+    public async Task<Success> ActivateStudent([Service] StudentService studentService,
+        [Service] ILogger<StudentService> logger,
         ClaimsPrincipal claimsPrincipal, string studentGuid)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -168,8 +168,8 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(StudentNotFoundException))]
-    public async Task<Success> DeActivateStudent([Service] IStudentService studentService,
-        [Service] ILogger<IStudentService> logger,
+    public async Task<Success> DeActivateStudent([Service] StudentService studentService,
+        [Service] ILogger<StudentService> logger,
         ClaimsPrincipal claimsPrincipal, string studentGuid)
     {
         var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
