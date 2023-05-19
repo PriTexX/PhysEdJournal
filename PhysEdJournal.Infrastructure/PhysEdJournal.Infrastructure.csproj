@@ -27,7 +27,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PhysEdJournal.Application\PhysEdJournal.Application.csproj" />
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
     </ItemGroup>
 
