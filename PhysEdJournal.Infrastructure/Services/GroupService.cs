@@ -2,7 +2,6 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
@@ -13,7 +12,7 @@ using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
-public sealed class GroupService : IGroupService
+public sealed class GroupService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;

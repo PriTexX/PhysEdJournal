@@ -2,7 +2,6 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -18,16 +17,16 @@ using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
-public sealed class StudentService : IStudentService
+public sealed class StudentService
 {
-    private readonly IGroupService _groupService;
+    private readonly GroupService _groupService;
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;
     private readonly StandardsValidator _standardsValidator;
     private readonly string _userInfoServerURL;
     private readonly int _pageSize;
 
-    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, PermissionValidator permissionValidator, StandardsValidator standardsValidator)
+    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, GroupService groupService, PermissionValidator permissionValidator, StandardsValidator standardsValidator)
     {
         _groupService = groupService;
         _permissionValidator = permissionValidator;

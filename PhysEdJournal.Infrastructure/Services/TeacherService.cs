@@ -2,7 +2,6 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
@@ -12,7 +11,7 @@ using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
-public sealed class TeacherService : ITeacherService
+public sealed class TeacherService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly PermissionValidator _permissionValidator;
