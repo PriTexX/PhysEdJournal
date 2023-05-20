@@ -9,6 +9,4 @@ public sealed class ArchiveStudentPayload
     public required string CurrentSemesterName { get; init; }
     public required string ActiveSemesterName { get; init; }
     public required double TotalPoints { get; init; }
-    public required bool HasDebtFromPreviousSemester { get; init; }
-    
 }
