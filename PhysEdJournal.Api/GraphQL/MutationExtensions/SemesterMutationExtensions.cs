@@ -3,6 +3,7 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Services;
+using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -19,7 +20,10 @@ public class SemesterMutationExtensions
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
-        var teacherGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
         var res = await semesterService.StartNewSemesterAsync(semesterName);
         
@@ -28,5 +32,13 @@ public class SemesterMutationExtensions
             logger.LogError(exception, "Error during starting a new semester");
             throw exception;
         });
+    }
+    
+    private static void ThrowIfCallerGuidIsNull(string? callerGuid)
+    {
+        if (callerGuid is null)
+        {
+            throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
+        }
     }
 }

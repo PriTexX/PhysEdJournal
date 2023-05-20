@@ -3,6 +3,7 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Services;
+using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -20,6 +21,10 @@ public class GroupMutationExtensions
         ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+        
         var res = await groupService.AssignCuratorAsync(groupName, teacherGuid);
         
         return res.Match(_ => true, exception =>
@@ -40,6 +45,10 @@ public class GroupMutationExtensions
         ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+        
         var res = await groupService.AssignVisitValueAsync( groupName, newVisitValue);
 
         return res.Match(_ => true, exception =>
@@ -58,6 +67,10 @@ public class GroupMutationExtensions
         ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
+        ThrowIfCallerGuidIsNull(callerGuid);
+        
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+        
         var res = await groupService.UpdateGroupsInfoAsync();
         
         return res.Match(_ => true, exception =>
@@ -65,5 +78,13 @@ public class GroupMutationExtensions
             logger.LogError(exception, "Error during updating groups' info in database");
             throw exception;
         });
+    }
+    
+    private static void ThrowIfCallerGuidIsNull(string? callerGuid)
+    {
+        if (callerGuid is null)
+        {
+            throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
+        }
     }
 }
