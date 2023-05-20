@@ -1,6 +1,5 @@
 ﻿using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Database;
@@ -10,7 +9,13 @@ using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
-public sealed class ArchiveStudentCommand
+public sealed class ArchiveStudentCommandPayload
+{
+    public required string StudentGuid { get; init; }
+    public required bool IsForceMode { get; init; } = false;
+}
+
+public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayload, ArchivedStudentEntity>
 {
     private readonly ApplicationContext _applicationContext;
     private readonly StudentArchiver _studentArchiver;
@@ -21,11 +26,11 @@ public sealed class ArchiveStudentCommand
         _studentArchiver = new StudentArchiver(applicationContext); // Деталь имплементации, поэтому не внедряю через DI
     }
 
-    public async Task<Result<ArchivedStudentEntity>> Execute(string studentGuid, bool isForceMode = false)
+    public async Task<Result<ArchivedStudentEntity>> ExecuteAsync(ArchiveStudentCommandPayload commandPayload)
     {
         var studentFromDb = await _applicationContext.Students
             .AsNoTracking()
-            .Where(s => s.StudentGuid == studentGuid)
+            .Where(s => s.StudentGuid == commandPayload.StudentGuid)
             .Select(s => new  {
                 s.Group.VisitValue, 
                 s.Visits, 
@@ -40,7 +45,7 @@ public sealed class ArchiveStudentCommand
 
         if (studentFromDb is null)
         {
-            return new Result<ArchivedStudentEntity>(new StudentNotFoundException(studentGuid));
+            return new Result<ArchivedStudentEntity>(new StudentNotFoundException(commandPayload.StudentGuid));
         }
 
         var activeSemesterName = (await _applicationContext.GetActiveSemester()).Name;
@@ -53,14 +58,14 @@ public sealed class ArchiveStudentCommand
         var totalPoints = CalculateTotalPoints(studentFromDb.Visits, studentFromDb.VisitValue,
             studentFromDb.AdditionalPoints, studentFromDb.PointsForStandards);
 
-        if (isForceMode || totalPoints > POINT_AMOUNT) // если превысил порог по баллам
+        if (commandPayload.IsForceMode || totalPoints > POINT_AMOUNT) // если превысил порог по баллам
         {
             var archiveStudentPayload = new ArchiveStudentPayload
             {
                 Visits = studentFromDb.Visits,
                 FullName = studentFromDb.FullName,
                 GroupNumber = studentFromDb.GroupNumber,
-                StudentGuid = studentGuid,
+                StudentGuid = commandPayload.StudentGuid,
                 TotalPoints = totalPoints,
                 ActiveSemesterName = activeSemesterName,
                 CurrentSemesterName = studentFromDb.CurrentSemesterName,
@@ -71,11 +76,11 @@ public sealed class ArchiveStudentCommand
         }
         
         await _applicationContext.Students
-            .Where(s => s.StudentGuid == studentGuid)
+            .Where(s => s.StudentGuid == commandPayload.StudentGuid)
             .ExecuteUpdateAsync(p => p
                 .SetProperty(s => s.HasDebtFromPreviousSemester, true)
                 .SetProperty(s => s.ArchivedVisitValue, studentFromDb.VisitValue));
         
-        return new Result<ArchivedStudentEntity>(new NotEnoughPointsException(studentGuid, totalPoints));
+        return new Result<ArchivedStudentEntity>(new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints));
     }
 }
