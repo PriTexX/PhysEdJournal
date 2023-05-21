@@ -1,7 +1,11 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
+using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
+using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
@@ -15,9 +19,16 @@ public sealed class IncreaseStudentVisitsCommandPayload
 }
 
 
-internal sealed class IncreaseStudentVisitsCommandValidator
+internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<IncreaseStudentVisitsCommandPayload>
 {
-    public ValidationResult ValidateCommandInput(IncreaseStudentVisitsCommandPayload input)
+    private readonly ApplicationContext _applicationContext;
+
+    public IncreaseStudentVisitsCommandValidator(ApplicationContext applicationContext)
+    {
+        _applicationContext = applicationContext;
+    }
+
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(IncreaseStudentVisitsCommandPayload input)
     {
         if (input.Date > DateOnly.FromDateTime(DateTime.Now))
         {
@@ -27,6 +38,15 @@ internal sealed class IncreaseStudentVisitsCommandValidator
         if (DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber > VISIT_LIFE_DAYS)
         {
             return new VisitExpiredException(input.Date);
+        }
+        
+        var recordCopy = await _applicationContext.VisitsStudentsHistory
+            .Where(v => v.StudentGuid == input.StudentGuid && v.Date == input.Date)
+            .FirstOrDefaultAsync();
+
+        if (recordCopy is not null)
+        {
+            return new VisitAlreadyExistsException(input.Date);
         }
 
         return ValidationResult.Success;
@@ -42,19 +62,39 @@ public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisit
     public IncreaseStudentVisitsCommand(ApplicationContext applicationContext)
     {
         _applicationContext = applicationContext;
-        _validator = new IncreaseStudentVisitsCommandValidator();
+        _validator = new IncreaseStudentVisitsCommandValidator(applicationContext);
     }
 
     public async Task<Result<Unit>> ExecuteAsync(IncreaseStudentVisitsCommandPayload commandPayload)
     {
-        var validationResult = _validator.ValidateCommandInput(commandPayload);
+        var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
 
         if (validationResult.IsFailed)
         {
             return new Result<Unit>(validationResult.ValidationException);
         }
+        
+        var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
 
-        return new Result<Unit>(Unit.Default);
+        if (student is null)
+        {
+            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+        }
+        
+        student.Visits++;
+
+        var record = new VisitStudentHistoryEntity
+        {
+            Date = commandPayload.Date,
+            StudentGuid = commandPayload.StudentGuid,
+            TeacherGuid = commandPayload.TeacherGuid
+        };
+
+        _applicationContext.VisitsStudentsHistory.Add(record);
+        _applicationContext.Students.Update(student);
+        await _applicationContext.SaveChangesAsync();
+
+        return Unit.Default;
     }
 }
 
