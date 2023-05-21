@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
+using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Models;
 using PhysEdJournal.Infrastructure.Services;

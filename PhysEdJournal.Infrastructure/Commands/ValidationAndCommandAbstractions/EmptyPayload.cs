@@ -1,4 +1,4 @@
-﻿namespace PhysEdJournal.Infrastructure.Commands;
+﻿namespace PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 
 public sealed class EmptyPayload
 {
