@@ -8,7 +8,7 @@ using PhysEdJournal.Infrastructure.Models;
 using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
-namespace PhysEdJournal.Infrastructure.Commands;
+namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 public sealed class ArchiveStudentCommandPayload
 {

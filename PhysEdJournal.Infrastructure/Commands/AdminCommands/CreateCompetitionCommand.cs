@@ -4,7 +4,7 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 
-namespace PhysEdJournal.Infrastructure.Commands;
+namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 public sealed class CreateCompetitionCommandPayload
 {

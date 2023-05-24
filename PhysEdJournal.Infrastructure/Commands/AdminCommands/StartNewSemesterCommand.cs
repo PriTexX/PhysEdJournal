@@ -8,7 +8,7 @@ using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 
-namespace PhysEdJournal.Infrastructure.Commands;
+namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 public sealed class StartNewSemesterCommandPayload
 {
