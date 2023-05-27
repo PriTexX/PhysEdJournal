@@ -9,7 +9,7 @@ using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
 
-namespace PhysEdJournal.Tests;
+namespace PhysEdJournal.Tests.Tests.Services;
 
 public class GroupServiceTests
 {
