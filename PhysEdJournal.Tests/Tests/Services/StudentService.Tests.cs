@@ -13,7 +13,7 @@ using PhysEdJournal.Infrastructure.Services;
 using PhysEdJournal.Infrastructure.Validators.Standards;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
-namespace PhysEdJournal.Tests;
+namespace PhysEdJournal.Tests.Tests.Services;
 
 public class StudentServiceTests
 {
