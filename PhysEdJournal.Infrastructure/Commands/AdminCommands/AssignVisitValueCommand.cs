@@ -39,10 +39,10 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
     public async Task<Result<Unit>> ExecuteAsync(AssignVisitValueCommandPayload commandPayload)
     {
         var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
-        
+
         if (validationResult.IsFailed)
         {
-            return new Result<Unit>(validationResult.ValidationException);
+            return validationResult;
         }
         
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
