@@ -71,7 +71,7 @@ public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisit
 
         if (validationResult.IsFailed)
         {
-            return new Result<Unit>(validationResult.ValidationException);
+            return validationResult;
         }
         
         var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
