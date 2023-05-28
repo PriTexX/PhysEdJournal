@@ -47,7 +47,7 @@ public sealed class StartNewSemesterCommand : ICommand<StartNewSemesterCommandPa
 
         if (validationResult.IsFailed)
         {
-            return validationResult;
+            return validationResult.ToResult<Unit>();
         }
 
         var currentSemester = await _applicationContext.Semesters.Where(s => s.IsCurrent == true).SingleOrDefaultAsync();
