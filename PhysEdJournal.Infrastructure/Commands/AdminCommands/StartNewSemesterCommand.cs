@@ -44,10 +44,10 @@ public sealed class StartNewSemesterCommand : ICommand<StartNewSemesterCommandPa
     public async Task<Result<Unit>> ExecuteAsync(StartNewSemesterCommandPayload commandPayload)
     {
         var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
-        
+
         if (validationResult.IsFailed)
         {
-            return new Result<Unit>(validationResult.ValidationException);
+            return validationResult;
         }
 
         var currentSemester = await _applicationContext.Semesters.Where(s => s.IsCurrent == true).SingleOrDefaultAsync();
