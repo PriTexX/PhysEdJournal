@@ -32,9 +32,9 @@ internal struct ValidationResult
         return ValueTask.FromResult(result);
     }
 
-    public static implicit operator Result<Unit>(ValidationResult result)
+    public Result<T> ToResult<T>()
     {
-        return new Result<Unit>(result.ValidationException);
+        return new Result<T>(ValidationException);
     }
 
     public static ValidationResult Success { get; } = new ValidationResult { IsSuccess = true };

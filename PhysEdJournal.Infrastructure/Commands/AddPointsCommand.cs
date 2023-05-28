@@ -51,11 +51,11 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
 
     public async Task<Result<Unit>> ExecuteAsync(AddPointsCommandPayload commandPayload)
     {
-        var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
+        var validation = await _validator.ValidateCommandInputAsync(commandPayload);
 
-        if (validationResult.IsFailed)
+        if (validation.IsFailed)
         {
-            return validationResult;
+            return validation.ToResult<Unit>();
         }
         
         var pointsStudentHistoryEntity = new PointsStudentHistoryEntity

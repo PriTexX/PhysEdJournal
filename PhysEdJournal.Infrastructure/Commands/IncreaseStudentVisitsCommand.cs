@@ -67,11 +67,11 @@ public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisit
 
     public async Task<Result<Unit>> ExecuteAsync(IncreaseStudentVisitsCommandPayload commandPayload)
     {
-        var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
+        var validation = await _validator.ValidateCommandInputAsync(commandPayload);
 
-        if (validationResult.IsFailed)
+        if (validation.IsFailed)
         {
-            return validationResult;
+            return validation.ToResult<Unit>();
         }
         
         var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
