@@ -1,4 +1,7 @@
-﻿namespace PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
+﻿using LanguageExt;
+using LanguageExt.Common;
+
+namespace PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 
 internal struct ValidationResult
 {
@@ -27,6 +30,11 @@ internal struct ValidationResult
     public static implicit operator ValueTask<ValidationResult>(ValidationResult result)
     {
         return ValueTask.FromResult(result);
+    }
+
+    public static implicit operator Result<Unit>(ValidationResult result)
+    {
+        return new Result<Unit>(result.ValidationException);
     }
 
     public static ValidationResult Success { get; } = new ValidationResult { IsSuccess = true };
