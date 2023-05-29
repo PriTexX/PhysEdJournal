@@ -47,7 +47,7 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
         
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
 
-        if (group == null)
+        if (group is null)
         {
             return new Result<Unit>(new GroupNotFoundException(commandPayload.GroupName));
         }
