@@ -7,6 +7,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
@@ -94,6 +95,8 @@ public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisit
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
+        await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
+        
         return Unit.Default;
     }
 }

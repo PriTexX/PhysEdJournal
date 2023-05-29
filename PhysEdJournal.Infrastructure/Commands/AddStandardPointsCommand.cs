@@ -8,6 +8,7 @@ using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
@@ -109,6 +110,8 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
+        await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
+        
         return Unit.Default;
     }
 }
