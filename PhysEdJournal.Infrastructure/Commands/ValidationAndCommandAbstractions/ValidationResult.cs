@@ -14,7 +14,7 @@ internal struct ValidationResult
         return new ValidationResult
         {
             IsSuccess = false,
-            ValidationException = new AggregateException(exc)
+            ValidationException = exc
         };
     }
     
@@ -23,7 +23,7 @@ internal struct ValidationResult
         return new ValidationResult
         {
             IsSuccess = false,
-            ValidationException = new AggregateException(exc)
+            ValidationException = exc
         };
     }
 

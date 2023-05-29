@@ -71,7 +71,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         Assert.False(result.IsSuccess);
         result.Match(_ => true, exception =>
         {
-            Assert.IsType<NullVisitValueException>(exception.InnerException);
+            Assert.IsType<NullVisitValueException>(exception);
             return true;
         });
     }
