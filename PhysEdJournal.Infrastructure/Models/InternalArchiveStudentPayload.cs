@@ -1,6 +1,6 @@
 ﻿namespace PhysEdJournal.Infrastructure.Models;
 
-public sealed class ArchiveStudentPayload
+internal sealed class InternalArchiveStudentPayload
 {
     public required string StudentGuid { get; init; }
     public required int Visits { get; init; }

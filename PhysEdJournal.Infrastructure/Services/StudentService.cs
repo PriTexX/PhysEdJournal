@@ -204,7 +204,7 @@ public sealed class StudentService
                 return new Result<ArchivedStudentEntity>(new CannotMigrateToNewSemesterException(activeSemester.Name));
 
             var totalPoints = CalculateTotalPoints(student);
-            if (isForceMode || totalPoints > POINT_AMOUNT) // если превысил порог по баллам
+            if (isForceMode || totalPoints > REQUIRED_POINT_AMOUNT) // если превысил порог по баллам
             {
                 await using var transaction = await _applicationContext.Database.BeginTransactionAsync();
                 
@@ -472,7 +472,7 @@ public sealed class StudentService
             return false;
         
         var totalPoints = CalculateTotalPoints(student);
-        return totalPoints >= POINT_AMOUNT;
+        return totalPoints >= REQUIRED_POINT_AMOUNT;
     }
 
     private double CalculateTotalPoints(StudentEntity student)

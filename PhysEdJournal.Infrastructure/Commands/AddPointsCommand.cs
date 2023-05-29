@@ -6,6 +6,7 @@ using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Services;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -68,8 +69,8 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
             SemesterName = commandPayload.SemesterName,
             TeacherGuid = commandPayload.TeacherGuid
         };
-        
-        var student = await _applicationContext.Students.FindAsync(pointsStudentHistoryEntity.StudentGuid);
+
+        var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
 
         if (student is null)
         {
@@ -83,6 +84,8 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
+        await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
+        
         return Unit.Default;
     }
 }
