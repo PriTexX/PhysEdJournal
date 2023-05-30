@@ -58,6 +58,7 @@ public class Startup
 
         services
             .AddGraphQLServer()
+            .AddDiagnosticEventListener<ErrorLoggingDiagnosticsEventListener>()
             .AddAuthorization()
             .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()
