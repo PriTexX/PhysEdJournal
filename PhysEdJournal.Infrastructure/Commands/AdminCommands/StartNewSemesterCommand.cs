@@ -10,25 +10,23 @@ using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
-public sealed class StartNewSemesterCommandPayload
+internal sealed partial class StartNewSemesterCommandValidator : ICommandValidator<string>
 {
-    public required string SemesterName { get; init; }
-}
-
-internal sealed class StartNewSemesterCommandValidator : ICommandValidator<StartNewSemesterCommandPayload>
-{
-    public ValueTask<ValidationResult> ValidateCommandInputAsync(StartNewSemesterCommandPayload commandInput)
+    public ValueTask<ValidationResult> ValidateCommandInputAsync(string semesterName)
     {
-        if (!Regex.IsMatch(commandInput.SemesterName, @"\d{4}-\d{4}/\w{5}"))
+        if (!MyRegex().IsMatch(semesterName))
         {
             return ValueTask.FromResult<ValidationResult>(new SemesterNameValidationException());
         }
 
         return ValueTask.FromResult(ValidationResult.Success);
     }
+
+    [GeneratedRegex("\\d{4}-\\d{4}/\\w{5}")]
+    private static partial Regex MyRegex();
 }
 
-public sealed class StartNewSemesterCommand : ICommand<StartNewSemesterCommandPayload, Unit>
+public sealed class StartNewSemesterCommand : ICommand<string, Unit>
 {
     private readonly ApplicationContext _applicationContext;
     private readonly IMemoryCache _memoryCache;
@@ -41,9 +39,9 @@ public sealed class StartNewSemesterCommand : ICommand<StartNewSemesterCommandPa
         _validator = new StartNewSemesterCommandValidator();
     }
     
-    public async Task<Result<Unit>> ExecuteAsync(StartNewSemesterCommandPayload commandPayload)
+    public async Task<Result<Unit>> ExecuteAsync(string semesterName)
     {
-        var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
+        var validationResult = await _validator.ValidateCommandInputAsync(semesterName);
         
         if (validationResult.IsFailed)
         {
@@ -57,7 +55,7 @@ public sealed class StartNewSemesterCommand : ICommand<StartNewSemesterCommandPa
             _applicationContext.Update(currentSemester);
         }
 
-        var semester = new SemesterEntity { Name = commandPayload.SemesterName, IsCurrent = true };
+        var semester = new SemesterEntity { Name = semesterName, IsCurrent = true };
             
         _applicationContext.Add(semester);
         await _applicationContext.SaveChangesAsync();

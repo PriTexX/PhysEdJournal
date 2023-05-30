@@ -7,6 +7,9 @@ using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
+using PhysEdJournal.Infrastructure.Commands;
+using PhysEdJournal.Infrastructure.Commands.AdminCommands;
+using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
@@ -21,8 +24,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(ActionFromFutureException))]
     public async Task<Success> AddPointsToStudent(
-        [Service] StudentService studentService, 
-        [Service] ILogger<StudentService> logger,
+        [Service] AddPointsCommand addPointsCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal,
         string studentGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
@@ -47,22 +49,19 @@ public class StudentMutationExtensions
             }
         }
 
-        var pointsHistory = new PointsStudentHistoryEntity
+        var addPointsPayload = new AddPointsCommandPayload
         {
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
-            Comment = comment
+            Comment = comment,
         };
-        var res = await studentService.AddPointsAsync(pointsHistory);
+        
+        var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
 
-        return res.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error adding points to student with guid: {studentGuid}. With points history entity: {pointsHistory}", pointsHistory.StudentGuid, pointsHistory);
-            throw exception;
-        });
+        return res.Match(_ => true, exception => throw exception);
     }
     
     [Error(typeof(StudentNotFoundException))]
@@ -74,8 +73,7 @@ public class StudentMutationExtensions
     [Error(typeof(ActionFromFutureException))]
     public async Task<Success> AddPointsForStandardToStudent(
         string studentGuid, int pointsAmount, DateOnly date, StandardType standardType,
-        [Service] StudentService studentService, 
-        [Service] ILogger<StudentService> logger,
+        [Service] AddStandardPointsCommand addStandardPointsCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -84,7 +82,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, TeacherPermissions.DefaultAccess);
         
-        var pointsForStandardHistory = new StandardsStudentHistoryEntity()
+        var addPointsForStandardPayload = new AddStandardPointsCommandPayload
         {
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
@@ -92,13 +90,9 @@ public class StudentMutationExtensions
             Date = date,
             StandardType = standardType,
         };
-        var res = await studentService.AddPointsForStandardsAsync(pointsForStandardHistory);
+        var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 
-        return res.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error adding points for standard to student with guid: {studentGuid}. With points history entity: {pointsHistory}", pointsForStandardHistory.StudentGuid, pointsForStandardHistory);
-            throw exception;
-        });
+        return res.Match(_ => true, exception => throw exception);
     }
 
     [Error(typeof(StudentNotFoundException))]
@@ -109,8 +103,7 @@ public class StudentMutationExtensions
     [Error(typeof(ActionFromFutureException))]
     public async Task<Success> IncreaseStudentVisits(
         string studentGuid, DateOnly date,  
-        [Service] StudentService studentService, 
-        [Service] ILogger<StudentService> logger,
+        [Service] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -119,13 +112,16 @@ public class StudentMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, TeacherPermissions.DefaultAccess);
 
-        var res = await studentService.IncreaseVisitsAsync(studentGuid, date, callerGuid);
-
-        return res.Match(_ => true, exception =>
+        var increaseStudentVisitsPayload = new IncreaseStudentVisitsCommandPayload
         {
-            logger.LogError(exception, "Error during visit increase on student with guid: {studentGuid} and teacher guid: {teacherGuid}", studentGuid, callerGuid);
-            throw exception;
-        });
+            Date = date,
+            StudentGuid = studentGuid,
+            TeacherGuid = callerGuid
+        };
+        
+        var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
+
+        return res.Match(_ => true, exception => throw exception);
     }
 
     [Error(typeof(StudentNotFoundException))]
@@ -134,8 +130,7 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPointsException))]
     [Error(typeof(CannotMigrateToNewSemesterException))]
     public async Task<ArchivedStudentEntity> ArchiveStudent(
-        [Service] StudentService studentService, 
-        [Service] ILogger<StudentService> logger,
+        [Service] ArchiveStudentCommand archiveStudentCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal,
         string studentGuid, bool isForceMode = false)
@@ -145,19 +140,20 @@ public class StudentMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
-        var res = await studentService.ArchiveStudentAsync(studentGuid, isForceMode);
-
-        return res.Match(archivedStudent => archivedStudent, exception =>
+        var archiveStudentPayload = new ArchiveStudentCommandPayload
         {
-            logger.LogError(exception, "Error during archiving. Student guid: {studentGuid}", studentGuid);
-            throw exception;
-        });
+            StudentGuid = studentGuid,
+            IsForceMode = isForceMode
+        };
+        
+        var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
+
+        return res.Match(archivedStudent => archivedStudent, exception => throw exception);
     }
 
     public async Task<Success> UnArchiveStudent(
         string studentGuid, string semesterName,
-        [Service] StudentService studentService,
-        [Service] ILogger<StudentService> logger,
+        [Service] UnArchiveStudentCommand unArchiveStudentCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -166,19 +162,21 @@ public class StudentMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
-        var res = await studentService.UnArchiveStudentAsync(studentGuid, semesterName);
-        
-        return res.Match(_ => true, exception =>
+        var unArchiveStudentPayload = new UnArchiveStudentCommandPayload
         {
-            logger.LogError(exception, "Error during unarchiving. Student guid: {studentGuid}. Semester name: {semesterName}", studentGuid, semesterName);
-            throw exception;
-        });
+            StudentGuid = studentGuid,
+            SemesterName = semesterName
+        };
+        
+        var res = await unArchiveStudentCommand.ExecuteAsync(unArchiveStudentPayload);
+        
+        return res.Match(_ => true, exception => throw exception);
     }
     
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> UpdateStudentsInfo(
-        [Service] StudentService studentService, 
+        [Service] UpdateStudentsInfoCommand updateStudentsInfoCommand, 
         [Service] ILogger<StudentService> logger,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
@@ -188,13 +186,23 @@ public class StudentMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
-        var res = await studentService.UpdateStudentsInfoAsync();
-
-        return res.Match(_ => true, exception =>
+        Task.Run(async () =>
         {
-            logger.LogError(exception, "Error during updating students' info in database");
-            throw exception;
+            try
+            {
+                logger.LogInformation("Teacher: {teacherGuid} started {commandName}", callerGuid, nameof(UpdateStudentsInfoCommand));
+                
+                await updateStudentsInfoCommand.ExecuteAsync(EmptyPayload.Empty);
+                
+                logger.LogInformation("{commandName} has successfully finished", nameof(UpdateStudentsInfoCommand));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Unhandled exception happened in {commandName}", nameof(UpdateStudentsInfoCommand));
+            }    
         });
+
+        return true;
     }
 
     [Error(typeof(NotEnoughPermissionsException))]
@@ -202,8 +210,7 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     public async Task<Success> ActivateStudent(
         string studentGuid,
-        [Service] StudentService studentService,
-        [Service] ILogger<StudentService> logger,
+        [Service] ActivateStudentCommand activateStudentCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -211,14 +218,10 @@ public class StudentMutationExtensions
         ThrowIfCallerGuidIsNull(callerGuid);
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        
-        var res = await studentService.ActivateStudentAsync(studentGuid);
 
-        return res.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error during activating student with guid: {studentGuid}", studentGuid);
-            throw exception;
-        });
+        var res = await activateStudentCommand.ExecuteAsync(studentGuid);
+
+        return res.Match(_ => true, exception => throw exception);
     }
     
     [Error(typeof(NotEnoughPermissionsException))]
@@ -226,8 +229,7 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     public async Task<Success> DeActivateStudent(
         string studentGuid,
-        [Service] StudentService studentService,
-        [Service] ILogger<StudentService> logger,
+        [Service] DeActivateStudentCommand deActivateStudentCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -236,13 +238,9 @@ public class StudentMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
         
-        var res = await studentService.DeActivateStudentAsync(studentGuid);
+        var res = await deActivateStudentCommand.ExecuteAsync(studentGuid);
 
-        return res.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error during deactivating student with guid: {studentGuid}", studentGuid);
-            throw exception;
-        });
+        return res.Match(_ => true, exception => throw exception);
     }
 
     private static void ThrowIfCallerGuidIsNull(string? callerGuid)

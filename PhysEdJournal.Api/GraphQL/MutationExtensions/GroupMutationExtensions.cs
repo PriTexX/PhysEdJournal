@@ -2,6 +2,7 @@
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
@@ -15,8 +16,7 @@ public class GroupMutationExtensions
     [Error(typeof(GroupNotFoundException))]
     public async Task<Success> AssignCuratorToGroup(
         string groupName, string teacherGuid, 
-        [Service] GroupService groupService, 
-        [Service] ILogger<GroupService> logger,
+        [Service] AssignCuratorCommand assignCuratorCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -24,14 +24,16 @@ public class GroupMutationExtensions
         ThrowIfCallerGuidIsNull(callerGuid);
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        
-        var res = await groupService.AssignCuratorAsync(groupName, teacherGuid);
-        
-        return res.Match(_ => true, exception =>
+
+        var assignCuratorPayload = new AssignCuratorCommandPayload
         {
-            logger.LogError(exception, "Error during assigning curator with guid: {teacherGuid} to group with name: {groupName}", teacherGuid, groupName);
-            throw exception;
-        });
+            GroupName = groupName,
+            TeacherGuid = teacherGuid
+        };
+        
+        var res = await assignCuratorCommand.ExecuteAsync(assignCuratorPayload);
+        
+        return res.Match(_ => true, exception => throw exception);
     }
 
     [Error(typeof(NotEnoughPermissionsException))]
@@ -39,8 +41,7 @@ public class GroupMutationExtensions
     [Error(typeof(NullVisitValueException))]
     public async Task<Success> AssignVisitValue(
         string groupName, double newVisitValue,
-        [Service] GroupService groupService, 
-        [Service] ILogger<GroupService> logger, 
+        [Service] AssignVisitValueCommand assignVisitValueCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -48,38 +49,18 @@ public class GroupMutationExtensions
         ThrowIfCallerGuidIsNull(callerGuid);
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        
-        var res = await groupService.AssignVisitValueAsync( groupName, newVisitValue);
 
-        return res.Match(_ => true, exception =>
+        var assignVisitValuePayload = new AssignVisitValueCommandPayload
         {
-            logger.LogError(exception, "Error during setting group's visit value {newVisitValue} to group with name: {groupName}", newVisitValue, groupName);
-            throw exception;
-        });
+            GroupName = groupName,
+            NewVisitValue = newVisitValue
+        };
+        
+        var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
+
+        return res.Match(_ => true, exception => throw exception);
     }
-    
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> UpdateGroupsInfo(
-        [Service] GroupService groupService, 
-        [Service] ILogger<GroupService> logger,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal)
-    {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
-        
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        
-        var res = await groupService.UpdateGroupsInfoAsync();
-        
-        return res.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error during updating groups' info in database");
-            throw exception;
-        });
-    }
-    
+
     private static void ThrowIfCallerGuidIsNull(string? callerGuid)
     {
         if (callerGuid is null)

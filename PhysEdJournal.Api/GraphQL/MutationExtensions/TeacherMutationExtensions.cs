@@ -3,6 +3,7 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
@@ -17,8 +18,7 @@ public class TeacherMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     public async Task<TeacherEntity> CreateTeacherAsync(
         string teacherGuid, string fullName, 
-        [Service] TeacherService teacherService, 
-        [Service] ILogger<TeacherService> logger, 
+        [Service] CreateTeacherCommand createTeacherCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -26,13 +26,15 @@ public class TeacherMutationExtensions
         ThrowIfCallerGuidIsNull(callerGuid);
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-        
-        var result = await teacherService.CreateTeacherAsync(new TeacherEntity
+
+        var createTeacherPayload = new CreateTeacherCommandPayload
         {
             TeacherGuid = teacherGuid,
             FullName = fullName,
             Permissions = TeacherPermissions.DefaultAccess
-        });
+        };
+        
+        var result = await createTeacherCommand.ExecuteAsync(createTeacherPayload);
 
         return result.Match(_ => new TeacherEntity
         {
@@ -40,11 +42,7 @@ public class TeacherMutationExtensions
             TeacherGuid = teacherGuid, 
             Permissions = TeacherPermissions.DefaultAccess
         }, 
-            exception =>
-            {
-                logger.LogError(exception, "Error during teacher creation. Teacher: {result}", result);
-                throw exception;
-            });
+            exception => throw exception);
     }
 
     [Error(typeof(TeacherNotFoundException))]
@@ -52,8 +50,7 @@ public class TeacherMutationExtensions
     [Error(typeof(CannotGrantSuperUserPermissionsException))]
     public async Task<Success> GivePermissionsToTeacherAsync(
         string teacherGuid, IEnumerable<TeacherPermissions> permissions, 
-        [Service] TeacherService teacherService, 
-        [Service] ILogger<TeacherService> logger,
+        [Service] GivePermissionsCommand givePermissionsCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -70,23 +67,24 @@ public class TeacherMutationExtensions
         {
             await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
         }
-        
 
-        var result = await teacherService.GivePermissionsAsync(teacherGuid, teacherPermissions);
-        
-        return result.Match(_ => true, exception =>
+
+        var givePermissionsPayload = new GivePermissionsCommandPayload
         {
-            logger.LogError(exception, "Error during updating teacher's permissions. Teacher guid: {teacherGuid}", teacherGuid);
-            throw exception;
-        });
+            TeacherGuid = teacherGuid,
+            TeacherPermissions = teacherPermissions
+        };
+        
+        var result = await givePermissionsCommand.ExecuteAsync(givePermissionsPayload);
+        
+        return result.Match(_ => true, exception => throw exception);
     }
 
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     public async Task<Success> CreateCompetition(
         string competitionName, 
-        [Service] TeacherService teacherService, 
-        [Service] ILogger<TeacherService> logger,
+        [Service] CreateCompetitionCommand createCompetitionCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -95,13 +93,9 @@ public class TeacherMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
-        var result = await teacherService.CreateCompetitionAsync(competitionName);
+        var result = await createCompetitionCommand.ExecuteAsync(competitionName);
 
-        return result.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error during creating competition with name: {competitionName}", competitionName);
-            throw exception;
-        });
+        return result.Match(_ => true, exception => throw exception);
     }
     
     [Error(typeof(TeacherNotFoundException))]
@@ -109,8 +103,7 @@ public class TeacherMutationExtensions
     [Error(typeof(CompetitionNotFoundException))]
     public async Task<Success> DeleteCompetition(
         string competitionName, 
-        [Service] TeacherService teacherService, 
-        [Service] ILogger<TeacherService> logger,
+        [Service] DeleteCompetitionCommand deleteCompetitionCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -119,13 +112,9 @@ public class TeacherMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
-        var result = await teacherService.DeleteCompetitionAsync(competitionName);
+        var result = await deleteCompetitionCommand.ExecuteAsync(competitionName);
 
-        return result.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error during deleting competitions with name: {competitionName}", competitionName);
-            throw exception;
-        });
+        return result.Match(_ => true, exception => throw exception);
     }
     
     private static void ThrowIfCallerGuidIsNull(string? callerGuid)

@@ -15,7 +15,6 @@ public sealed class AddPointsCommandPayload
     public required string StudentGuid { get; init; }
     public required DateOnly Date { get; init; }
     public required int Points { get; init; }
-    public required string SemesterName { get; init; }
     public required string TeacherGuid { get; init; }
     public required WorkType WorkType { get; init; }
     public string? Comment { get; init; }
@@ -58,6 +57,13 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
         {
             return validation.ToResult<Unit>();
         }
+
+        var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
+
+        if (student is null)
+        {
+            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+        }
         
         var pointsStudentHistoryEntity = new PointsStudentHistoryEntity
         {
@@ -66,20 +72,12 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
             Date = commandPayload.Date,
             Points = commandPayload.Points,
             WorkType = commandPayload.WorkType,
-            SemesterName = commandPayload.SemesterName,
+            SemesterName = student.CurrentSemesterName,
             TeacherGuid = commandPayload.TeacherGuid
         };
 
-        var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
-
-        if (student is null)
-        {
-            return new Result<Unit>(new StudentNotFoundException(pointsStudentHistoryEntity.StudentGuid));
-        }
-
         student.AdditionalPoints += pointsStudentHistoryEntity.Points;
-
-        pointsStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
+        
         _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();

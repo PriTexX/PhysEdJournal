@@ -18,7 +18,6 @@ public sealed class AddStandardPointsCommandPayload
     public required string StudentGuid { get; init; }
     public required DateOnly Date { get; init; }
     public required int Points { get; init; }
-    public required string SemesterName { get; init; }
     public required string TeacherGuid { get; init; }
     public required StandardType StandardType { get; init; }
 }
@@ -85,27 +84,36 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
         {
             return validation.ToResult<Unit>();
         }
+
+        var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
+
+        if (student is null)
+        {
+            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+        }
         
         var standardsStudentHistoryEntity = new StandardsStudentHistoryEntity
         {
             StudentGuid = commandPayload.StudentGuid,
             TeacherGuid = commandPayload.TeacherGuid,
-            SemesterName = commandPayload.SemesterName,
+            SemesterName = student.CurrentSemesterName,
             Date = commandPayload.Date,
             Points = commandPayload.Points,
             StandardType = commandPayload.StandardType
         };
 
-        var student = await _applicationContext.Students.FindAsync(standardsStudentHistoryEntity.StudentGuid);
-
-        if (student is null)
+        int adjustedStudentPointsAmount;
+        if (student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS)
         {
-            return new Result<Unit>(new StudentNotFoundException(standardsStudentHistoryEntity.StudentGuid));
+            adjustedStudentPointsAmount = MAX_POINTS_FOR_STANDARDS;
+        }
+        else
+        {
+            adjustedStudentPointsAmount = standardsStudentHistoryEntity.Points;
         }
 
-        student.PointsForStandards += student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardsStudentHistoryEntity.Points;
-
-        standardsStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
+        student.PointsForStandards = adjustedStudentPointsAmount;
+        
         _applicationContext.StandardsStudentsHistory.Add(standardsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();

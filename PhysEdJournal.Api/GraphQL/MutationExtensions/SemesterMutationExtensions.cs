@@ -2,6 +2,7 @@
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
@@ -15,8 +16,7 @@ public class SemesterMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> StartNewSemester(
         string semesterName, 
-        [Service] SemesterService semesterService, 
-        [Service] ILogger<SemesterService> logger,
+        [Service] StartNewSemesterCommand startNewSemesterCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {
@@ -25,13 +25,9 @@ public class SemesterMutationExtensions
         
         await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
 
-        var res = await semesterService.StartNewSemesterAsync(semesterName);
+        var res = await startNewSemesterCommand.ExecuteAsync(semesterName);
         
-        return res.Match(_ => true, exception =>
-        {
-            logger.LogError(exception, "Error during starting a new semester");
-            throw exception;
-        });
+        return res.Match(_ => true, exception => throw exception);
     }
     
     private static void ThrowIfCallerGuidIsNull(string? callerGuid)

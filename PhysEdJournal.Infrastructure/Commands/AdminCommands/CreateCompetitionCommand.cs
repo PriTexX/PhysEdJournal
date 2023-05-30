@@ -6,12 +6,7 @@ using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
-public sealed class CreateCompetitionCommandPayload
-{
-    public required string CompetitionName { get; init; }
-}
-
-public sealed class CreateCompetitionCommand : ICommand<CreateCompetitionCommandPayload, Unit>
+public sealed class CreateCompetitionCommand : ICommand<string, Unit>
 {
     private readonly ApplicationContext _applicationContext;
 
@@ -20,9 +15,9 @@ public sealed class CreateCompetitionCommand : ICommand<CreateCompetitionCommand
         _applicationContext = applicationContext;
     }
     
-    public async Task<Result<Unit>> ExecuteAsync(CreateCompetitionCommandPayload commandPayload)
+    public async Task<Result<Unit>> ExecuteAsync(string competitionName)
     {
-        var comp = new CompetitionEntity{CompetitionName = commandPayload.CompetitionName};
+        var comp = new CompetitionEntity{CompetitionName = competitionName};
 
         _applicationContext.Competitions.Add(comp);
         await _applicationContext.SaveChangesAsync();

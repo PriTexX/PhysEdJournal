@@ -6,12 +6,7 @@ using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
-public sealed class DeleteCompetitionCommandPayload
-{
-    public required string CompetitionName { get; init; }
-}
-
-public sealed class DeleteCompetitionCommand : ICommand<DeleteCompetitionCommandPayload, Unit>
+public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
 {
     private readonly ApplicationContext _applicationContext;
 
@@ -20,12 +15,12 @@ public sealed class DeleteCompetitionCommand : ICommand<DeleteCompetitionCommand
         _applicationContext = applicationContext;
     }
     
-    public async Task<Result<Unit>> ExecuteAsync(DeleteCompetitionCommandPayload commandPayload)
+    public async Task<Result<Unit>> ExecuteAsync(string competitionName)
     {
-        var comp = await _applicationContext.Competitions.FindAsync(commandPayload.CompetitionName);
+        var comp = await _applicationContext.Competitions.FindAsync(competitionName);
 
         if (comp is null)
-            return new Result<Unit>(new CompetitionNotFoundException(commandPayload.CompetitionName));
+            return new Result<Unit>(new CompetitionNotFoundException(competitionName));
 
         _applicationContext.Competitions.Remove(comp);
         await _applicationContext.SaveChangesAsync();

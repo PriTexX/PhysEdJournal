@@ -14,7 +14,6 @@ public sealed class CreateTeacherCommandPayload
     public required string TeacherGuid { get; init; }
     public required string FullName { get; init; }
     public required TeacherPermissions Permissions { get; init; }
-    public required ICollection<GroupEntity> Groups { get; init; }
 }
 
 public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload, Unit>
@@ -42,7 +41,6 @@ public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload,
             TeacherGuid = commandPayload.TeacherGuid,
             FullName = commandPayload.FullName,
             Permissions = commandPayload.Permissions,
-            Groups = commandPayload.Groups
         };
             
         await _applicationContext.Teachers.AddAsync(teacherEntity);

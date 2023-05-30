@@ -11,14 +11,14 @@ namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 public sealed class GivePermissionsCommandPayload
 {
     public required string TeacherGuid { get; init; }
-    public required TeacherPermissions Type { get; init; }
+    public required TeacherPermissions TeacherPermissions { get; init; }
 }
 
 internal sealed class GivePermissionsCommandValidator : ICommandValidator<GivePermissionsCommandPayload>
 {
     public ValueTask<ValidationResult> ValidateCommandInputAsync(GivePermissionsCommandPayload commandInput)
     {
-        if (commandInput.Type == TeacherPermissions.SuperUser)
+        if (commandInput.TeacherPermissions == TeacherPermissions.SuperUser)
             return ValueTask.FromResult<ValidationResult>(new CannotGrantSuperUserPermissionsException(commandInput.TeacherGuid));
 
         return ValueTask.FromResult(ValidationResult.Success);
@@ -54,7 +54,7 @@ public sealed class GivePermissionsCommand : ICommand<GivePermissionsCommandPayl
             return new Result<TeacherEntity>(new TeacherNotFoundException(commandPayload.TeacherGuid));
         }
 
-        teacher.Permissions = commandPayload.Type;
+        teacher.Permissions = commandPayload.TeacherPermissions;
 
         using var entry = _memoryCache.CreateEntry(commandPayload.TeacherGuid);
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
