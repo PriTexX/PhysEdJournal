@@ -4,7 +4,6 @@ using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Services;
 using PhysEdJournal.Tests.Setup;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
