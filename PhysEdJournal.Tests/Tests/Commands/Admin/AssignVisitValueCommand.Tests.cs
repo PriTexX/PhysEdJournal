@@ -28,8 +28,8 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             NewVisitValue = visitValue
         };
 
-        context.Teachers.Add(caller);
-        context.Groups.Add(group);
+        await context.Teachers.AddAsync(caller);
+        await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
         // Act
@@ -60,8 +60,8 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             NewVisitValue = visitValue
         };
 
-        context.Teachers.Add(caller);
-        context.Groups.Add(group);
+        await context.Teachers.AddAsync(caller);
+        await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
         // Act
@@ -95,7 +95,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             NewVisitValue = visitValue
         };
 
-        context.Teachers.Add(caller);
+        await context.Teachers.AddAsync(caller);
         await context.SaveChangesAsync();
 
         // Act

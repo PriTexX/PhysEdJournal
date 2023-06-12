@@ -27,9 +27,9 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
             TeacherGuid = teacher.TeacherGuid
         };
         
-        context.Teachers.Add(caller);
-        context.Teachers.Add(teacher);
-        context.Groups.Add(group);
+        await context.Teachers.AddAsync(caller);
+        await context.Teachers.AddAsync(teacher);
+        await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
         // Act
@@ -58,8 +58,8 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
             TeacherGuid = teacher.TeacherGuid
         };
 
-        context.Teachers.Add(caller);
-        context.Teachers.Add(teacher);
+        await context.Teachers.AddAsync(caller);
+        await context.Teachers.AddAsync(teacher);
         await context.SaveChangesAsync();
     
         // Act
@@ -91,8 +91,8 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
             TeacherGuid = teacher.TeacherGuid
         };
         
-        context.Teachers.Add(caller);
-        context.Groups.Add(group);
+        await context.Teachers.AddAsync(caller);
+        await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
     
         // Act
