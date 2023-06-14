@@ -7,7 +7,7 @@ namespace PhysEdJournal.Tests.Setup;
 [Collection("Db collection")]
 public abstract class DatabaseTestsHelper
 {
-    internal static ApplicationContext CreateContext(IMemoryCache cache = null)
+    protected static ApplicationContext CreateContext(IMemoryCache cache = null)
     {
         var builder = new DbContextOptionsBuilder<ApplicationContext>()
             .UseNpgsql(PostgresContainerFixture.ConnectionString);
@@ -16,12 +16,12 @@ public abstract class DatabaseTestsHelper
         return dbContext;
     }
 
-    internal static IMemoryCache CreateMemoryCache()
+    protected static IMemoryCache CreateMemoryCache()
     {
         return new MemoryCache(new MemoryCacheOptions());
     }
 
-    internal static async Task ClearDatabase(ApplicationContext context)
+    protected static async Task ClearDatabase(ApplicationContext context)
     {
         await context.Groups.ExecuteDeleteAsync();
         await context.PointsStudentsHistory.ExecuteDeleteAsync();
