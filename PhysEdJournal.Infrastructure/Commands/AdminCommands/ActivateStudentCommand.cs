@@ -22,7 +22,7 @@ public sealed class ActivateStudentCommand : ICommand<string, Unit>
             .Where(s => s.StudentGuid == studentGuid)
             .ExecuteUpdateAsync(p => p
                 .SetProperty(s => s.IsActive, true));
-
+        
         if (rowsAffected == 0)
         {
             return new Result<Unit>(new StudentNotFoundException(studentGuid));
