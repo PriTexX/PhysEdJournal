@@ -1,5 +1,7 @@
-﻿using PhysEdJournal.Core.Entities.DB;
+﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Tests.Setup;
@@ -27,10 +29,13 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
 
         // Act
         var result = await command.ExecuteAsync(student.StudentGuid);
-        var studentFromDb = await context.Students.FindAsync(student.StudentGuid);
 
         // Assert
         Assert.True(result.IsSuccess);
+        var studentFromDb = await context.Students
+            .AsNoTracking()
+            .Where(s => s.StudentGuid == student.StudentGuid)
+            .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.True(studentFromDb.IsActive);
     }
@@ -50,6 +55,11 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.False(result.IsSuccess);
+        result.Match(_ => true, exception =>
+        {
+            Assert.IsType<StudentNotFoundException>(exception);
+            return true;
+        });
     }
 
     private StudentEntity DefaultStudentEntity(bool hasDebt = false, bool isActive = false)
