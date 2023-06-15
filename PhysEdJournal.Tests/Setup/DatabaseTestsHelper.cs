@@ -7,7 +7,7 @@ namespace PhysEdJournal.Tests.Setup;
 [Collection("Db collection")]
 public abstract class DatabaseTestsHelper
 {
-    protected static ApplicationContext CreateContext(IMemoryCache cache = null)
+    protected static ApplicationContext CreateContext(IMemoryCache? cache = null)
     {
         var builder = new DbContextOptionsBuilder<ApplicationContext>()
             .UseNpgsql(PostgresContainerFixture.ConnectionString);

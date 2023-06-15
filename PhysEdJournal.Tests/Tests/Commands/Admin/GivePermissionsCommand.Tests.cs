@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
+﻿using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Tests.Setup;
+using PhysEdJournal.Tests.Setup.Utils;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
 
@@ -22,9 +20,9 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
          await using var context = CreateContext(cache);
          await ClearDatabase(context);
          
-         var command = CreateCommand(context, cache);
+         var command = new GivePermissionsCommand(context, cache);
          var expectedPermissions = permissions; 
-         var teacher = DefaultTeacherEntity();
+         var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
          var payload = new GivePermissionsCommandPayload
          {
              TeacherGuid = teacher.TeacherGuid,
@@ -51,9 +49,9 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
         await using var context = CreateContext(cache);
         await ClearDatabase(context);
         
-        var command = CreateCommand(context, cache);
+        var command = new GivePermissionsCommand(context, cache);
         var permissions = TeacherPermissions.SuperUser;
-        var teacher = DefaultTeacherEntity();
+        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
         var payload = new GivePermissionsCommandPayload
         {
             TeacherGuid = teacher.TeacherGuid,
@@ -87,11 +85,10 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
         await using var context = CreateContext(cache);
         await ClearDatabase(context);
          
-        var command = CreateCommand(context, cache);
-        var teacher = DefaultTeacherEntity(permissions);
+        var command = new GivePermissionsCommand(context, cache);
         var payload = new GivePermissionsCommandPayload
         {
-            TeacherGuid = teacher.TeacherGuid,
+            TeacherGuid = "Default",
             Type = permissions
         };
 
@@ -105,21 +102,5 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
             Assert.IsType<TeacherNotFoundException>(exception);
             return true;
         });
-    }
-    
-    private TeacherEntity DefaultTeacherEntity(TeacherPermissions permissions = TeacherPermissions.DefaultAccess)
-    {
-        var teacher = new TeacherEntity()
-        {
-            FullName = "DefaultName",
-            TeacherGuid = Guid.NewGuid().ToString(),
-            Permissions = permissions
-        };
-        return teacher;
-    }
-
-    private GivePermissionsCommand CreateCommand(ApplicationContext context, IMemoryCache cache)
-    {
-        return new GivePermissionsCommand(context, cache);
     }
 }

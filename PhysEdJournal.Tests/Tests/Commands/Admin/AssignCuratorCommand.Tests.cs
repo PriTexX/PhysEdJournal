@@ -1,10 +1,9 @@
-﻿using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
+﻿using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Tests.Setup;
+using PhysEdJournal.Tests.Setup.Utils;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
 
@@ -17,17 +16,15 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var caller = DefaultTeacherEntity();
-        var teacher = DefaultTeacherEntity();
-        var group = DefaultGroupEntity();
+        var command = new AssignCuratorCommand(context);
+        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
+        var group = EntitiesFactory.DefaultGroupEntity("Default");
         var payload = new AssignCuratorCommandPayload
         {
             GroupName = group.GroupName, 
             TeacherGuid = teacher.TeacherGuid
         };
         
-        await context.Teachers.AddAsync(caller);
         await context.Teachers.AddAsync(teacher);
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
@@ -48,17 +45,15 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var caller = DefaultTeacherEntity();
-        var teacher = DefaultTeacherEntity();
+        var command = new AssignCuratorCommand(context);
+        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
         var groupName = "non-existing-group";
         var payload = new AssignCuratorCommandPayload
         {
             GroupName = groupName, 
             TeacherGuid = teacher.TeacherGuid
         };
-
-        await context.Teachers.AddAsync(caller);
+        
         await context.Teachers.AddAsync(teacher);
         await context.SaveChangesAsync();
     
@@ -81,17 +76,14 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var caller = DefaultTeacherEntity();
-        var teacher = DefaultTeacherEntity();
-        var group = DefaultGroupEntity();
+        var command = new AssignCuratorCommand(context);
+        var group = EntitiesFactory.DefaultGroupEntity("Default");
         var payload = new AssignCuratorCommandPayload
         {
             GroupName = group.GroupName, 
-            TeacherGuid = teacher.TeacherGuid
+            TeacherGuid = "teacher.TeacherGuid"
         };
         
-        await context.Teachers.AddAsync(caller);
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
     
@@ -105,28 +97,5 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
             Assert.IsType<TeacherNotFoundException>(exception);
             return true;
         });
-    }
-
-    private GroupEntity DefaultGroupEntity(string groupName = "DefaultName")
-    {
-        var group = new GroupEntity {GroupName = groupName};
-
-        return group;
-    }
-    
-    private AssignCuratorCommand CreateCommand(ApplicationContext context)
-    {
-        return new AssignCuratorCommand(context);
-    }
-    
-    private TeacherEntity DefaultTeacherEntity(TeacherPermissions permissions = TeacherPermissions.DefaultAccess)
-    {
-        var teacher = new TeacherEntity()
-        {
-            FullName = "DefaultName",
-            TeacherGuid = Guid.NewGuid().ToString(),
-            Permissions = permissions
-        };
-        return teacher;
     }
 }

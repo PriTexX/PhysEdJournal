@@ -1,9 +1,7 @@
-﻿using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Core.Exceptions.GroupExceptions;
+﻿using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Tests.Setup;
+using PhysEdJournal.Tests.Setup.Utils;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
 
@@ -19,16 +17,14 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var caller = DefaultTeacherEntity();
-        var group = DefaultGroupEntity();
+        var command = new AssignVisitValueCommand(context);
+        var group = EntitiesFactory.DefaultGroupEntity("Default");
         var payload = new AssignVisitValueCommandPayload
         {
             GroupName = group.GroupName,
             NewVisitValue = visitValue
         };
-
-        await context.Teachers.AddAsync(caller);
+        
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
@@ -51,16 +47,14 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var caller = DefaultTeacherEntity();
-        var group = DefaultGroupEntity();
+        var command = new AssignVisitValueCommand(context);
+        var group = EntitiesFactory.DefaultGroupEntity("Default");
         var payload = new AssignVisitValueCommandPayload
         {
             GroupName = group.GroupName,
             NewVisitValue = visitValue
         };
-
-        await context.Teachers.AddAsync(caller);
+        
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
@@ -86,17 +80,12 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var caller = DefaultTeacherEntity();
-        var group = DefaultGroupEntity();
+        var command = new AssignVisitValueCommand(context);
         var payload = new AssignVisitValueCommandPayload
         {
-            GroupName = group.GroupName,
+            GroupName = "default",
             NewVisitValue = visitValue
         };
-
-        await context.Teachers.AddAsync(caller);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await command.ExecuteAsync(payload);
@@ -108,28 +97,5 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             Assert.IsType<GroupNotFoundException>(exception);
             return true;
         });
-    }
-    
-    private GroupEntity DefaultGroupEntity(string groupName = "DefaultName")
-    {
-        var group = new GroupEntity {GroupName = groupName};
-
-        return group;
-    }
-    
-    private AssignVisitValueCommand CreateCommand(ApplicationContext context)
-    {
-        return new AssignVisitValueCommand(context);
-    }
-    
-    private TeacherEntity DefaultTeacherEntity(TeacherPermissions permissions = TeacherPermissions.DefaultAccess)
-    {
-        var teacher = new TeacherEntity
-        {
-            FullName = "DefaultName",
-            TeacherGuid = Guid.NewGuid().ToString(),
-            Permissions = permissions
-        };
-        return teacher;
     }
 }

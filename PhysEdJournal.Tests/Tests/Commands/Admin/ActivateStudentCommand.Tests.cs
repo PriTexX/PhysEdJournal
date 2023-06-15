@@ -1,26 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Tests.Setup;
+using PhysEdJournal.Tests.Setup.Utils;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
 
 public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
 {
-    [Fact]
-    public async Task ActivateStudentAsync_WhenStudentExists_ShouldActivateStudent()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ActivateStudentAsync_WhenStudentExists_ShouldActivateStudent(bool isActive)
     {
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var semester = DefaultSemesterEntity();
-        var group = DefaultGroupEntity("211-729");
-        var student = DefaultStudentEntity();
+        var command = new ActivateStudentCommand(context);
+        var semester = EntitiesFactory.DefaultSemesterEntity("2022-2023/spring", true);
+        var group = EntitiesFactory.DefaultGroupEntity("211-729");
+        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, isActive);
 
         await context.Semesters.AddAsync(semester);
         await context.Groups.AddAsync(group);
@@ -47,11 +47,10 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
         await using var context = CreateContext();
         await ClearDatabase(context);
         
-        var command = CreateCommand(context);
-        var student = DefaultStudentEntity();
+        var command = new ActivateStudentCommand(context);
 
         // Act
-        var result = await command.ExecuteAsync(student.StudentGuid);
+        var result = await command.ExecuteAsync("student.StudentGuid");
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -60,57 +59,5 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
             Assert.IsType<StudentNotFoundException>(exception);
             return true;
         });
-    }
-
-    private StudentEntity DefaultStudentEntity(bool hasDebt = false, bool isActive = false)
-    {
-        var student = new StudentEntity
-        {
-            StudentGuid = Guid.NewGuid().ToString(),
-            FullName = "John Smith",
-            GroupNumber = "211-729",
-            HasDebtFromPreviousSemester = hasDebt,
-            ArchivedVisitValue = 10.5,
-            AdditionalPoints = 2,
-            Visits = 10,
-            Course = 2,
-            HealthGroup = HealthGroupType.Basic,
-            Department = "IT",
-            CurrentSemesterName = "2022-2023/spring",
-            IsActive = isActive,
-            PointsForStandards = 2,
-        };
-
-        return student;
-    }
-
-    private SemesterEntity DefaultSemesterEntity(string semesterName = "2022-2023/spring", bool isCurrent = true)
-    {
-        var semester = new SemesterEntity { Name = semesterName, IsCurrent = isCurrent };
-
-        return semester;
-    }
-    
-    private GroupEntity DefaultGroupEntity(string groupName = "DefaultName")
-    {
-        var group = new GroupEntity {GroupName = groupName};
-
-        return group;
-    }
-
-    private ActivateStudentCommand CreateCommand(ApplicationContext context)
-    {
-        return new ActivateStudentCommand(context);
-    }
-    
-    private TeacherEntity DefaultTeacherEntity(TeacherPermissions permissions = TeacherPermissions.DefaultAccess)
-    {
-        var teacher = new TeacherEntity()
-        {
-            FullName = "DefaultName",
-            TeacherGuid = Guid.NewGuid().ToString(),
-            Permissions = permissions
-        };
-        return teacher;
     }
 }
