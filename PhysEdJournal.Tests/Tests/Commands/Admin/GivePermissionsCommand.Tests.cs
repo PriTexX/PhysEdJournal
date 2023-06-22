@@ -26,7 +26,7 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
          var payload = new GivePermissionsCommandPayload
          {
              TeacherGuid = teacher.TeacherGuid,
-             Type = permissions
+             TeacherPermissions = permissions
          };
          
          await context.Teachers.AddAsync(teacher); 
@@ -55,7 +55,7 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
         var payload = new GivePermissionsCommandPayload
         {
             TeacherGuid = teacher.TeacherGuid,
-            Type = permissions
+            TeacherPermissions = permissions
         };
         
         await context.Teachers.AddAsync(teacher); 
@@ -89,7 +89,7 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
         var payload = new GivePermissionsCommandPayload
         {
             TeacherGuid = "Default",
-            Type = permissions
+            TeacherPermissions = permissions
         };
 
         // Act

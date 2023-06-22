@@ -21,7 +21,6 @@ public sealed class CreateTeacherCommandTests : DatabaseTestsHelper
             TeacherGuid = "Default",
             FullName = "Default",
             Permissions = TeacherPermissions.DefaultAccess,
-            Groups = null
         };
 
         // Act
@@ -48,7 +47,6 @@ public sealed class CreateTeacherCommandTests : DatabaseTestsHelper
             TeacherGuid = teacher.TeacherGuid,
             FullName = teacher.FullName,
             Permissions = teacher.Permissions,
-            Groups = null
         };
 
         await context.Teachers.AddAsync(teacher);

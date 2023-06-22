@@ -14,15 +14,11 @@ public sealed class CreateCompetitionCommandTests : DatabaseTestsHelper
         
         var command = new CreateCompetitionCommand(context);
         var competitionName = "прыжки";
-        var payload = new CreateCompetitionCommandPayload
-        {
-            CompetitionName = "прыжки"
-        };
-        
+
         await context.SaveChangesAsync();
     
         // Act
-        var result = await command.ExecuteAsync(payload);
+        var result = await command.ExecuteAsync(competitionName);
         var competition = await context.Competitions.FindAsync(competitionName);
     
         // Assert

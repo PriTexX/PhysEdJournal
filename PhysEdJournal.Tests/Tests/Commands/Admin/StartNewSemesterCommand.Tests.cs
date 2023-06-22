@@ -17,13 +17,9 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
         
         var command = new StartNewSemesterCommand(context, cache);
         var validSemesterName = "2022-2023/spring";
-        var payload = new StartNewSemesterCommandPayload
-        {
-            SemesterName = validSemesterName
-        };
 
         // Act
-        var result = await command.ExecuteAsync(payload);
+        var result = await command.ExecuteAsync(validSemesterName);
         var semester = await context.Semesters.FirstOrDefaultAsync(s => s.Name == validSemesterName);
 
         // Assert
@@ -42,13 +38,9 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
         
         var command = new StartNewSemesterCommand(context, cache);
         var invalidSemesterName = "invalid_name";
-        var payload = new StartNewSemesterCommandPayload
-        {
-            SemesterName = invalidSemesterName
-        };
 
         // Act
-        var result = await command.ExecuteAsync(payload);
+        var result = await command.ExecuteAsync(invalidSemesterName);
     
         // Assert
         Assert.False(result.IsSuccess);

@@ -17,16 +17,12 @@ public sealed class DeleteCompetitionCommandTests : DatabaseTestsHelper
         var command = new DeleteCompetitionCommand(context);
         var competitionName = "прыжки";
         var competition = new CompetitionEntity {CompetitionName = competitionName};
-        var payload = new DeleteCompetitionCommandPayload
-        {
-            CompetitionName = competitionName
-        };
 
         await context.Competitions.AddAsync(competition);
         await context.SaveChangesAsync();
     
         // Act
-        var result = await command.ExecuteAsync(payload);
+        var result = await command.ExecuteAsync(competitionName);
         var competitionFromDb = await context.Competitions.FindAsync(competitionName);
     
         // Assert
@@ -43,15 +39,11 @@ public sealed class DeleteCompetitionCommandTests : DatabaseTestsHelper
         
         var command = new DeleteCompetitionCommand(context);
         var competitionName = "прыжки";
-        var payload = new DeleteCompetitionCommandPayload
-        {
-            CompetitionName = competitionName
-        };
-        
+
         await context.SaveChangesAsync();
     
         // Act
-        var result = await command.ExecuteAsync(payload);
+        var result = await command.ExecuteAsync(competitionName);
     
         // Assert
         Assert.False(result.IsSuccess);
