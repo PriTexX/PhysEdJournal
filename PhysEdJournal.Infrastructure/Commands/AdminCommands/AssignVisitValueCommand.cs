@@ -14,11 +14,11 @@ public sealed class AssignVisitValueCommandPayload
 
 internal sealed class AssignVisitValueCommandValidator : ICommandValidator<AssignVisitValueCommandPayload>
 {
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AssignVisitValueCommandPayload commandInput)
+    public ValueTask<ValidationResult> ValidateCommandInputAsync(AssignVisitValueCommandPayload commandInput)
     {
         if (commandInput.NewVisitValue <= 0)
         {
-            return new NullVisitValueException(commandInput.NewVisitValue);
+            return ValidationResult.Create(new NullVisitValueException(commandInput.NewVisitValue));
         }
 
         return ValidationResult.Success;
@@ -39,15 +39,15 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
     public async Task<Result<Unit>> ExecuteAsync(AssignVisitValueCommandPayload commandPayload)
     {
         var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
-        
+
         if (validationResult.IsFailed)
         {
-            return new Result<Unit>(validationResult.ValidationException);
+            return validationResult.ToResult<Unit>();
         }
         
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
 
-        if (group == null)
+        if (group is null)
         {
             return new Result<Unit>(new GroupNotFoundException(commandPayload.GroupName));
         }
