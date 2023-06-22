@@ -6,7 +6,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["PhysEdJournal.Core", "PhysEdJournal.Core/"]
-COPY ["PhysEdJournal.Application", "PhysEdJournal.Application/"]
 COPY ["PhysEdJournal.Infrastructure", "PhysEdJournal.Infrastructure/"]
 COPY ["PhysEdJournal.Api/PhysEdJournal.Api.csproj", "PhysEdJournal.Api/"]
 RUN dotnet restore "PhysEdJournal.Api/PhysEdJournal.Api.csproj"
