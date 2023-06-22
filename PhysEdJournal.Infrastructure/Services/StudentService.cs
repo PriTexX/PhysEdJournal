@@ -2,7 +2,6 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using PhysEdJournal.Application.Services;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -10,30 +9,27 @@ using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Validators.Permissions;
 using PhysEdJournal.Infrastructure.Validators.Standards;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
-public sealed class StudentService : IStudentService
+public sealed class StudentService
 {
-    private readonly IGroupService _groupService;
+    private readonly GroupService _groupService;
     private readonly ApplicationContext _applicationContext;
-    private readonly PermissionValidator _permissionValidator;
     private readonly StandardsValidator _standardsValidator;
-    private readonly string _userInfoServerURL;
+    
+    private readonly string _userInfoServerUrl;
     private readonly int _pageSize;
 
-    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, IGroupService groupService, PermissionValidator permissionValidator, StandardsValidator standardsValidator)
+    public StudentService(ApplicationContext applicationContext, IOptions<ApplicationOptions> options, GroupService groupService, StandardsValidator standardsValidator)
     {
         _groupService = groupService;
-        _permissionValidator = permissionValidator;
         _standardsValidator = standardsValidator;
         _applicationContext = applicationContext;
-        _userInfoServerURL = options.Value.UserInfoServerURL;
+        _userInfoServerUrl = options.Value.UserInfoServerURL;
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
@@ -41,22 +37,6 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            switch (pointsStudentHistoryEntity.WorkType)
-            {
-                case WorkType.InternalTeam or WorkType.Activist or WorkType.Competition:
-                {
-                    await _permissionValidator.ValidateTeacherPermissionsAndThrow(pointsStudentHistoryEntity.TeacherGuid,
-                        ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS);
-                    break;
-                }
-                case WorkType.OnlineWork:
-                {
-                    await _permissionValidator.ValidateTeacherPermissionsAndThrow(pointsStudentHistoryEntity.TeacherGuid,
-                        ADD_POINTS_FOR_LMS_PERMISSIONS);
-                    break;
-                }
-            }
-            
             if (pointsStudentHistoryEntity.Date > DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 return new Result<Unit>(new ActionFromFutureException(pointsStudentHistoryEntity.Date));
@@ -76,7 +56,7 @@ public sealed class StudentService : IStudentService
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
 
-            await TryArchiveStudentWithDebt(pointsStudentHistoryEntity.TeacherGuid, student);
+            await TryArchiveStudentWithDebt(student);
 
             return Unit.Default;
         }
@@ -90,19 +70,17 @@ public sealed class StudentService : IStudentService
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, INCREASE_VISITS_PERMISSIONS);
+            if (date > DateOnly.FromDateTime(DateTime.Now))
+            {
+                return new Result<Unit>(new ActionFromFutureException(date));
+            }
 
-           if (date > DateOnly.FromDateTime(DateTime.Now))
-           {
-               return new Result<Unit>(new ActionFromFutureException(date));
-           }
+            if (DateOnly.FromDateTime(DateTime.Now).DayNumber-date.DayNumber > VISIT_LIFE_DAYS)
+            {
+                return new Result<Unit>(new VisitExpiredException(date));
+            }
 
-           if (DateOnly.FromDateTime(DateTime.Now).DayNumber-date.DayNumber > VISIT_LIFE_DAYS)
-           {
-               return new Result<Unit>(new VisitExpiredException(date));
-           }
-
-           var student = await _applicationContext.Students.FindAsync(studentGuid);
+            var student = await _applicationContext.Students.FindAsync(studentGuid);
 
             if (student is null)
             {
@@ -130,7 +108,7 @@ public sealed class StudentService : IStudentService
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
             
-            await TryArchiveStudentWithDebt(teacherGuid, student);
+            await TryArchiveStudentWithDebt(student);
 
             return Unit.Default;
         }
@@ -140,41 +118,39 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardStudentHistoryEntity standardStudentHistoryEntity)
+    public async Task<Result<Unit>> AddPointsForStandardsAsync(StandardsStudentHistoryEntity standardsStudentHistoryEntity)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(standardStudentHistoryEntity.TeacherGuid, ADD_POINTS_FOR_STANDARDS_PERMISSIONS);
-            
-            if (standardStudentHistoryEntity.Date > DateOnly.FromDateTime(DateTime.Now))
+            if (standardsStudentHistoryEntity.Date > DateOnly.FromDateTime(DateTime.Now))
             {
-                return new Result<Unit>(new ActionFromFutureException(standardStudentHistoryEntity.Date));
+                return new Result<Unit>(new ActionFromFutureException(standardsStudentHistoryEntity.Date));
             }
            
-            var student = await _applicationContext.Students.FindAsync(standardStudentHistoryEntity.StudentGuid);
+            var student = await _applicationContext.Students.FindAsync(standardsStudentHistoryEntity.StudentGuid);
 
             if (student is null)
             {
-                return new Result<Unit>(new StudentNotFoundException(standardStudentHistoryEntity.StudentGuid));
+                return new Result<Unit>(new StudentNotFoundException(standardsStudentHistoryEntity.StudentGuid));
             }
 
             var allHistory = _applicationContext.StandardsStudentsHistory.ToList();
-            if (allHistory.FirstOrDefault(s => s.StandardType == standardStudentHistoryEntity.StandardType) != null)
+            if (allHistory.FirstOrDefault(s => s.StandardType == standardsStudentHistoryEntity.StandardType) != null)
             {
-                return new Result<Unit>(new StandardAlreadyExistsException(standardStudentHistoryEntity.StudentGuid,
-                    standardStudentHistoryEntity.StandardType));
+                return new Result<Unit>(new StandardAlreadyExistsException(standardsStudentHistoryEntity.StudentGuid,
+                    standardsStudentHistoryEntity.StandardType));
             }
 
-            _standardsValidator.ValidateStudentPointsForStandardsAndThrow(standardStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
+            _standardsValidator.ValidateStudentPointsForStandardsAndThrow(standardsStudentHistoryEntity.Points, student.PointsForStandards, student.StudentGuid);
             
-            student.PointsForStandards += student.PointsForStandards + standardStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardStudentHistoryEntity.Points;
+            student.PointsForStandards += student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS ? 0 : standardsStudentHistoryEntity.Points;
 
-            standardStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
-            _applicationContext.StandardsStudentsHistory.Add(standardStudentHistoryEntity);
+            standardsStudentHistoryEntity.SemesterName = student.CurrentSemesterName;
+            _applicationContext.StandardsStudentsHistory.Add(standardsStudentHistoryEntity);
             _applicationContext.Students.Update(student);
             await _applicationContext.SaveChangesAsync();
             
-            await TryArchiveStudentWithDebt(standardStudentHistoryEntity.TeacherGuid, student);
+            await TryArchiveStudentWithDebt(student);
 
             return Unit.Default;
         }
@@ -184,12 +160,10 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string teacherGuid, string studentGuid, bool isForceMode = false)
+    public async Task<Result<ArchivedStudentEntity>> ArchiveStudentAsync(string studentGuid, bool isForceMode = false)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, ARCHIVE_PERMISSIONS); // TODO обернуть в транзакцию
-            
             var studentFromDb = await _applicationContext.Students
                 .AsNoTracking()
                 .Where(s => s.StudentGuid == studentGuid)
@@ -230,7 +204,7 @@ public sealed class StudentService : IStudentService
                 return new Result<ArchivedStudentEntity>(new CannotMigrateToNewSemesterException(activeSemester.Name));
 
             var totalPoints = CalculateTotalPoints(student);
-            if (isForceMode || totalPoints > POINT_AMOUNT) // если превысил порог по баллам
+            if (isForceMode || totalPoints > REQUIRED_POINT_AMOUNT) // если превысил порог по баллам
             {
                 await using var transaction = await _applicationContext.Database.BeginTransactionAsync();
                 
@@ -328,12 +302,10 @@ public sealed class StudentService : IStudentService
         }
     }
     
-    public async Task<Result<Unit>> UnArchiveStudentAsync(string teacherGuid, string studentGuid, string semesterName)
+    public async Task<Result<Unit>> UnArchiveStudentAsync(string studentGuid, string semesterName)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, ARCHIVE_PERMISSIONS);
-        
             var student = await _applicationContext.Students.FindAsync(studentGuid);
             if (student is null)
             {
@@ -393,19 +365,17 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> UpdateStudentsInfoAsync(string teacherGuid)
+    public async Task<Result<Unit>> UpdateStudentsInfoAsync()
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-            
-            var res = await _groupService.UpdateGroupsInfoAsync(teacherGuid);
+            var res = await _groupService.UpdateGroupsInfoAsync();
             res.Match(_ => true, exception => throw exception);
 
             var currentSemesterName = (await _applicationContext.GetActiveSemester()).Name;
         
             const int batchSize = 500;
-            var updateTasks = GetAllStudentsAsync(_userInfoServerURL, pageSize: _pageSize)
+            var updateTasks = GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize)
                 .Buffer(batchSize)
                 .SelectAwait(async actualStudents => new
                 {
@@ -438,15 +408,13 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> DeActivateStudentAsync(string teacherGuid, string studentGuid)
+    public async Task<Result<Unit>> DeActivateStudentAsync(string studentGuid)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-
             try
             {
-                await _applicationContext.Students
+                await _applicationContext.Students // TODO убрать try/catch здесь т.к. он не имеет смысла (если при обновлении вылезла ошибка, это не значит, что студента нет)
                     .Where(s => s.StudentGuid == studentGuid)
                     .ExecuteUpdateAsync(p => p
                         .SetProperty(s => s.IsActive, false));
@@ -464,12 +432,10 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    public async Task<Result<Unit>> ActivateStudentAsync(string teacherGuid, string studentGuid)
+    public async Task<Result<Unit>> ActivateStudentAsync(string studentGuid)
     {
         try
         {
-            await _permissionValidator.ValidateTeacherPermissionsAndThrow(teacherGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
-
             try
             {
                 await _applicationContext.Students
@@ -490,13 +456,12 @@ public sealed class StudentService : IStudentService
         }
     }
 
-    private async Task TryArchiveStudentWithDebt(string teacherGuid,
-        StudentEntity student)
+    private async Task TryArchiveStudentWithDebt(StudentEntity student)
     {
         var hasDebtAndEnoughPoints = CheckIfStudentHasDebtAndEnoughPoints(student);
         if (hasDebtAndEnoughPoints)
         {
-            var res = await ArchiveStudentAsync(teacherGuid, student.StudentGuid);
+            var res = await ArchiveStudentAsync(student.StudentGuid);
             res.Match(_ => true, exception => throw exception);
         }
     }
@@ -507,7 +472,7 @@ public sealed class StudentService : IStudentService
             return false;
         
         var totalPoints = CalculateTotalPoints(student);
-        return totalPoints >= POINT_AMOUNT;
+        return totalPoints >= REQUIRED_POINT_AMOUNT;
     }
 
     private double CalculateTotalPoints(StudentEntity student)

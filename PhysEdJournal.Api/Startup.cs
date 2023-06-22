@@ -53,9 +53,12 @@ public class Startup
         services.AddCors();
 
         services.AddInfrastructure(Configuration);
+        
+        services.AddScoped<PermissionValidator>();
 
         services
             .AddGraphQLServer()
+            .AddDiagnosticEventListener<ErrorLoggingDiagnosticsEventListener>()
             .AddAuthorization()
             .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()

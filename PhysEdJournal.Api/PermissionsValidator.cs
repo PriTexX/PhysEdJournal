@@ -4,7 +4,7 @@ using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Database;
 
-namespace PhysEdJournal.Infrastructure.Validators.Permissions;
+namespace PhysEdJournal.Api;
 
 public class PermissionValidator
 {
@@ -19,6 +19,11 @@ public class PermissionValidator
 
     public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(string teacherGuid, TeacherPermissions requiredPermissions)
     {
+        if (requiredPermissions == TeacherPermissions.DefaultAccess)
+        {
+            return new LanguageExt.Common.Result<bool>(true);
+        }
+        
         _memoryCache.TryGetValue(teacherGuid, out TeacherEntity? teacher);
 
         if (teacher is null)

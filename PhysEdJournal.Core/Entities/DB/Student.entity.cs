@@ -58,5 +58,5 @@ public sealed class StudentEntity
     
     public ICollection<VisitStudentHistoryEntity> VisitsStudentHistory { get; set; }
     
-    public ICollection<StandardStudentHistoryEntity> StandardsStudentHistory { get; set; }
+    public ICollection<StandardsStudentHistoryEntity> StandardsStudentHistory { get; set; }
 }

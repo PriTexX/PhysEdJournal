@@ -10,11 +10,13 @@ public sealed class ApplicationContext : DbContext
     public DbSet<GroupEntity> Groups { get; set; }
     public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; set; }
     public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; set; }
-    public DbSet<StandardStudentHistoryEntity> StandardsStudentsHistory { get; set; }
+    public DbSet<StandardsStudentHistoryEntity> StandardsStudentsHistory { get; set; }
     public DbSet<StudentEntity> Students { get; set; }
     public DbSet<TeacherEntity> Teachers { get; set; }
     public DbSet<ArchivedStudentEntity> ArchivedStudents { get; set; }
     public DbSet<SemesterEntity> Semesters { get; set; }
+    
+    public DbSet<CompetitionEntity> Competitions { get; set; }
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options, IMemoryCache memoryCache) : base(options)
     {

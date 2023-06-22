@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace PhysEdJournal.Infrastructure.DateOnlySupport;
+namespace PhysEdJournal.Infrastructure.Database.DateOnlySupport;
 
 public sealed class DateOnlyComparer : ValueComparer<DateOnly>
 {

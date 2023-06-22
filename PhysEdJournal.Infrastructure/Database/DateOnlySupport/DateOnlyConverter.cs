@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace PhysEdJournal.Infrastructure.DateOnlySupport;
+namespace PhysEdJournal.Infrastructure.Database.DateOnlySupport;
 
 public sealed class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
 {
