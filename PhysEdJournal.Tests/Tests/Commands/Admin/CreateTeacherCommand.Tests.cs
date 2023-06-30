@@ -41,7 +41,7 @@ public sealed class CreateTeacherCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
             
         var command = new CreateTeacherCommand(context);
-        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
+        var teacher = EntitiesFactory.CreateTeacher(TeacherPermissions.DefaultAccess);
         var payload = new CreateTeacherCommandPayload
         {
             TeacherGuid = teacher.TeacherGuid,

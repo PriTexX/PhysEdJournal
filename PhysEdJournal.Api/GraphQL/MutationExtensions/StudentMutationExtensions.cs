@@ -10,7 +10,6 @@ using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
-using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
@@ -177,7 +176,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> UpdateStudentsInfo(
         [Service] UpdateStudentsInfoCommand updateStudentsInfoCommand, 
-        [Service] ILogger<StudentService> logger,
+        [Service] ILogger<UpdateStudentsInfoCommand> logger,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
     {

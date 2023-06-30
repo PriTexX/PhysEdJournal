@@ -17,8 +17,8 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
         
         var command = new AssignCuratorCommand(context);
-        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
-        var group = EntitiesFactory.DefaultGroupEntity("Default");
+        var teacher = EntitiesFactory.CreateTeacher(TeacherPermissions.DefaultAccess);
+        var group = EntitiesFactory.CreateGroup("Default");
         var payload = new AssignCuratorCommandPayload
         {
             GroupName = group.GroupName, 
@@ -46,7 +46,7 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
         
         var command = new AssignCuratorCommand(context);
-        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
+        var teacher = EntitiesFactory.CreateTeacher(TeacherPermissions.DefaultAccess);
         var groupName = "non-existing-group";
         var payload = new AssignCuratorCommandPayload
         {
@@ -77,7 +77,7 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
         
         var command = new AssignCuratorCommand(context);
-        var group = EntitiesFactory.DefaultGroupEntity("Default");
+        var group = EntitiesFactory.CreateGroup("Default");
         var payload = new AssignCuratorCommandPayload
         {
             GroupName = group.GroupName, 
