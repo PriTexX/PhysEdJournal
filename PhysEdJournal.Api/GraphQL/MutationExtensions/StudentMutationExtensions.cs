@@ -71,7 +71,7 @@ public class StudentMutationExtensions
     [Error(typeof(StandardAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
     public async Task<Success> AddPointsForStandardToStudent(
-        string studentGuid, int pointsAmount, DateOnly date, StandardType standardType,
+        string studentGuid, int pointsAmount, DateOnly date, StandardType standardType, bool isOverride,
         [Service] AddStandardPointsCommand addStandardPointsCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal)
@@ -88,6 +88,7 @@ public class StudentMutationExtensions
             Points = pointsAmount,
             Date = date,
             StandardType = standardType,
+            IsOverride = isOverride,
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 

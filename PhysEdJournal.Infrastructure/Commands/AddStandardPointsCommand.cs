@@ -20,6 +20,7 @@ public sealed class AddStandardPointsCommandPayload
     public required int Points { get; init; }
     public required string TeacherGuid { get; init; }
     public required StandardType StandardType { get; init; }
+    public required bool IsOverride { get; init; }
 }
 
 internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddStandardPointsCommandPayload>
@@ -37,10 +38,15 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
         {
             return new ActionFromFutureException(commandInput.Date);
         }
-        
-        if (commandInput.Points == MAX_POINTS_FOR_STANDARDS)
+
+        if (commandInput.Points > MAX_POINTS_FOR_ONE_STANDARD)
         {
-            return new OverAbundanceOfPointsForStudentException(commandInput.StudentGuid);
+            return new PointsOverflowException(commandInput.Points, MAX_POINTS_FOR_ONE_STANDARD);
+        }
+
+        if (commandInput.Points <= 0)
+        {
+            return new NegativePointAmount();
         }
 
         if (commandInput.Points % 2 != 0)
@@ -48,19 +54,25 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
             return new NonRegularPointsValueException(commandInput.Points);
         }
 
-        if (commandInput.Points <= 0)
-        {
-            return new NegativePointAmount();
-        }
+        var duplicateHistoryEntity = await _applicationContext.StandardsStudentsHistory
+            .AsNoTracking()
+            .Where(s => s.StudentGuid == commandInput.StudentGuid && s.StandardType == commandInput.StandardType)
+            .OrderByDescending(s => s.Points)
+            .FirstOrDefaultAsync();
         
-        var hasDuplicateRow = await _applicationContext.StandardsStudentsHistory
-            .AnyAsync(s => s.StudentGuid == commandInput.StudentGuid && s.StandardType == commandInput.StandardType);
-        if (hasDuplicateRow)
+        if (commandInput.IsOverride && duplicateHistoryEntity is not null)
         {
-            return new StandardAlreadyExistsException(commandInput.StudentGuid,
-                commandInput.StandardType);
+            if (commandInput.Points < duplicateHistoryEntity.Points)
+                return new LoweringTheScoreException(duplicateHistoryEntity.Points);
+            
+            return ValidationResult.Success;
         }
-        
+
+        if (duplicateHistoryEntity is not null)
+        {
+            return new StandardAlreadyExistsException(commandInput.StudentGuid, commandInput.StandardType);
+        }
+
         return ValidationResult.Success;
     }
 }
@@ -79,7 +91,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
     public async Task<Result<Unit>> ExecuteAsync(AddStandardPointsCommandPayload commandPayload)
     {
         var validation = await _validator.ValidateCommandInputAsync(commandPayload);
-
+        
         if (validation.IsFailed)
         {
             return validation.ToResult<Unit>();
@@ -101,16 +113,20 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             Points = commandPayload.Points,
             StandardType = commandPayload.StandardType
         };
+        
+        if (commandPayload.IsOverride)
+        {
+            var points = await _applicationContext.StandardsStudentsHistory
+                .AsNoTracking()
+                .Where(s => s.StudentGuid == commandPayload.StudentGuid && s.StandardType == commandPayload.StandardType)
+                .OrderByDescending(s => s.Points)
+                .Select(s => s.Points)
+                .FirstAsync();
 
-        int adjustedStudentPointsAmount;
-        if (student.PointsForStandards + standardsStudentHistoryEntity.Points > MAX_POINTS_FOR_STANDARDS)
-        {
-            adjustedStudentPointsAmount = MAX_POINTS_FOR_STANDARDS;
+            student.PointsForStandards -= points;
         }
-        else
-        {
-            adjustedStudentPointsAmount = standardsStudentHistoryEntity.Points;
-        }
+        
+        var adjustedStudentPointsAmount = AdjustStudentPointsAmount(student.PointsForStandards, standardsStudentHistoryEntity.Points);
 
         student.PointsForStandards = adjustedStudentPointsAmount;
         
@@ -121,5 +137,20 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
         
         return Unit.Default;
+    }
+
+    private int AdjustStudentPointsAmount(int studentTotalPointsForStandards, int pointsToImplement)
+    {
+        int adjustedStudentPointsAmount;
+        if (studentTotalPointsForStandards + pointsToImplement > MAX_POINTS_FOR_STANDARDS)
+        {
+            adjustedStudentPointsAmount = MAX_POINTS_FOR_STANDARDS;
+        }
+        else
+        {
+            adjustedStudentPointsAmount = studentTotalPointsForStandards + pointsToImplement;
+        }
+
+        return adjustedStudentPointsAmount;
     }
 }
