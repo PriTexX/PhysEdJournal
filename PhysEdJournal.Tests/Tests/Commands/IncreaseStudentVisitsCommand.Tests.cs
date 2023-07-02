@@ -130,11 +130,10 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var group = EntitiesFactory.CreateGroup("211-729");
         var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
         var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var today = DateOnly.FromDateTime(DateTime.Today);
         var payload = new IncreaseStudentVisitsCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            Date = new DateOnly(today.Year, today.Month, today.Day - (VISIT_LIFE_DAYS + 1)),
+            Date = DateOnly.MinValue,
             TeacherGuid = teacher.TeacherGuid,
         };
         
