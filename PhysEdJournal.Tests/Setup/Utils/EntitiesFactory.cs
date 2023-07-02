@@ -25,28 +25,58 @@ public static class EntitiesFactory
         };
     }
     
-    public static SemesterEntity DefaultSemesterEntity(string semesterName, bool isCurrent)
+    public static SemesterEntity CreateSemester(string semesterName, bool isCurrent)
     {
         var semester = new SemesterEntity { Name = semesterName, IsCurrent = isCurrent };
 
         return semester;
     }
     
-    public static GroupEntity DefaultGroupEntity(string groupName)
+    public static GroupEntity CreateGroup(string groupName)
     {
         var group = new GroupEntity {GroupName = groupName};
 
         return group;
     }
     
-    public static TeacherEntity DefaultTeacherEntity(TeacherPermissions permissions)
+    public static TeacherEntity CreateTeacher(TeacherPermissions permissions)
     {
-        var teacher = new TeacherEntity()
+        var teacher = new TeacherEntity
         {
             FullName = "DefaultName",
             TeacherGuid = Guid.NewGuid().ToString(),
             Permissions = permissions
         };
         return teacher;
+    }
+    
+    public static PointsStudentHistoryEntity CreatePointsStudentHistoryEntity( string studentGuid, WorkType workType, string teacherGuid, DateOnly date, int points)
+    {
+        var historyEntity = new PointsStudentHistoryEntity
+        {
+            StudentGuid = studentGuid,
+            Date = date == default
+                ? DateOnly.FromDateTime(DateTime.Today)
+                : date,
+            TeacherGuid = teacherGuid,
+            WorkType = workType,
+            Points = points,
+        };
+
+        return historyEntity;
+    }
+    
+    public static StandardsStudentHistoryEntity CreateStandardsHistoryEntity(string studentGuid, StandardType standardType, string teacherGuid, DateOnly date, int points)
+    {
+        var historyEntity = new StandardsStudentHistoryEntity
+        {
+            StudentGuid = studentGuid,
+            Date = date == default ? DateOnly.FromDateTime(DateTime.Today) : date,
+            TeacherGuid = teacherGuid,
+            StandardType = standardType,
+            Points = points,
+        };
+
+        return historyEntity;
     }
 }

@@ -18,7 +18,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
         
         var command = new AssignVisitValueCommand(context);
-        var group = EntitiesFactory.DefaultGroupEntity("Default");
+        var group = EntitiesFactory.CreateGroup("Default");
         var payload = new AssignVisitValueCommandPayload
         {
             GroupName = group.GroupName,
@@ -48,7 +48,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
         
         var command = new AssignVisitValueCommand(context);
-        var group = EntitiesFactory.DefaultGroupEntity("Default");
+        var group = EntitiesFactory.CreateGroup("Default");
         var payload = new AssignVisitValueCommandPayload
         {
             GroupName = group.GroupName,

@@ -3,7 +3,6 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Services;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;

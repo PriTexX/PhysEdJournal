@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -11,22 +12,25 @@ namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
 {
-    private readonly ApplicationContext _applicationContext;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly string _userInfoServerUrl;
     private readonly int _pageSize;
 
-    public UpdateStudentsInfoCommand(ApplicationContext applicationContext, IOptions<ApplicationOptions> options)
+    public UpdateStudentsInfoCommand(IOptions<ApplicationOptions> options, IServiceScopeFactory serviceScopeFactory)
     {
-        _applicationContext = applicationContext;
+        _serviceScopeFactory = serviceScopeFactory;
         _userInfoServerUrl = options.Value.UserInfoServerURL;
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
 
     public async Task<Result<Unit>> ExecuteAsync(EmptyPayload commandPayload)
     {
-        await UpdateGroups();
+        await using var scope = _serviceScopeFactory.CreateAsyncScope(); // Использую ServiceLocator т.к. команда запускается в бэкграунде и переданный ей ApplicationContext закрывается до завершения работы команды
+        var applicationContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
         
-        var currentSemesterName = (await _applicationContext.GetActiveSemester()).Name;
+        await UpdateGroups(applicationContext);
+        
+        var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
         
         const int batchSize = 500;
         var updateTasks = GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize)
@@ -34,7 +38,7 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
             .SelectAwait(async actualStudents => new
             {
                 actualStudents = actualStudents.ToDictionary(s => s.Guid), 
-                dbStudents = (await GetManyStudentsWithManyKeys(_applicationContext, actualStudents
+                dbStudents = (await GetManyStudentsWithManyKeys(applicationContext, actualStudents
                         .Select(s => s.Guid)
                         .ToArray()))
                     .ToDictionary(d => d.StudentGuid)
@@ -47,7 +51,7 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
                 )))
             .Select(d => d
                 .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2, currentSemesterName)))
-            .Select(s => CommitChangesToContext(_applicationContext, s.ToList()));
+            .Select(s => CommitChangesToContext(applicationContext, s.ToList()));
 
         await foreach (var updateTask in updateTasks)
         {
@@ -57,7 +61,7 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
         return Unit.Default;
     }
 
-    private async Task UpdateGroups()
+    private async Task UpdateGroups(ApplicationContext applicationContext)
     {
         var distinctGroups = await GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize)
             .Select(s => s.Group)
@@ -65,13 +69,13 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
             .Distinct()
             .ToListAsync();
 
-        var dbGroups = await _applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
+        var dbGroups = await applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
 
         var newGroups = distinctGroups
             .Where(g => !dbGroups.ContainsKey(g))
             .Select(g => new GroupEntity { GroupName = g });
 
-        _applicationContext.Groups.AddRange(newGroups);
-        await _applicationContext.SaveChangesAsync();
+        applicationContext.Groups.AddRange(newGroups);
+        await applicationContext.SaveChangesAsync();
     }
 }

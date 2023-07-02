@@ -22,7 +22,7 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
          
          var command = new GivePermissionsCommand(context, cache);
          var expectedPermissions = permissions; 
-         var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
+         var teacher = EntitiesFactory.CreateTeacher(TeacherPermissions.DefaultAccess);
          var payload = new GivePermissionsCommandPayload
          {
              TeacherGuid = teacher.TeacherGuid,
@@ -51,7 +51,7 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
         
         var command = new GivePermissionsCommand(context, cache);
         var permissions = TeacherPermissions.SuperUser;
-        var teacher = EntitiesFactory.DefaultTeacherEntity(TeacherPermissions.DefaultAccess);
+        var teacher = EntitiesFactory.CreateTeacher(TeacherPermissions.DefaultAccess);
         var payload = new GivePermissionsCommandPayload
         {
             TeacherGuid = teacher.TeacherGuid,

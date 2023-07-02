@@ -12,7 +12,7 @@ public class StandardsStudentHistoryEntity
     public int Id { get; set; }
     
     [Required]
-    [Range(0,10)]
+    [Range(2,10)]
     public int Points { get; set; }
     
     [Column(TypeName = "date")]

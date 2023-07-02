@@ -18,8 +18,8 @@ public sealed class DeActivateStudentCommandTests : DatabaseTestsHelper
         await ClearDatabase(context);
 
         var command = new DeActivateStudentCommand(context);
-        var semester = EntitiesFactory.DefaultSemesterEntity("2022-2023/spring", true);
-        var group = EntitiesFactory.DefaultGroupEntity("211-729");
+        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
+        var group = EntitiesFactory.CreateGroup("211-729");
         var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, isActive);
         
         await context.Semesters.AddAsync(semester);
