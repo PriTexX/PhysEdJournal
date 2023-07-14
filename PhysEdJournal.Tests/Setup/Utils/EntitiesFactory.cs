@@ -25,6 +25,26 @@ public static class EntitiesFactory
         };
     }
     
+    public static StudentEntity CreateStudent(string groupNumber, string currentSemesterName, bool hasDebtFromPreviousSemester, bool isActive, int additionalPoints)
+    {
+        return new StudentEntity
+        {
+            StudentGuid = Guid.NewGuid().ToString(),
+            FullName = "John Smith",
+            GroupNumber = groupNumber,
+            HasDebtFromPreviousSemester = hasDebtFromPreviousSemester,
+            ArchivedVisitValue = 0,
+            AdditionalPoints = additionalPoints,
+            Visits = 0,
+            Course = 2,
+            HealthGroup = HealthGroupType.Basic,
+            Department = "IT",
+            CurrentSemesterName = currentSemesterName, //"2022-2023/spring"
+            IsActive = isActive,
+            PointsForStandards = 0,
+        };
+    }
+
     public static SemesterEntity CreateSemester(string semesterName, bool isCurrent)
     {
         var semester = new SemesterEntity { Name = semesterName, IsCurrent = isCurrent };
@@ -35,6 +55,17 @@ public static class EntitiesFactory
     public static GroupEntity CreateGroup(string groupName)
     {
         var group = new GroupEntity {GroupName = groupName};
+
+        return group;
+    }
+    public static GroupEntity CreateGroup(string groupName, double visitValue, string curatorGuid)
+    {
+        var group = new GroupEntity
+        {
+            GroupName = groupName,
+            VisitValue = visitValue,
+            CuratorGuid = curatorGuid
+        };
 
         return group;
     }

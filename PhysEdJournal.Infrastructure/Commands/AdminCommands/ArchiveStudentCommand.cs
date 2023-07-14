@@ -59,7 +59,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         var totalPoints = CalculateTotalPoints(studentFromDb.Visits, studentFromDb.VisitValue,
             studentFromDb.AdditionalPoints, studentFromDb.PointsForStandards);
 
-        if (commandPayload.IsForceMode || totalPoints > REQUIRED_POINT_AMOUNT) // если превысил порог по баллам
+        if (commandPayload.IsForceMode || totalPoints >= REQUIRED_POINT_AMOUNT) // если превысил порог по баллам
         {
             var archiveStudentPayload = new InternalArchiveStudentPayload
             {
