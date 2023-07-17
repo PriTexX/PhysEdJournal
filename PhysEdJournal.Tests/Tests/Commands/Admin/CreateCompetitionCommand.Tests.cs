@@ -19,10 +19,11 @@ public sealed class CreateCompetitionCommandTests : DatabaseTestsHelper
     
         // Act
         var result = await command.ExecuteAsync(competitionName);
-        var competition = await context.Competitions.FindAsync(competitionName);
-    
+
         // Assert
         Assert.True(result.IsSuccess);
+        await using var assertContext = CreateContext();
+        var competition = await assertContext.Competitions.FindAsync(competitionName);
         Assert.NotNull(competition);
         Assert.Equal(competitionName, competition.CompetitionName);
     }

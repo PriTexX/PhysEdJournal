@@ -1,4 +1,5 @@
-﻿using PhysEdJournal.Core.Entities.Types;
+﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands;
@@ -49,9 +50,12 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
         
         //Assert
         Assert.True(result.IsSuccess);
-        var studentFromDb = await context.Students.FindAsync(student.StudentGuid);
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.Include(s => s.PointsStudentHistory)
+            .Where(s => s.StudentGuid == student.StudentGuid).FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
-        Assert.NotNull(studentFromDb.PointsStudentHistory.FirstOrDefault(h => h.Points == historyEntity.Points));
+        var duplicate = studentFromDb.PointsStudentHistory.FirstOrDefault(h => h.Points == historyEntity.Points);
+        Assert.NotNull(duplicate);
     }
     
     [Theory]

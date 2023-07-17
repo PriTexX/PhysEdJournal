@@ -34,11 +34,13 @@ public sealed class GivePermissionsCommandTests  : DatabaseTestsHelper
     
          // Act
         var result = await command.ExecuteAsync(payload);
-        var teacherFromDb = await context.Teachers.FindAsync(teacher.TeacherGuid);
-    
-         // Assert
+
+        // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(expectedPermissions, teacherFromDb?.Permissions);
+        await using var assertContext = CreateContext();
+        var teacherFromDb = await assertContext.Teachers.FindAsync(teacher.TeacherGuid);
+        Assert.NotNull(teacherFromDb);
+        Assert.Equal(expectedPermissions, teacherFromDb.Permissions);
      }
      
     [Fact]

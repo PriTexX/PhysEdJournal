@@ -1,4 +1,5 @@
-﻿using PhysEdJournal.Core.Entities.Types;
+﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
@@ -52,7 +53,9 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         
         //Assert
         Assert.True(result.IsSuccess);
-        var studentFromDb = await context.Students.FindAsync(student.StudentGuid);
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.Include(s => s.StandardsStudentHistory)
+            .Where(s => s.StudentGuid == student.StudentGuid).FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.NotNull(studentFromDb.StandardsStudentHistory.FirstOrDefault(h => h.Points == historyEntity.Points));
     }
@@ -96,7 +99,9 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         
         //Assert
         Assert.True(result.IsSuccess);
-        var studentFromDb = await context.Students.FindAsync(student.StudentGuid);
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.Include(s => s.StandardsStudentHistory)
+            .Where(s => s.StudentGuid == student.StudentGuid).FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.NotNull(studentFromDb.StandardsStudentHistory.FirstOrDefault(h => h.Points == historyEntity.Points));
     }
@@ -402,7 +407,9 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         //Assert
         Assert.True(firstTry.IsSuccess);
         Assert.True(overrideTry.IsSuccess);
-        var studentFromDb = await context.Students.FindAsync(student.StudentGuid);
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.Include(s => s.StandardsStudentHistory)
+            .Where(s => s.StudentGuid == student.StudentGuid).FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.NotNull(studentFromDb.StandardsStudentHistory.FirstOrDefault(h => h.Points == payload2.Points));
         Assert.Equal(2, studentFromDb.StandardsStudentHistory.Count);

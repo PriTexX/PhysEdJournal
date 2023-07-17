@@ -33,7 +33,8 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.True(result.IsSuccess);
-        var groupFromDb = await context.Groups.FindAsync(group.GroupName);
+        await using var assertContext = CreateContext();
+        var groupFromDb = await assertContext.Groups.FindAsync(group.GroupName);
         Assert.NotNull(groupFromDb);
         Assert.Equal(visitValue, groupFromDb.VisitValue);
     }

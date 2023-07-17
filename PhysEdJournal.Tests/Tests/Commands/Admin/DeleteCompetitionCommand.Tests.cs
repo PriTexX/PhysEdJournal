@@ -23,10 +23,11 @@ public sealed class DeleteCompetitionCommandTests : DatabaseTestsHelper
     
         // Act
         var result = await command.ExecuteAsync(competitionName);
-        var competitionFromDb = await context.Competitions.FindAsync(competitionName);
-    
+
         // Assert
         Assert.True(result.IsSuccess);
+        await using var assertContext = CreateContext();
+        var competitionFromDb = await assertContext.Competitions.FindAsync(competitionName);
         Assert.Null(competitionFromDb);
     }
      

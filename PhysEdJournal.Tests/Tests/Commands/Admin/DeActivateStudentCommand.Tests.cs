@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
+﻿using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Tests.Setup;
 using PhysEdJournal.Tests.Setup.Utils;
@@ -11,7 +10,7 @@ public sealed class DeActivateStudentCommandTests : DatabaseTestsHelper
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task DeActivateStudentAsync_WhenStudentExists_ShouldActivateStudent(bool isActive)
+    public async Task DeActivateStudentAsync_WhenStudentExists_ShouldDeActivateStudent(bool isActive)
     {
         // Arrange
         await using var context = CreateContext();
@@ -32,10 +31,8 @@ public sealed class DeActivateStudentCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.True(result.IsSuccess);
-        var studentFromDb = await context.Students
-            .AsNoTracking()
-            .Where(s => s.StudentGuid == student.StudentGuid)
-            .FirstOrDefaultAsync();
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.FindAsync(student.StudentGuid);
         Assert.NotNull(studentFromDb);
         Assert.False(studentFromDb.IsActive);
     }
