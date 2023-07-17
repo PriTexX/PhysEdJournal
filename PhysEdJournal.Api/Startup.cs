@@ -4,6 +4,7 @@ using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PhysEdJournal.Api.Endpoints.MeEndpoint;
 using PhysEdJournal.Api.FilterExtensions;
 using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
@@ -49,12 +50,14 @@ public class Startup
                 ValidateLifetime = true
             });
         
+        services.AddControllers();
         services.AddAuthorization();
         services.AddCors();
 
         services.AddInfrastructure(Configuration);
         
         services.AddScoped<PermissionValidator>();
+        services.AddScoped<MeInfoService>();
 
         services
             .AddGraphQLServer()
@@ -99,13 +102,12 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseCors(builder => { builder.AllowAnyOrigin(); builder.AllowAnyHeader(); });
         app.UseRouting();
-
         app.UseAuthentication();
         app.UseAuthorization();
         
-           
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapControllers();
             endpoints.MapGraphQL();
         });
     }

@@ -17,7 +17,6 @@ namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 [ExtendObjectType(OperationTypeNames.Mutation)]
 public class StudentMutationExtensions
 {
-    
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
