@@ -5,7 +5,6 @@ using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Tests.Setup;
 using PhysEdJournal.Tests.Setup.Utils;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Tests.Tests.Commands;
 
@@ -41,7 +40,8 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
     
         // Assert
         Assert.True(result.IsSuccess);
-        var studentFromDb = await context.Students.FindAsync(student.StudentGuid);
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.FindAsync(student.StudentGuid);
         Assert.NotNull(studentFromDb);
         Assert.Equal(studentFromDb.Visits, student.Visits);
     }

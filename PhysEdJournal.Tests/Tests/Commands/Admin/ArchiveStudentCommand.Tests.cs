@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Entities.DB;
+﻿using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
@@ -56,7 +55,8 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         
         //Assert
         Assert.True(result.IsSuccess); 
-        var archivedStudentFromDb = await context.ArchivedStudents.FindAsync(student.StudentGuid, lastSemester.Name);
+        await using var assertContext = CreateContext();
+        var archivedStudentFromDb = await assertContext.ArchivedStudents.FindAsync(student.StudentGuid, lastSemester.Name);
         Assert.NotNull(archivedStudentFromDb);
         Assert.True(archivedStudentFromDb == archivedStudent);
     }
@@ -110,7 +110,8 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         
         //Assert
         Assert.True(result.IsSuccess); 
-        var archivedStudentFromDb = await context.ArchivedStudents.FindAsync(student.StudentGuid, lastSemester.Name);
+        await using var assertContext = CreateContext();
+        var archivedStudentFromDb = await assertContext.ArchivedStudents.FindAsync(student.StudentGuid, lastSemester.Name);
         Assert.NotNull(archivedStudentFromDb);
         Assert.True(archivedStudentFromDb == archivedStudent);
     }
@@ -157,7 +158,8 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             Assert.IsType<NotEnoughPointsException>(exception);
             return true;
         });
-        var studentFromDb = await context.Students.AsNoTracking().Where(s => s.StudentGuid == student.StudentGuid).FirstOrDefaultAsync();
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.FindAsync(student.StudentGuid);
         Assert.NotNull(studentFromDb);
         Assert.True(studentFromDb.HasDebtFromPreviousSemester);
         Assert.Equal(visitValue, studentFromDb.ArchivedVisitValue);

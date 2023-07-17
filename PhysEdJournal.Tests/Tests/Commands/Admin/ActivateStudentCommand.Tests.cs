@@ -16,7 +16,7 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new ActivateStudentCommand(context);
         var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
         var group = EntitiesFactory.CreateGroup("211-729");
@@ -32,10 +32,8 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.True(result.IsSuccess);
-        var studentFromDb = await context.Students
-            .AsNoTracking()
-            .Where(s => s.StudentGuid == student.StudentGuid)
-            .FirstOrDefaultAsync();
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students.FindAsync(student.StudentGuid);
         Assert.NotNull(studentFromDb);
         Assert.True(studentFromDb.IsActive);
     }

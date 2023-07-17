@@ -20,10 +20,11 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
 
         // Act
         var result = await command.ExecuteAsync(validSemesterName);
-        var semester = await context.Semesters.FirstOrDefaultAsync(s => s.Name == validSemesterName);
 
         // Assert
         Assert.True(result.IsSuccess);
+        await using var assertContext = CreateContext(cache);
+        var semester = await assertContext.Semesters.FindAsync(validSemesterName);
         Assert.NotNull(semester);
         Assert.Equal(semester.Name, validSemesterName);
     }

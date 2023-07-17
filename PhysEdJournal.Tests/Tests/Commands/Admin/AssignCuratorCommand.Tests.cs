@@ -31,11 +31,13 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
 
         // Act
         var result = await command.ExecuteAsync(payload);
-        group = await context.Groups.FindAsync(group.GroupName);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(teacher.TeacherGuid, group?.CuratorGuid);
+        await using var assertContext = CreateContext();
+        group = await assertContext.Groups.FindAsync(group.GroupName);
+        Assert.NotNull(group);
+        Assert.Equal(teacher.TeacherGuid, group.CuratorGuid);
     }
 
     [Fact]
