@@ -1,5 +1,6 @@
 using PhysEdJournal.Api;
 using Serilog;
+using Serilog.Formatting.Json;
 
 static async Task Main(string[] args)
 {
@@ -7,7 +8,14 @@ static async Task Main(string[] args)
 
     hostBuilder.UseSerilog((context, configuration) =>
     {
-        configuration.WriteTo.Console();
+        if (context.HostingEnvironment.IsProduction())
+        {
+            configuration.WriteTo.Console(new JsonFormatter());
+        }
+        else
+        {
+            configuration.WriteTo.Console();
+        }
     });
 
     await hostBuilder.Build().RunAsync();
