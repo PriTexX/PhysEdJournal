@@ -37,7 +37,9 @@ public class Startup
     {
         services
             .AddOptions<ApplicationOptions>()
-            .BindConfiguration("Application");
+            .BindConfiguration("Application")
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
         
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
