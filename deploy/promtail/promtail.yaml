@@ -30,6 +30,7 @@ scrape_configs:
       - json:
           expressions:
             Properties:
+            Level:
 
       - json:
           expressions:
@@ -38,4 +39,5 @@ scrape_configs:
 
       - labels:
           EnvironmentName:
+          Level:
     
