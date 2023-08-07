@@ -1,0 +1,94 @@
+﻿version: "2.2"
+services:
+  physedjournal:
+    image: "ghcr.io/pritexx/physedjournal:latest"
+    labels:
+      logging: "promtail"
+    restart: always
+    container_name: physedjournal
+    environment:
+      ConnectionStrings:DefaultConnection: ${DB_CONNECTION_STRING}
+    ports: ["${HTTP_PORT}:80", "${HTTPS_PORT}:443"]
+    depends_on: 
+      loki:
+        condition: service_healthy
+  
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    depends_on:
+      - physedjournal
+  
+  loki:
+    image: grafana/loki:2.8.0
+    container_name: loki
+    volumes:
+      - loki-data:/loki
+      - ./loki/loki.yaml:/etc/config/loki.yaml
+    command: -config.file=/etc/config/loki.yaml
+    healthcheck:
+      test: wget -q --tries=1 -O- http://localhost:3100/ready
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: always
+    volumes:
+      - ./promtail/promtail.yaml:/etc/promtail/docker-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/docker-config.yaml
+    depends_on: 
+      loki:
+        condition: service_healthy
+  
+  grafana:
+    image: grafana/grafana:9.5.6
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    container_name: grafana
+    restart: always
+    depends_on: 
+      - prometheus
+      - loki
+  
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:v1.5.0
+    container_name: node_exporter
+    command: "--path.rootfs=/host"
+    pid: host
+    restart: always
+    volumes:
+      - /:/host:ro,rslave
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    network_mode: host
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    restart: always
+
+volumes:
+  prometheus-data:
+    driver: local    
+  grafana-data:
+    driver: local
+  loki-data:
+    driver: local    
+  postgres-data: 
+    driver: local
