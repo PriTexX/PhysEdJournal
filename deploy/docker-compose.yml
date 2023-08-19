@@ -17,6 +17,13 @@ services:
     image: prom/prometheus
     restart: always
     container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.external-url=/prometheus/'
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
@@ -55,6 +62,9 @@ services:
       - grafana-data:/var/lib/grafana
     container_name: grafana
     restart: always
+    environment:
+      GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/physedjournal/grafana/"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     depends_on: 
       - prometheus
       - loki
@@ -90,7 +100,6 @@ services:
     depends_on:
       - physedjournal
     volumes:
-      - /etc/ssl:/etc/ssl:ro
       - /etc/letsencrypt:/etc/certs:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     restart: always
