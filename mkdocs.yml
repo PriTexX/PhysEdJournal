@@ -1,0 +1,10 @@
+﻿site_name: PhysEdJournal
+site_author: PriTexX
+site_description: Documentation site for PhysEdJournal
+site_url: https://pritexx.github.io/PhysEdJournal/
+
+repo_url: https://github.com/PriTexX/PhysEdJournal/
+
+theme:
+  name: readthedocs
+  highlightjs: true
