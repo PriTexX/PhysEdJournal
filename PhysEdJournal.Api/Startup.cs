@@ -5,6 +5,7 @@ using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
+using PhysEdJournal.Api.Endpoints.StaffEndpoint;
 using PhysEdJournal.Api.FilterExtensions;
 using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
@@ -37,7 +38,7 @@ public class Startup
     {
         services
             .AddOptions<ApplicationOptions>()
-            .BindConfiguration("Application")
+            .BindConfiguration(ApplicationOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
         
@@ -54,6 +55,7 @@ public class Startup
         
         services.AddControllers();
         services.AddAuthorization();
+        services.AddSingleton<IStaffInfoClient, StaffInfoHttpClient>();
         services.AddCors();
 
         services.AddInfrastructure(Configuration);
