@@ -2,7 +2,7 @@
 using Serilog.Context;
 using RequestDelegate = Microsoft.AspNetCore.Http.RequestDelegate;
 
-namespace PhysEdJournal.Api.Logging;
+namespace PhysEdJournal.Api.Monitoring.Logging;
 
 public static class LogUserGuidExtensions
 {

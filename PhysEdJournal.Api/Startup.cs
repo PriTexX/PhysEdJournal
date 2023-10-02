@@ -11,10 +11,11 @@ using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Api.Logging;
+using PhysEdJournal.Api.Monitoring.Logging;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
+using Prometheus;
 using Serilog;
 
 namespace PhysEdJournal.Api;
@@ -111,6 +112,9 @@ public class Startup
         app.UseSerilogRequestLogging();
         
         app.UseRouting();
+
+        app.UseMetricServer();
+        
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -118,11 +122,6 @@ public class Startup
         
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGet("/test", (ILogger<Startup> logger) =>
-            {
-                logger.LogInformation("fffff test logggg");
-                Results.Ok();
-            });
             endpoints.MapControllers();
             endpoints.MapGraphQL();
         });

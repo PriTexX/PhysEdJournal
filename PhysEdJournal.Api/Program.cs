@@ -26,7 +26,7 @@ static async Task Main(string[] args)
         }
         else
         {
-            configuration.WriteTo.Console(new JsonFormatter());
+            configuration.WriteTo.Console();
         }
     });
 
