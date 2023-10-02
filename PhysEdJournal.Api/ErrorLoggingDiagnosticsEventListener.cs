@@ -2,17 +2,27 @@
 using HotChocolate.Execution.Instrumentation;
 using HotChocolate.Execution.Processing;
 using HotChocolate.Resolvers;
+using Serilog;
 
 namespace PhysEdJournal.Api;
 
 public class ErrorLoggingDiagnosticsEventListener : ExecutionDiagnosticEventListener
 {
     private readonly ILogger<ErrorLoggingDiagnosticsEventListener> _logger;
+    private readonly IDiagnosticContext _diagnosticContext;
 
     public ErrorLoggingDiagnosticsEventListener(
-        ILogger<ErrorLoggingDiagnosticsEventListener> logger)
+        ILogger<ErrorLoggingDiagnosticsEventListener> logger, IDiagnosticContext diagnosticContext)
     {
         _logger = logger;
+        _diagnosticContext = diagnosticContext;
+    }
+
+    public override IDisposable ResolveFieldValue(IMiddlewareContext context)
+    {
+        _diagnosticContext.Set("Resolver", context.Path);
+        _diagnosticContext.Set("OperationType", context.Operation.Operation.ToString());
+        return EmptyScope;
     }
 
     public override void ResolverError(

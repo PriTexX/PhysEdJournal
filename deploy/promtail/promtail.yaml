@@ -35,9 +35,16 @@ scrape_configs:
       - json:
           expressions:
             EnvironmentName:
+            UserGuid:
+            Resolver:
+            OperationType:
           source: Properties
 
       - labels:
           EnvironmentName:
           Level:
+          UserGuid:
+          Resolver:
+          OperationType:
+          
     
