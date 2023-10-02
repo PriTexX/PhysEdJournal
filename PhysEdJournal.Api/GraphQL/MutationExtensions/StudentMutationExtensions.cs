@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Api.Monitoring;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -10,6 +11,7 @@ using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
+using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
@@ -104,6 +106,7 @@ public class StudentMutationExtensions
         string studentGuid, DateOnly date,  
         [Service] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
         [Service] PermissionValidator permissionValidator,
+        [Service] ApplicationContext applicationContext,
         ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -119,8 +122,13 @@ public class StudentMutationExtensions
         };
         
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
+        var teacher = await applicationContext.Teachers.FindAsync(callerGuid);
 
-        return res.Match(_ => true, exception => throw exception);
+        return res.Match(_ =>
+        {
+            PhysEdMetrics.VisitsCounter.WithLabels(callerGuid, teacher.FullName, date.DayOfWeek.ToString()).Inc();
+            return true;
+        }, exception => throw exception);
     }
 
     [Error(typeof(StudentNotFoundException))]
