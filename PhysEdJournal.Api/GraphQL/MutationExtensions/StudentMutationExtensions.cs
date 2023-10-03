@@ -26,6 +26,7 @@ public class StudentMutationExtensions
     public async Task<Success> AddPointsToStudent(
         [Service] AddPointsCommand addPointsCommand,
         [Service] PermissionValidator permissionValidator,
+        [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal,
         string studentGuid, int pointsAmount, DateOnly date, WorkType workType, string? comment = null)
     {
@@ -61,7 +62,11 @@ public class StudentMutationExtensions
         
         var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
 
-        return res.Match(_ => true, exception => throw exception);
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogWarning(exception, "Something bad happened");
+            throw exception;
+        });
     }
     
     [Error(typeof(StudentNotFoundException))]
@@ -75,6 +80,7 @@ public class StudentMutationExtensions
         string studentGuid, int pointsAmount, DateOnly date, StandardType standardType, bool isOverride,
         [Service] AddStandardPointsCommand addStandardPointsCommand,
         [Service] PermissionValidator permissionValidator,
+        [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -93,7 +99,11 @@ public class StudentMutationExtensions
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 
-        return res.Match(_ => true, exception => throw exception);
+        return res.Match(_ => true, exception =>
+        {
+            logger.LogWarning(exception, "Something bad happened");
+            throw exception;
+        });
     }
 
     [Error(typeof(StudentNotFoundException))]
@@ -107,6 +117,7 @@ public class StudentMutationExtensions
         [Service] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
         [Service] PermissionValidator permissionValidator,
         [Service] ApplicationContext applicationContext,
+        [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
@@ -128,7 +139,11 @@ public class StudentMutationExtensions
         {
             PhysEdMetrics.VisitsCounter.WithLabels(callerGuid, teacher.FullName, date.DayOfWeek.ToString()).Inc();
             return true;
-        }, exception => throw exception);
+        }, exception =>
+        {
+            logger.LogWarning(exception, "Something bad happened");
+            throw exception;
+        });
     }
 
     [Error(typeof(StudentNotFoundException))]

@@ -29,14 +29,14 @@ public class ErrorLoggingDiagnosticsEventListener : ExecutionDiagnosticEventList
         IMiddlewareContext context,
         IError error)
     {
-        _logger.LogError(error.Exception, "ResolverError");
+        _logger.LogError(error.Exception, "ResolverError with msg: {errorMsg}", error.Message);
     }
 
     public override void TaskError(
         IExecutionTask task,
         IError error)
     {
-        _logger.LogError(error.Exception, "TaskError");
+        _logger.LogError(error.Exception, "TaskError with msg: {errorMsg}", error.Message);
     }
 
     public override void RequestError(
