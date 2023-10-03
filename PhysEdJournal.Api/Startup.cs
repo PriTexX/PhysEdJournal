@@ -108,12 +108,11 @@ public class Startup
     {
         app.UseHttpsRedirection();
         app.UseCors(builder => { builder.AllowAnyOrigin(); builder.AllowAnyHeader(); });
+        app.UseMetricServer();
 
         app.UseSerilogRequestLogging();
         
         app.UseRouting();
-
-        app.UseMetricServer();
         
         app.UseAuthentication();
         app.UseAuthorization();
