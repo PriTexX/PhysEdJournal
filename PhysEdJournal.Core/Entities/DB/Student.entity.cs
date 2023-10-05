@@ -7,13 +7,16 @@ namespace PhysEdJournal.Core.Entities.DB;
 
 public sealed class StudentEntity
 {
+    [StringLength(36)]
     [Key]
     [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
     
+    [StringLength(120)]
     [Required(AllowEmptyStrings = false)]
     public string FullName { get; set; }
     
+    [StringLength(30)]
     [Required(AllowEmptyStrings = false)]
     public string GroupNumber { get; set; }
     
@@ -43,6 +46,7 @@ public sealed class StudentEntity
     [Range(1, 6)]
     public int Course { get; set; }
     
+    [StringLength(32)]
     [Required(AllowEmptyStrings = false)]
     public string CurrentSemesterName { get; set; }
     
@@ -52,6 +56,7 @@ public sealed class StudentEntity
     [DefaultValue(HealthGroupType.None)]
     public HealthGroupType HealthGroup { get; set; }
 
+    [StringLength(200)]
     public string? Department { get; set; }
     
     public ICollection<PointsStudentHistoryEntity> PointsStudentHistory { get; set; }

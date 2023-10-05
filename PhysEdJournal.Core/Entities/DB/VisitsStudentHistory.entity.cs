@@ -14,6 +14,7 @@ public sealed class VisitStudentHistoryEntity
     [Required(AllowEmptyStrings = false)]
     public DateOnly Date { get; set; }
 
+    [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public string TeacherGuid { get; set; }
     
@@ -23,6 +24,7 @@ public sealed class VisitStudentHistoryEntity
     [ForeignKey("TeacherGuid")]
     public TeacherEntity Teacher { get; set; }
 
+    [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
     
