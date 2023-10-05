@@ -16,7 +16,7 @@ public sealed class StudentEntity
     [Required(AllowEmptyStrings = false)]
     public string FullName { get; set; }
     
-    [StringLength(30)]
+    [StringLength(20)]
     [Required(AllowEmptyStrings = false)]
     public string GroupNumber { get; set; }
     

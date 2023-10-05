@@ -39,7 +39,6 @@ public sealed class PointsStudentHistoryEntity
     [DefaultValue(false)]
     public bool IsArchived { get; set; }
     
-    [StringLength(300)]
     public string? Comment { get; set; }
     
     [StringLength(36)]

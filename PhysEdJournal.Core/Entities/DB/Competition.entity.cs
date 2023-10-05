@@ -4,7 +4,7 @@ namespace PhysEdJournal.Core.Entities.DB;
 
 public sealed class CompetitionEntity
 {
-    [StringLength(100)]
     [Key]
+    [StringLength(255)]
     public string CompetitionName { get; set; }
 }
