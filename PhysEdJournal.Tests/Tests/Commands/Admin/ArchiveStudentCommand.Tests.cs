@@ -4,6 +4,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Tests.Setup;
 using PhysEdJournal.Tests.Setup.Utils;
+using PhysEdJournal.Tests.Setup.Utils.Comparers;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
@@ -58,7 +59,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         await using var assertContext = CreateContext();
         var archivedStudentFromDb = await assertContext.ArchivedStudents.FindAsync(student.StudentGuid, lastSemester.Name);
         Assert.NotNull(archivedStudentFromDb);
-        Assert.True(archivedStudentFromDb == archivedStudent);
+        Assert.True(ArchiveStudentComparer.Compare(archivedStudentFromDb, archivedStudent));
     }
     
     [Theory]
@@ -113,7 +114,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         await using var assertContext = CreateContext();
         var archivedStudentFromDb = await assertContext.ArchivedStudents.FindAsync(student.StudentGuid, lastSemester.Name);
         Assert.NotNull(archivedStudentFromDb);
-        Assert.True(archivedStudentFromDb == archivedStudent);
+        Assert.True(ArchiveStudentComparer.Compare(archivedStudentFromDb, archivedStudent));
     }
     
     [Theory]
