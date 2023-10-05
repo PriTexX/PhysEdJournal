@@ -8,6 +8,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Services;
+using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -53,6 +54,16 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             {
                 return new FitnessAlreadyExistsException();
             }
+        }
+        
+        if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
+        {
+            return new PointsExpiredException(commandInput.Date);
+        }
+
+        if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        {
+            return new NonWorkingDayException(commandInput.Date.DayOfWeek);
         }
 
         return ValidationResult.Success;

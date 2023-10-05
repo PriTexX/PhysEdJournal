@@ -25,7 +25,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var payload = new IncreaseStudentVisitsCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            Date = DateOnly.FromDateTime(DateTime.Now),
+            Date = DateOnlyGenerator.GetWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
         };
         
@@ -60,7 +60,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var payload = new IncreaseStudentVisitsCommandPayload
         {
             StudentGuid = "Default",
-            Date = DateOnly.FromDateTime(DateTime.Now),
+            Date = DateOnlyGenerator.GetWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
         };
         
@@ -96,7 +96,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var payload = new IncreaseStudentVisitsCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            Date = DateOnly.MaxValue,
+            Date = DateOnlyGenerator.GetWorkingDate(DateOnly.MaxValue),
             TeacherGuid = teacher.TeacherGuid,
         };
         
@@ -133,7 +133,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var payload = new IncreaseStudentVisitsCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            Date = DateOnly.MinValue,
+            Date = DateOnlyGenerator.GetWorkingDate(DateOnly.MinValue.AddDays(2)),
             TeacherGuid = teacher.TeacherGuid,
         };
         
@@ -170,7 +170,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var payload = new IncreaseStudentVisitsCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            Date = DateOnly.FromDateTime(DateTime.Now),
+            Date = DateOnlyGenerator.GetWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
         };
         
@@ -190,6 +190,43 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         result.Match(_ => true, exception =>
         {
             Assert.IsType<VisitAlreadyExistsException>(exception);
+            return true;
+        });
+    }
+    
+    [Fact]
+    public async Task IncreaseVisitsAsync_NonWorkingDayException_ShouldThrowException()
+    {
+        // Arrange
+        await using var context = CreateContext();
+        await ClearDatabase(context);
+        
+        var command = new IncreaseStudentVisitsCommand(context);
+        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
+        var group = EntitiesFactory.CreateGroup("211-729");
+        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
+        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
+        var payload = new IncreaseStudentVisitsCommandPayload
+        {
+            StudentGuid = student.StudentGuid,
+            Date = DateOnlyGenerator.GetNonWorkingDate(),
+            TeacherGuid = teacher.TeacherGuid,
+        };
+        
+        await context.Semesters.AddAsync(semester);
+        await context.Groups.AddAsync(group);
+        await context.Students.AddAsync(student); 
+        await context.Teachers.AddAsync(teacher);
+        await context.SaveChangesAsync();
+    
+        // Act
+        var result = await command.ExecuteAsync(payload);
+    
+        // Assert
+        Assert.False(result.IsSuccess);
+        result.Match(_ => true, exception =>
+        {
+            Assert.IsType<NonWorkingDayException>(exception);
             return true;
         });
     }

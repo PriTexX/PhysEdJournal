@@ -12,14 +12,14 @@ namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 internal sealed partial class StartNewSemesterCommandValidator : ICommandValidator<string>
 {
-    public ValueTask<ValidationResult> ValidateCommandInputAsync(string semesterName)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(string semesterName)
     {
         if (!MyRegex().IsMatch(semesterName))
         {
-            return ValueTask.FromResult<ValidationResult>(new SemesterNameValidationException());
+            return new SemesterNameValidationException();
         }
 
-        return ValueTask.FromResult(ValidationResult.Success);
+        return ValidationResult.Success;
     }
 
     [GeneratedRegex("\\d{4}-\\d{4}/\\w{5}")]

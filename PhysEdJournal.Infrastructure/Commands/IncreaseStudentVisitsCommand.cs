@@ -35,6 +35,11 @@ internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<
         {
             return new ActionFromFutureException(input.Date);
         }
+        
+        if (input.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        {
+            return new NonWorkingDayException(input.Date.DayOfWeek);
+        }
 
         if (DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber > VISIT_LIFE_DAYS)
         {
