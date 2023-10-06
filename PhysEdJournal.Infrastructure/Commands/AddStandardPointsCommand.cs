@@ -60,11 +60,6 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
             return new NegativePointAmount();
         }
 
-        if (commandInput.Points % 2 != 0)
-        {
-            return new NonRegularPointsValueException(commandInput.Points);
-        }
-
         var duplicateHistoryEntity = await _applicationContext.StandardsStudentsHistory
             .AsNoTracking()
             .Where(s => s.StudentGuid == commandInput.StudentGuid && s.StandardType == commandInput.StandardType)

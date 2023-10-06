@@ -62,10 +62,15 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
     }
     
     [Theory]
+    [InlineData(1)]
     [InlineData(2)]
+    [InlineData(3)]
     [InlineData(4)]
+    [InlineData(5)]
     [InlineData(6)]
+    [InlineData(7)]
     [InlineData(8)]
+    [InlineData(9)]
     [InlineData(10)]
     public async Task AddPointsForStandardsAsync_AddsProperPointsForStandardToStudent_ShouldWorkProperly(int points)
     {
@@ -107,52 +112,6 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         Assert.NotNull(studentFromDb.StandardsStudentHistory.FirstOrDefault(h => h.Points == historyEntity.Points));
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(3)]
-    [InlineData(5)]
-    [InlineData(7)]
-    [InlineData(9)]
-    public async Task AddPointsForStandardsAsync_NonRegularPointsValueException_ShouldThrowException(int points)
-    {
-        //Arrange
-        await using var context = CreateContext();
-        await ClearDatabase(context);
-        
-        var command = new AddStandardPointsCommand(context);
-        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
-        var group = EntitiesFactory.CreateGroup("211-729");
-        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
-        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var historyEntity = EntitiesFactory.CreateStandardsHistoryEntity(student.StudentGuid, StandardType.Tilts, teacher.TeacherGuid, DateOnlyGenerator.GetWorkingDate(), points);
-        var payload = new AddStandardPointsCommandPayload
-        {
-            StudentGuid = historyEntity.StudentGuid,
-            Date = historyEntity.Date,
-            Points = historyEntity.Points,
-            TeacherGuid = historyEntity.TeacherGuid,
-            StandardType = StandardType.Tilts,
-            IsOverride = false
-        };
-
-        await context.Semesters.AddAsync(semester);
-        await context.Groups.AddAsync(group);
-        await context.Students.AddAsync(student); 
-        await context.Teachers.AddAsync(teacher);
-        await context.SaveChangesAsync();
-
-        //Act
-        var result = await command.ExecuteAsync(payload);
-        
-        //Assert
-        Assert.False(result.IsSuccess);
-        result.Match(_ => true, exception =>
-        {
-            Assert.IsType<NonRegularPointsValueException>(exception);
-            return true;
-        });
-    }
-    
     [Theory]
     [InlineData(int.MaxValue)]
     [InlineData(12)]
