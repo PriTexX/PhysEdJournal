@@ -1,4 +1,5 @@
-﻿using GraphQL;
+﻿using System.Globalization;
+using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,11 @@ public static class StudentServiceFunctions
         applicationContext.Students.AddRange(students
             .Where(d => d.Item1)
             .Where(p => p.Item2.GroupNumber != "")
+            .Select(p =>
+            {
+                p.Item2.FullName = PrettifyFullName(p.Item2.FullName);
+                return p;
+            })
             .Select(p => p.Item2));
         
         applicationContext.Students.UpdateRange(students
@@ -71,6 +77,11 @@ public static class StudentServiceFunctions
         await applicationContext.SaveChangesAsync();
     }
 
+    static string PrettifyFullName(string fullName)
+    {
+        return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fullName.ToLower().Trim());
+    }
+    
     public static (bool, StudentEntity) GetUpdatedOrCreatedStudentEntities(Student studentModel, StudentEntity? dbStudent, string currentSemesterName)
     {
         if (dbStudent is null)

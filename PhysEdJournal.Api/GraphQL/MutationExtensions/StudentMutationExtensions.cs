@@ -23,6 +23,7 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(ActionFromFutureException))]
+    [Error(typeof(FitnessAlreadyExistsException))]
     public async Task<Success> AddPointsToStudent(
         [Service] AddPointsCommand addPointsCommand,
         [Service] PermissionValidator permissionValidator,

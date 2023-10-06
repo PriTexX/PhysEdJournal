@@ -1,5 +1,6 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -22,16 +23,36 @@ public sealed class AddPointsCommandPayload
 
 internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCommandPayload>
 {
-    public ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsCommandPayload commandInput)
+    private readonly ApplicationContext _applicationContext;
+
+    public AddPointsCommandValidator(ApplicationContext applicationContext)
+    {
+        _applicationContext = applicationContext;
+    }
+
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsCommandPayload commandInput)
     {
         if (commandInput.Date > DateOnly.FromDateTime(DateTime.UtcNow))
         {
-            return ValidationResult.Create(new ActionFromFutureException(commandInput.Date));
+            return new ActionFromFutureException(commandInput.Date);
         }
 
         if (commandInput.Points <= 0)
         {
-            return ValidationResult.Create(new NegativePointAmount());  
+            return new NegativePointAmount();  
+        }
+
+        if (commandInput.WorkType == WorkType.ExternalFitness)
+        {
+            var anotherFitness = await _applicationContext.PointsStudentsHistory
+                .AsNoTracking()
+                .Where(p => p.StudentGuid == commandInput.StudentGuid && p.WorkType == WorkType.ExternalFitness)
+                .FirstOrDefaultAsync();
+
+            if (anotherFitness is not null)
+            {
+                return new FitnessAlreadyExistsException();
+            }
         }
 
         return ValidationResult.Success;
@@ -46,7 +67,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
     public AddPointsCommand(ApplicationContext applicationContext)
     {
         _applicationContext = applicationContext;
-        _validator = new AddPointsCommandValidator();
+        _validator = new AddPointsCommandValidator(applicationContext);
     }
 
     public async Task<Result<Unit>> ExecuteAsync(AddPointsCommandPayload commandPayload)
