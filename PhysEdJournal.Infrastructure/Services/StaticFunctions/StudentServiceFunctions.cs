@@ -62,6 +62,7 @@ public static class StudentServiceFunctions
         applicationContext.Students.AddRange(students
             .Where(d => d.Item1)
             .Where(p => p.Item2.GroupNumber != "")
+            .Where(p => p.Item2.GroupNumber[2] == '1')
             .Select(p =>
             {
                 p.Item2.FullName = PrettifyFullName(p.Item2.FullName);

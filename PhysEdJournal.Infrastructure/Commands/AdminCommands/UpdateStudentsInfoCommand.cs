@@ -67,6 +67,7 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
             .Select(s => s.Group)
             .Where(g => !string.IsNullOrEmpty(g))
             .Distinct()
+            .Where(FilterGroups)
             .ToListAsync();
 
         var dbGroups = await applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
@@ -77,5 +78,10 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
 
         applicationContext.Groups.AddRange(newGroups);
         await applicationContext.SaveChangesAsync();
+    }
+
+    private static bool FilterGroups(string groupName)
+    {
+        return groupName[2] == '1';
     }
 }
