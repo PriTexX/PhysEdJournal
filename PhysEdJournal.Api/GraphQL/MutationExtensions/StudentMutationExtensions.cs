@@ -74,7 +74,6 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(OverAbundanceOfPointsForStudentException))]
-    [Error(typeof(NonRegularPointsValueException))]
     [Error(typeof(StandardAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
     public async Task<Success> AddPointsForStandardToStudent(

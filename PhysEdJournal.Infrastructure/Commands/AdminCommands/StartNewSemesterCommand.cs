@@ -16,10 +16,10 @@ internal sealed partial class StartNewSemesterCommandValidator : ICommandValidat
     {
         if (!MyRegex().IsMatch(semesterName))
         {
-            return ValueTask.FromResult<ValidationResult>(new SemesterNameValidationException());
+            return ValidationResult.Create(new SemesterNameValidationException());
         }
 
-        return ValueTask.FromResult(ValidationResult.Success);
+        return ValidationResult.Success;
     }
 
     [GeneratedRegex("\\d{4}-\\d{4}/\\w{5}")]

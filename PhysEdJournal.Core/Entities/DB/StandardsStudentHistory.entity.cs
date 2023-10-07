@@ -19,6 +19,7 @@ public class StandardsStudentHistoryEntity
     [Required]
     public DateOnly Date { get; set; }
     
+    [StringLength(32)]
     [Required(AllowEmptyStrings = false)]
     [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
     public string SemesterName { get; set; }
@@ -32,12 +33,14 @@ public class StandardsStudentHistoryEntity
     [Required]
     public StandardType StandardType { get; set; }
 
+    [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public string TeacherGuid { get; set; }
 
     [ForeignKey("TeacherGuid")]
     public TeacherEntity Teacher { get; set; }
 
+    [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public string StudentGuid { get; set; }
     

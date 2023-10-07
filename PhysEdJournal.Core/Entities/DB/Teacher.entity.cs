@@ -6,9 +6,11 @@ namespace PhysEdJournal.Core.Entities.DB;
 
 public sealed class TeacherEntity
 {
+    [StringLength(36)]
     [Key]
     public string TeacherGuid { get; set; }
     
+    [StringLength(120)]
     [Required(AllowEmptyStrings = false)]
     public string FullName { get; set; }
     

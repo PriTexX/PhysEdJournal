@@ -38,6 +38,16 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
         {
             return new ActionFromFutureException(commandInput.Date);
         }
+        
+        if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
+        {
+            return new DateExpiredException(commandInput.Date);
+        }
+        
+        if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        {
+            return new NonWorkingDayException(commandInput.Date.DayOfWeek);
+        }
 
         if (commandInput.Points > MAX_POINTS_FOR_ONE_STANDARD)
         {
@@ -47,11 +57,6 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
         if (commandInput.Points <= 0)
         {
             return new NegativePointAmount();
-        }
-
-        if (commandInput.Points % 2 != 0)
-        {
-            return new NonRegularPointsValueException(commandInput.Points);
         }
 
         var duplicateHistoryEntity = await _applicationContext.StandardsStudentsHistory

@@ -1,5 +1,4 @@
-﻿using PhysEdJournal.Core.Exceptions.StandardExceptions;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
+﻿using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 namespace PhysEdJournal.Infrastructure.Validators.Standards;
 
@@ -17,11 +16,6 @@ public class StandardsValidator
         if (pointsForStandards == MAX_POINTS_FOR_STANDARDS)
         {
             return new LanguageExt.Common.Result<bool>(new OverAbundanceOfPointsForStudentException(studentGuid));
-        }
-
-        if (pointsToAdd % 2 != 0)
-        {
-            return new LanguageExt.Common.Result<bool>(new NonRegularPointsValueException(pointsToAdd));
         }
 
         return true;
