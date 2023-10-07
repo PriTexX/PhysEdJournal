@@ -19,9 +19,9 @@ internal sealed class GivePermissionsCommandValidator : ICommandValidator<GivePe
     public ValueTask<ValidationResult> ValidateCommandInputAsync(GivePermissionsCommandPayload commandInput)
     {
         if (commandInput.TeacherPermissions == TeacherPermissions.SuperUser)
-            return ValueTask.FromResult<ValidationResult>(new CannotGrantSuperUserPermissionsException(commandInput.TeacherGuid));
+            return ValidationResult.Create(new CannotGrantSuperUserPermissionsException(commandInput.TeacherGuid));
 
-        return ValueTask.FromResult(ValidationResult.Success);
+        return ValidationResult.Success;
     }
 }
 

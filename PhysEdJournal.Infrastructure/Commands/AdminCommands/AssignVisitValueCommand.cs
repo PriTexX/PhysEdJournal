@@ -18,10 +18,10 @@ internal sealed class AssignVisitValueCommandValidator : ICommandValidator<Assig
     {
         if (commandInput.NewVisitValue <= 0)
         {
-            return ValueTask.FromResult<ValidationResult>(new NullVisitValueException(commandInput.NewVisitValue));
+            return ValidationResult.Create(new NullVisitValueException(commandInput.NewVisitValue));
         }
 
-        return ValueTask.FromResult(ValidationResult.Success);
+        return ValidationResult.Success;
     }
 } 
 

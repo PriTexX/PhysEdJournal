@@ -3,7 +3,7 @@ using LanguageExt.Common;
 
 namespace PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 
-internal struct ValidationResult
+internal readonly struct ValidationResult
 {
     public required bool IsSuccess { get; init; }
     public bool IsFailed => !IsSuccess;

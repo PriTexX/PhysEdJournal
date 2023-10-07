@@ -12,11 +12,11 @@ namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 internal sealed partial class StartNewSemesterCommandValidator : ICommandValidator<string>
 {
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(string semesterName)
+    public ValueTask<ValidationResult> ValidateCommandInputAsync(string semesterName)
     {
         if (!MyRegex().IsMatch(semesterName))
         {
-            return new SemesterNameValidationException();
+            return ValidationResult.Create(new SemesterNameValidationException());
         }
 
         return ValidationResult.Success;
