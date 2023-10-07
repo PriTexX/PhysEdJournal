@@ -41,10 +41,10 @@ internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<
             return new NonWorkingDayException(input.Date.DayOfWeek);
         }
 
-        if (DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber > VISIT_LIFE_DAYS)
-        {
-            return new VisitExpiredException(input.Date);
-        }
+        // if (DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber > VISIT_LIFE_DAYS)
+        // {
+        //     return new VisitExpiredException(input.Date);
+        // }
         
         var recordCopy = await _applicationContext.VisitsStudentsHistory
             .Where(v => v.StudentGuid == input.StudentGuid && v.Date == input.Date)
