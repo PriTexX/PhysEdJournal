@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
-using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -42,7 +41,7 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
         
         if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
         {
-            return new PointsExpiredException(commandInput.Date);
+            return new DateExpiredException(commandInput.Date);
         }
         
         if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
-using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands;
@@ -464,7 +463,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         Assert.False(result.IsSuccess);
         result.Match(_ => true, exception =>
         {
-            Assert.IsType<PointsExpiredException>(exception);
+            Assert.IsType<DateExpiredException>(exception);
             return true;
         });
     }

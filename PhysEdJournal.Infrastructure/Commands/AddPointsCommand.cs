@@ -34,6 +34,11 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
 
     public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsCommandPayload commandInput)
     {
+        if (commandInput.Points > 50)
+        {
+            return new PointsExceededLimit(50);
+        }
+        
         if (commandInput.Date > DateOnly.FromDateTime(DateTime.UtcNow))
         {
             return new ActionFromFutureException(commandInput.Date);
@@ -55,11 +60,21 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             {
                 return new FitnessAlreadyExistsException();
             }
+
+            if (commandInput.Points > 10)
+            {
+                return new PointsExceededLimit(10);
+            }
+        }
+
+        if (commandInput is { WorkType: WorkType.Science, Points: > 30 })
+        {
+            return new PointsExceededLimit(30);
         }
         
         if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
         {
-            return new PointsExpiredException(commandInput.Date);
+            return new DateExpiredException(commandInput.Date);
         }
 
         if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)

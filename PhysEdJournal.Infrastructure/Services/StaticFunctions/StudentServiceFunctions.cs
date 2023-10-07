@@ -77,7 +77,7 @@ public static class StudentServiceFunctions
         await applicationContext.SaveChangesAsync();
     }
 
-    static string PrettifyFullName(string fullName)
+    private static string PrettifyFullName(string fullName)
     {
         return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fullName.ToLower().Trim());
     }
