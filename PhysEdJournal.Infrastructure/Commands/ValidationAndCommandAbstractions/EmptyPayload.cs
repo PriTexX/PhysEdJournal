@@ -2,7 +2,7 @@
 
 public sealed class EmptyPayload
 {
-    private EmptyPayload(){}
+    private EmptyPayload() { }
 
-    public static EmptyPayload Empty { get; } = new ();
+    public static EmptyPayload Empty { get; } = new();
 }

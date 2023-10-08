@@ -4,9 +4,9 @@ namespace PhysEdJournal.Infrastructure.Database.DateOnlySupport;
 
 public sealed class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
 {
-    public DateOnlyConverter() : base(
-        dateOnly => dateOnly.ToDateTime(TimeOnly.MinValue),
-        dateTime => DateOnly.FromDateTime(dateTime))
-    {
-    }
+    public DateOnlyConverter()
+        : base(
+            dateOnly => dateOnly.ToDateTime(TimeOnly.MinValue),
+            dateTime => DateOnly.FromDateTime(dateTime)
+        ) { }
 }

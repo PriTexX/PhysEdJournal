@@ -24,7 +24,7 @@ public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload,
     {
         _applicationContext = applicationContext;
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(CreateTeacherCommandPayload commandPayload)
     {
         var teacherGuid = await _applicationContext.Teachers
@@ -42,10 +42,10 @@ public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload,
             FullName = commandPayload.FullName,
             Permissions = commandPayload.Permissions,
         };
-            
+
         await _applicationContext.Teachers.AddAsync(teacherEntity);
         await _applicationContext.SaveChangesAsync();
-        
+
         return Unit.Default;
     }
 }

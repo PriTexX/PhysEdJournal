@@ -38,17 +38,19 @@ public sealed class StartNewSemesterCommand : ICommand<string, Unit>
         _memoryCache = memoryCache;
         _validator = new StartNewSemesterCommandValidator();
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(string semesterName)
     {
         var validationResult = await _validator.ValidateCommandInputAsync(semesterName);
-        
+
         if (validationResult.IsFailed)
         {
             return new Result<Unit>(validationResult.ValidationException);
         }
 
-        var currentSemester = await _applicationContext.Semesters.Where(s => s.IsCurrent == true).SingleOrDefaultAsync();
+        var currentSemester = await _applicationContext.Semesters
+            .Where(s => s.IsCurrent == true)
+            .SingleOrDefaultAsync();
         if (currentSemester is not null)
         {
             currentSemester.IsCurrent = false;
@@ -56,10 +58,10 @@ public sealed class StartNewSemesterCommand : ICommand<string, Unit>
         }
 
         var semester = new SemesterEntity { Name = semesterName, IsCurrent = true };
-            
+
         _applicationContext.Add(semester);
         await _applicationContext.SaveChangesAsync();
-            
+
         using var entry = _memoryCache.CreateEntry("activeSemester");
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
         entry.Value = semester;

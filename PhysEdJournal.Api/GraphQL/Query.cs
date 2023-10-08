@@ -13,7 +13,7 @@ public class Query
     {
         return context.Students.Where(s => s.StudentGuid == guid);
     }
-    
+
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
@@ -22,7 +22,7 @@ public class Query
     {
         return context.Students;
     }
-    
+
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
@@ -49,7 +49,7 @@ public class Query
     {
         return context.Groups;
     }
-    
+
     [UseFirstOrDefault]
     [UseProjection]
     [UseFiltering]
@@ -57,7 +57,7 @@ public class Query
     {
         return context.Teachers.Where(t => t.TeacherGuid == guid);
     }
-    
+
     [UseOffsetPaging]
     [UseProjection]
     [UseFiltering]
@@ -76,7 +76,10 @@ public class Query
         return context.Semesters;
     }
 
-    public async Task<string> GetCurrentSemesterAsync(ApplicationContext context, [Service] ILogger<Query> logger)
+    public async Task<string> GetCurrentSemesterAsync(
+        ApplicationContext context,
+        [Service] ILogger<Query> logger
+    )
     {
         try
         {
@@ -89,8 +92,11 @@ public class Query
             throw;
         }
     }
-    
-    public async Task<IEnumerable<string>> GetCompetitions(ApplicationContext context, [Service] ILogger<Query> logger)
+
+    public async Task<IEnumerable<string>> GetCompetitions(
+        ApplicationContext context,
+        [Service] ILogger<Query> logger
+    )
     {
         try
         {

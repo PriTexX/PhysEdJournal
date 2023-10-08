@@ -12,11 +12,11 @@ public sealed class ProfessorInfoResponse
 
 public enum UserType
 {
-    Student, Professor
+    Student,
+    Professor
 }
-
 
 public sealed class MeRequest
 {
-    public UserType Type { get; init; } 
+    public UserType Type { get; init; }
 }

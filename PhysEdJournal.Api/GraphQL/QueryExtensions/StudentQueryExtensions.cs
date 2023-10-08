@@ -12,7 +12,7 @@ public class StudentQueryExtensions
     {
         return student.PointsStudentHistory;
     }
-    
+
     [BindMember(nameof(StudentEntity.VisitsStudentHistory))]
     [UseFiltering]
     [UseSorting]
@@ -20,11 +20,13 @@ public class StudentQueryExtensions
     {
         return student.VisitsStudentHistory;
     }
-    
+
     [BindMember(nameof(StudentEntity.StandardsStudentHistory))]
     [UseFiltering]
     [UseSorting]
-    public IEnumerable<StandardsStudentHistoryEntity> GetStandardsHistory([Parent] StudentEntity student)
+    public IEnumerable<StandardsStudentHistoryEntity> GetStandardsHistory(
+        [Parent] StudentEntity student
+    )
     {
         return student.StandardsStudentHistory;
     }

@@ -14,24 +14,29 @@ public class GroupMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(GroupNotFoundException))]
     public async Task<Success> AssignCuratorToGroup(
-        string groupName, string teacherGuid, 
+        string groupName,
+        string teacherGuid,
         [Service] AssignCuratorCommand assignCuratorCommand,
         [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal)
+        ClaimsPrincipal claimsPrincipal
+    )
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         ThrowIfCallerGuidIsNull(callerGuid);
-        
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
 
         var assignCuratorPayload = new AssignCuratorCommandPayload
         {
             GroupName = groupName,
             TeacherGuid = teacherGuid
         };
-        
+
         var res = await assignCuratorCommand.ExecuteAsync(assignCuratorPayload);
-        
+
         return res.Match(_ => true, exception => throw exception);
     }
 
@@ -39,22 +44,27 @@ public class GroupMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NullVisitValueException))]
     public async Task<Success> AssignVisitValue(
-        string groupName, double newVisitValue,
+        string groupName,
+        double newVisitValue,
         [Service] AssignVisitValueCommand assignVisitValueCommand,
         [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal)
+        ClaimsPrincipal claimsPrincipal
+    )
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         ThrowIfCallerGuidIsNull(callerGuid);
-        
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
 
         var assignVisitValuePayload = new AssignVisitValueCommandPayload
         {
             GroupName = groupName,
             NewVisitValue = newVisitValue
         };
-        
+
         var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
 
         return res.Match(_ => true, exception => throw exception);

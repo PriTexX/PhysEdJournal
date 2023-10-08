@@ -11,20 +11,12 @@ internal readonly struct ValidationResult
 
     public static ValidationResult Create(Exception exc)
     {
-        return new ValidationResult
-        {
-            IsSuccess = false,
-            ValidationException = exc
-        };
+        return new ValidationResult { IsSuccess = false, ValidationException = exc };
     }
-    
+
     public static implicit operator ValidationResult(Exception exc)
     {
-        return new ValidationResult
-        {
-            IsSuccess = false,
-            ValidationException = exc
-        };
+        return new ValidationResult { IsSuccess = false, ValidationException = exc };
     }
 
     public static implicit operator ValueTask<ValidationResult>(ValidationResult result)

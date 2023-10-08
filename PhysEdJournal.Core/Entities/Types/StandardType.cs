@@ -2,12 +2,12 @@
 
 public enum StandardType
 {
-    Tilts,                                         //Наклоны
-    Jumps,                                         // Прыжки
-    PullUps,                                       //Подтягивания
-    Squats,                                        // Приседания
-    JumpingRopeJumps,                              // Прыжки через скакалку
-    TorsoLifts,                                    // Поднимания туловища
-    FlexionAndExtensionOfArms,                     // Сгибания и разгибания рук
-    ShuttleRun                                     // Челночный бег
+    Tilts, //Наклоны
+    Jumps, // Прыжки
+    PullUps, //Подтягивания
+    Squats, // Приседания
+    JumpingRopeJumps, // Прыжки через скакалку
+    TorsoLifts, // Поднимания туловища
+    FlexionAndExtensionOfArms, // Сгибания и разгибания рук
+    ShuttleRun // Челночный бег
 }

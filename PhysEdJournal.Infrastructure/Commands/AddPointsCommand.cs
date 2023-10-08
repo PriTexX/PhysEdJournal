@@ -32,13 +32,15 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsCommandPayload commandInput)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(
+        AddPointsCommandPayload commandInput
+    )
     {
         if (commandInput.Points > 50)
         {
             return new PointsExceededLimit(50);
         }
-        
+
         if (commandInput.Date > DateOnly.FromDateTime(DateTime.UtcNow))
         {
             return new ActionFromFutureException(commandInput.Date);
@@ -46,14 +48,18 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
 
         if (commandInput.Points <= 0)
         {
-            return new NegativePointAmount();  
+            return new NegativePointAmount();
         }
 
         if (commandInput.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext.PointsStudentsHistory
                 .AsNoTracking()
-                .Where(p => p.StudentGuid == commandInput.StudentGuid && p.WorkType == WorkType.ExternalFitness)
+                .Where(
+                    p =>
+                        p.StudentGuid == commandInput.StudentGuid
+                        && p.WorkType == WorkType.ExternalFitness
+                )
                 .FirstOrDefaultAsync();
 
             if (anotherFitness is not null)
@@ -71,7 +77,7 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         {
             return new PointsExceededLimit(30);
         }
-        
+
         // if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
         // {
         //     return new DateExpiredException(commandInput.Date);
@@ -112,7 +118,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
         {
             return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
         }
-        
+
         var pointsStudentHistoryEntity = new PointsStudentHistoryEntity
         {
             StudentGuid = commandPayload.StudentGuid,
@@ -125,13 +131,13 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
         };
 
         student.AdditionalPoints += pointsStudentHistoryEntity.Points;
-        
+
         _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
-        
+
         return Unit.Default;
     }
 }

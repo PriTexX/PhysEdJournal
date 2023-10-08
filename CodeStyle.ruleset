@@ -1,0 +1,22 @@
+﻿<RuleSet Name="Rules for PhysEdJournal project" Description="Rule set for StyleCopAnalyzer" ToolsVersion="14.0">
+    <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+        <Rule Id="SA1000" Action="None" />
+        <Rule Id="SA1009" Action="None" />
+        <Rule Id="SA1101" Action="None" />
+        <Rule Id="SA1111" Action="None" />
+        <Rule Id="SA1118" Action="None" />
+        <Rule Id="SA1137" Action="None" />
+        <Rule Id="SA1200" Action="None" />
+        <Rule Id="SA1201" Action="None" />
+        <Rule Id="SA1206" Action="None" />
+        <Rule Id="SA1309" Action="None" />
+        <Rule Id="SA1500" Action="None" />
+        <Rule Id="SA1501" Action="None" />
+        <Rule Id="SA1502" Action="None" />
+        <Rule Id="SA1504" Action="None" />
+        <Rule Id="SA1516" Action="None" />
+        <Rule Id="SA1600" Action="None" />
+        <Rule Id="SA1602" Action="None" />
+        <Rule Id="SA1633" Action="None" />
+    </Rules>
+</RuleSet>

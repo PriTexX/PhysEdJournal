@@ -2,5 +2,6 @@
 
 public sealed class VisitExpiredException : Exception
 {
-    public VisitExpiredException(DateOnly date): base($"The ability to set a visit for {date} has expired"){}
+    public VisitExpiredException(DateOnly date)
+        : base($"The ability to set a visit for {date} has expired") { }
 }

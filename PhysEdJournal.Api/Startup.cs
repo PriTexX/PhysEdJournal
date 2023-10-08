@@ -23,7 +23,7 @@ namespace PhysEdJournal.Api;
 public class Startup
 {
     private IConfiguration Configuration { get; }
-    
+
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
@@ -35,7 +35,6 @@ public class Startup
         rsa.ImportFromPem(publicKey);
         return new RsaSecurityKey(rsa);
     }
-    
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -44,25 +43,30 @@ public class Startup
             .BindConfiguration(ApplicationOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
-            {
-                IssuerSigningKey = GetSecurityKey(Configuration["Application:RsaPublicKey"]),
-                ValidIssuer = "humanresourcesdepartmentapi.mospolytech.ru",
-                ValidAudience = "HumanResourcesDepartment",
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true
-            });
-        
+            .AddJwtBearer(
+                options =>
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        IssuerSigningKey = GetSecurityKey(
+                            Configuration["Application:RsaPublicKey"]
+                        ),
+                        ValidIssuer = "humanresourcesdepartmentapi.mospolytech.ru",
+                        ValidAudience = "HumanResourcesDepartment",
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true
+                    }
+            );
+
         services.AddControllers();
         services.AddAuthorization();
         services.AddSingleton<IStaffInfoClient, StaffInfoHttpClient>();
         services.AddCors();
 
         services.AddInfrastructure(Configuration);
-        
+
         services.AddScoped<PermissionValidator>();
         services.AddScoped<MeInfoService>();
 
@@ -73,52 +77,62 @@ public class Startup
             .AddAuthorization()
             .AddMutationConventions(applyToAllMutations: true)
             .RegisterDbContext<ApplicationContext>()
-            
             .AddQueryType<Query>()
             .AddTypeExtension<TeacherQueryExtensions>()
             .AddTypeExtension<StudentQueryExtensions>()
-            
             .AddType<SuccessType>()
             .AddType<DateOnlyType>()
             .BindRuntimeType<Success, SuccessType>()
             .BindRuntimeType<DateOnly, DateOnlyType>()
-
             .AddMutationType<Mutation>()
             .AddTypeExtension<TeacherMutationExtensions>()
             .AddTypeExtension<GroupMutationExtensions>()
             .AddTypeExtension<SemesterMutationExtensions>()
             .AddTypeExtension<StudentMutationExtensions>()
-            
             .AddProjections()
             .AddFiltering()
-            .AddConvention<IFilterConvention>(new FilterConventionExtension(x => x.AddProviderExtension(
-                new QueryableFilterProviderExtension(y => y.AddFieldHandler<QueryableStringInvariantContainsHandler>()))))
+            .AddConvention<IFilterConvention>(
+                new FilterConventionExtension(
+                    x =>
+                        x.AddProviderExtension(
+                            new QueryableFilterProviderExtension(
+                                y => y.AddFieldHandler<QueryableStringInvariantContainsHandler>()
+                            )
+                        )
+                )
+            )
             .AddSorting()
-            .SetPagingOptions(new PagingOptions
-            {
-                MaxPageSize = 200,
-                DefaultPageSize = 30,
-                IncludeTotalCount = true
-            });
-        
+            .SetPagingOptions(
+                new PagingOptions
+                {
+                    MaxPageSize = 200,
+                    DefaultPageSize = 30,
+                    IncludeTotalCount = true
+                }
+            );
+
         services.AddEndpointsApiExplorer();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
-        app.UseCors(builder => { builder.AllowAnyOrigin(); builder.AllowAnyHeader(); });
+        app.UseCors(builder =>
+        {
+            builder.AllowAnyOrigin();
+            builder.AllowAnyHeader();
+        });
         app.UseMetricServer();
 
         app.UseSerilogRequestLogging();
-        
+
         app.UseRouting();
-        
+
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseUserGuidLogger();
-        
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();

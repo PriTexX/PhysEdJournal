@@ -10,10 +10,14 @@ namespace PhysEdJournal.Infrastructure.DI;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        services.AddDbContext<ApplicationContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<ApplicationContext>(
+            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+        );
 
         services.AddSingleton<StandardsValidator>();
 
@@ -29,7 +33,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<AddPointsCommand>();
         services.AddScoped<IncreaseStudentVisitsCommand>();
         services.AddScoped<AddStandardPointsCommand>();
-        
+
         services.AddScoped<ActivateStudentCommand>();
         services.AddScoped<DeActivateStudentCommand>();
         services.AddScoped<ArchiveStudentCommand>();
@@ -43,5 +47,4 @@ public static class DependencyInjectionExtensions
         services.AddScoped<StartNewSemesterCommand>();
         services.AddScoped<UpdateStudentsInfoCommand>();
     }
-
 }

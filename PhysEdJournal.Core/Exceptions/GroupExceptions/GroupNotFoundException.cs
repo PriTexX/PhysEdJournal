@@ -2,5 +2,6 @@
 
 public class GroupNotFoundException : Exception
 {
-    public GroupNotFoundException(string groupGuid) : base($"No group with guid: {groupGuid}"){}
+    public GroupNotFoundException(string groupGuid)
+        : base($"No group with guid: {groupGuid}") { }
 }

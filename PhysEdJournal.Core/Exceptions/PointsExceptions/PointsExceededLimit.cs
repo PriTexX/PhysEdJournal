@@ -2,6 +2,6 @@
 
 public class PointsExceededLimit : Exception
 {
-    public PointsExceededLimit(int maxValue) : base($"The maximum points value is {maxValue}")
-    {}
+    public PointsExceededLimit(int maxValue)
+        : base($"The maximum points value is {maxValue}") { }
 }

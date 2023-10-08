@@ -16,7 +16,10 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
     private readonly string _userInfoServerUrl;
     private readonly int _pageSize;
 
-    public UpdateStudentsInfoCommand(IOptions<ApplicationOptions> options, IServiceScopeFactory serviceScopeFactory)
+    public UpdateStudentsInfoCommand(
+        IOptions<ApplicationOptions> options,
+        IServiceScopeFactory serviceScopeFactory
+    )
     {
         _serviceScopeFactory = serviceScopeFactory;
         _userInfoServerUrl = options.Value.UserInfoServerURL;
@@ -27,30 +30,48 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
     {
         await using var scope = _serviceScopeFactory.CreateAsyncScope(); // Использую ServiceLocator т.к. команда запускается в бэкграунде и переданный ей ApplicationContext закрывается до завершения работы команды
         var applicationContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-        
+
         await UpdateGroups(applicationContext);
-        
+
         var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
-        
+
         const int batchSize = 500;
         var updateTasks = GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize)
             .Buffer(batchSize)
-            .SelectAwait(async actualStudents => new
-            {
-                actualStudents = actualStudents.ToDictionary(s => s.Guid), 
-                dbStudents = (await GetManyStudentsWithManyKeys(applicationContext, actualStudents
-                        .Select(s => s.Guid)
-                        .ToArray()))
-                    .ToDictionary(d => d.StudentGuid)
-            })
-            .Select(s => s.actualStudents.Keys
-                .Select(actualStudentGuid => 
-                (
-                    s.actualStudents[actualStudentGuid], 
-                    s.dbStudents.GetValueOrDefault(actualStudentGuid)
-                )))
-            .Select(d => d
-                .Select(s => GetUpdatedOrCreatedStudentEntities(s.Item1, s.Item2, currentSemesterName)))
+            .SelectAwait(
+                async actualStudents =>
+                    new
+                    {
+                        actualStudents = actualStudents.ToDictionary(s => s.Guid),
+                        dbStudents = (
+                            await GetManyStudentsWithManyKeys(
+                                applicationContext,
+                                actualStudents.Select(s => s.Guid).ToArray()
+                            )
+                        ).ToDictionary(d => d.StudentGuid)
+                    }
+            )
+            .Select(
+                s =>
+                    s.actualStudents.Keys.Select(
+                        actualStudentGuid =>
+                            (
+                                s.actualStudents[actualStudentGuid],
+                                s.dbStudents.GetValueOrDefault(actualStudentGuid)
+                            )
+                    )
+            )
+            .Select(
+                d =>
+                    d.Select(
+                        s =>
+                            GetUpdatedOrCreatedStudentEntities(
+                                s.Item1,
+                                s.Item2,
+                                currentSemesterName
+                            )
+                    )
+            )
             .Select(s => CommitChangesToContext(applicationContext, s.ToList()));
 
         await foreach (var updateTask in updateTasks)

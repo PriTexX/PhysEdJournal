@@ -14,21 +14,25 @@ public class SemesterMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> StartNewSemester(
-        string semesterName, 
+        string semesterName,
         [Service] StartNewSemesterCommand startNewSemesterCommand,
         [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal)
+        ClaimsPrincipal claimsPrincipal
+    )
     {
         var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
         ThrowIfCallerGuidIsNull(callerGuid);
-        
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(callerGuid, FOR_ONLY_ADMIN_USE_PERMISSIONS);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
 
         var res = await startNewSemesterCommand.ExecuteAsync(semesterName);
-        
+
         return res.Match(_ => true, exception => throw exception);
     }
-    
+
     private static void ThrowIfCallerGuidIsNull(string? callerGuid)
     {
         if (callerGuid is null)

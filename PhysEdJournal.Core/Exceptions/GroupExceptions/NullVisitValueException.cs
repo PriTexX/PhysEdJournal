@@ -2,5 +2,6 @@
 
 public class NullVisitValueException : Exception
 {
-    public NullVisitValueException(double visitValue) : base($"Visit value cannot be negative. Visit value: {visitValue}"){}
+    public NullVisitValueException(double visitValue)
+        : base($"Visit value cannot be negative. Visit value: {visitValue}") { }
 }

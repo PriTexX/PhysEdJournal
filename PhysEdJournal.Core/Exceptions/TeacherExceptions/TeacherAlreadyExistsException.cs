@@ -2,5 +2,6 @@
 
 public class TeacherAlreadyExistsException : Exception
 {
-    public TeacherAlreadyExistsException(string guid): base($"Teacher with guid: {guid} already exists"){}
+    public TeacherAlreadyExistsException(string guid)
+        : base($"Teacher with guid: {guid} already exists") { }
 }

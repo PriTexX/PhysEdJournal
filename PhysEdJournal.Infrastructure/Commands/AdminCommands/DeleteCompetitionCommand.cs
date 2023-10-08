@@ -14,7 +14,7 @@ public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
     {
         _applicationContext = applicationContext;
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(string competitionName)
     {
         var comp = await _applicationContext.Competitions.FindAsync(competitionName);

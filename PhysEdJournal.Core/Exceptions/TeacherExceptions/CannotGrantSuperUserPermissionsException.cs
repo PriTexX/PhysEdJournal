@@ -2,5 +2,6 @@
 
 public class CannotGrantSuperUserPermissionsException : Exception
 {
-    public CannotGrantSuperUserPermissionsException(string guid) : base($"Cannot grant superuser permissions to teacher: {guid}") {}
+    public CannotGrantSuperUserPermissionsException(string guid)
+        : base($"Cannot grant superuser permissions to teacher: {guid}") { }
 }

@@ -14,7 +14,7 @@ public sealed class CreateTeacherCommandTests : DatabaseTestsHelper
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-            
+
         var command = new CreateTeacherCommand(context);
         var payload = new CreateTeacherCommandPayload
         {
@@ -33,14 +33,14 @@ public sealed class CreateTeacherCommandTests : DatabaseTestsHelper
         Assert.NotNull(teacherFromDb);
         Assert.Equal(payload.TeacherGuid, teacherFromDb.TeacherGuid);
     }
-     
+
     [Fact]
     public async Task CreateTeacherAsync_WhenDuplicateTeacher_ShouldThrow()
-    { 
+    {
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-            
+
         var command = new CreateTeacherCommand(context);
         var teacher = EntitiesFactory.CreateTeacher(TeacherPermissions.DefaultAccess);
         var payload = new CreateTeacherCommandPayload
@@ -58,10 +58,13 @@ public sealed class CreateTeacherCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.False(result.IsSuccess);
-        result.Match(_ => true, exception =>
-        {
-            Assert.IsType<TeacherAlreadyExistsException>(exception);
-            return true;
-        });
+        result.Match(
+            _ => true,
+            exception =>
+            {
+                Assert.IsType<TeacherAlreadyExistsException>(exception);
+                return true;
+            }
+        );
     }
 }

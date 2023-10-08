@@ -14,12 +14,17 @@ public sealed class GivePermissionsCommandPayload
     public required TeacherPermissions TeacherPermissions { get; init; }
 }
 
-internal sealed class GivePermissionsCommandValidator : ICommandValidator<GivePermissionsCommandPayload>
+internal sealed class GivePermissionsCommandValidator
+    : ICommandValidator<GivePermissionsCommandPayload>
 {
-    public ValueTask<ValidationResult> ValidateCommandInputAsync(GivePermissionsCommandPayload commandInput)
+    public ValueTask<ValidationResult> ValidateCommandInputAsync(
+        GivePermissionsCommandPayload commandInput
+    )
     {
         if (commandInput.TeacherPermissions == TeacherPermissions.SuperUser)
-            return ValidationResult.Create(new CannotGrantSuperUserPermissionsException(commandInput.TeacherGuid));
+            return ValidationResult.Create(
+                new CannotGrantSuperUserPermissionsException(commandInput.TeacherGuid)
+            );
 
         return ValidationResult.Success;
     }
@@ -37,8 +42,10 @@ public sealed class GivePermissionsCommand : ICommand<GivePermissionsCommandPayl
         _memoryCache = memoryCache;
         _validator = new GivePermissionsCommandValidator();
     }
-    
-    public async Task<Result<TeacherEntity>> ExecuteAsync(GivePermissionsCommandPayload commandPayload)
+
+    public async Task<Result<TeacherEntity>> ExecuteAsync(
+        GivePermissionsCommandPayload commandPayload
+    )
     {
         var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
 
@@ -51,7 +58,9 @@ public sealed class GivePermissionsCommand : ICommand<GivePermissionsCommandPayl
 
         if (teacher is null)
         {
-            return new Result<TeacherEntity>(new TeacherNotFoundException(commandPayload.TeacherGuid));
+            return new Result<TeacherEntity>(
+                new TeacherNotFoundException(commandPayload.TeacherGuid)
+            );
         }
 
         teacher.Permissions = commandPayload.TeacherPermissions;
