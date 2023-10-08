@@ -17,7 +17,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -26,7 +27,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
@@ -35,7 +37,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 120,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "TeacherGuid",
@@ -44,7 +47,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "GroupNumber",
@@ -53,7 +57,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
@@ -62,7 +67,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 120,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Department",
@@ -72,7 +78,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "text",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "CurrentSemesterName",
@@ -81,7 +88,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 32,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -90,7 +98,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "TeacherGuid",
@@ -99,7 +108,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -108,7 +118,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "SemesterName",
@@ -117,7 +128,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 32,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -126,7 +138,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 32,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "TeacherGuid",
@@ -135,7 +148,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -144,7 +158,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "SemesterName",
@@ -153,7 +168,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 32,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "CuratorGuid",
@@ -163,7 +179,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "text",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "GroupName",
@@ -172,7 +189,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 30,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "CompetitionName",
@@ -181,7 +199,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 255,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "GroupNumber",
@@ -190,7 +209,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
@@ -199,7 +219,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 120,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "SemesterName",
@@ -208,7 +229,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 32,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -217,7 +239,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 maxLength: 36,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
         }
 
         /// <inheritdoc />
@@ -230,7 +253,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -239,7 +263,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
@@ -248,7 +273,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(120)",
-                oldMaxLength: 120);
+                oldMaxLength: 120
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "TeacherGuid",
@@ -257,7 +283,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "GroupNumber",
@@ -266,7 +293,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(20)",
-                oldMaxLength: 20);
+                oldMaxLength: 20
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
@@ -275,7 +303,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(120)",
-                oldMaxLength: 120);
+                oldMaxLength: 120
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Department",
@@ -285,7 +314,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 oldClrType: typeof(string),
                 oldType: "character varying(200)",
                 oldMaxLength: 200,
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "CurrentSemesterName",
@@ -294,7 +324,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(32)",
-                oldMaxLength: 32);
+                oldMaxLength: 32
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -303,7 +334,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "TeacherGuid",
@@ -312,7 +344,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -321,7 +354,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "SemesterName",
@@ -330,7 +364,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(32)",
-                oldMaxLength: 32);
+                oldMaxLength: 32
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -339,7 +374,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(32)",
-                oldMaxLength: 32);
+                oldMaxLength: 32
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "TeacherGuid",
@@ -348,7 +384,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -357,7 +394,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "SemesterName",
@@ -366,7 +404,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(32)",
-                oldMaxLength: 32);
+                oldMaxLength: 32
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "CuratorGuid",
@@ -376,7 +415,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
                 oldMaxLength: 36,
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "GroupName",
@@ -385,7 +425,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(30)",
-                oldMaxLength: 30);
+                oldMaxLength: 30
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "CompetitionName",
@@ -394,7 +435,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(255)",
-                oldMaxLength: 255);
+                oldMaxLength: 255
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "GroupNumber",
@@ -403,7 +445,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(20)",
-                oldMaxLength: 20);
+                oldMaxLength: 20
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
@@ -412,7 +455,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(120)",
-                oldMaxLength: 120);
+                oldMaxLength: 120
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "SemesterName",
@@ -421,7 +465,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(32)",
-                oldMaxLength: 32);
+                oldMaxLength: 32
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "StudentGuid",
@@ -430,7 +475,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(36)",
-                oldMaxLength: 36);
+                oldMaxLength: 36
+            );
         }
     }
 }

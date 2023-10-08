@@ -11,12 +11,12 @@ public sealed class CreateCompetitionCommandTests : DatabaseTestsHelper
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new CreateCompetitionCommand(context);
         var competitionName = "прыжки";
 
         await context.SaveChangesAsync();
-    
+
         // Act
         var result = await command.ExecuteAsync(competitionName);
 

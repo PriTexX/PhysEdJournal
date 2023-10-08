@@ -23,7 +23,8 @@ public sealed class AddStandardPointsCommandPayload
     public required bool IsOverride { get; init; }
 }
 
-internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddStandardPointsCommandPayload>
+internal sealed class AddStandardPointsCommandValidator
+    : ICommandValidator<AddStandardPointsCommandPayload>
 {
     private readonly ApplicationContext _applicationContext;
 
@@ -32,18 +33,20 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddStandardPointsCommandPayload commandInput)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(
+        AddStandardPointsCommandPayload commandInput
+    )
     {
         if (commandInput.Date > DateOnly.FromDateTime(DateTime.Now))
         {
             return new ActionFromFutureException(commandInput.Date);
         }
-        
+
         // if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
         // {
         //     return new DateExpiredException(commandInput.Date);
         // }
-        
+
         if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayException(commandInput.Date.DayOfWeek);
@@ -61,21 +64,28 @@ internal sealed class AddStandardPointsCommandValidator : ICommandValidator<AddS
 
         var duplicateHistoryEntity = await _applicationContext.StandardsStudentsHistory
             .AsNoTracking()
-            .Where(s => s.StudentGuid == commandInput.StudentGuid && s.StandardType == commandInput.StandardType)
+            .Where(
+                s =>
+                    s.StudentGuid == commandInput.StudentGuid
+                    && s.StandardType == commandInput.StandardType
+            )
             .OrderByDescending(s => s.Points)
             .FirstOrDefaultAsync();
-        
+
         if (commandInput.IsOverride && duplicateHistoryEntity is not null)
         {
             if (commandInput.Points < duplicateHistoryEntity.Points)
                 return new LoweringTheScoreException(duplicateHistoryEntity.Points);
-            
+
             return ValidationResult.Success;
         }
 
         if (duplicateHistoryEntity is not null)
         {
-            return new StandardAlreadyExistsException(commandInput.StudentGuid, commandInput.StandardType);
+            return new StandardAlreadyExistsException(
+                commandInput.StudentGuid,
+                commandInput.StandardType
+            );
         }
 
         return ValidationResult.Success;
@@ -96,7 +106,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
     public async Task<Result<Unit>> ExecuteAsync(AddStandardPointsCommandPayload commandPayload)
     {
         var validation = await _validator.ValidateCommandInputAsync(commandPayload);
-        
+
         if (validation.IsFailed)
         {
             return validation.ToResult<Unit>();
@@ -108,7 +118,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
         {
             return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
         }
-        
+
         var standardsStudentHistoryEntity = new StandardsStudentHistoryEntity
         {
             StudentGuid = commandPayload.StudentGuid,
@@ -118,29 +128,36 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             Points = commandPayload.Points,
             StandardType = commandPayload.StandardType
         };
-        
+
         if (commandPayload.IsOverride)
         {
             var points = await _applicationContext.StandardsStudentsHistory
                 .AsNoTracking()
-                .Where(s => s.StudentGuid == commandPayload.StudentGuid && s.StandardType == commandPayload.StandardType)
+                .Where(
+                    s =>
+                        s.StudentGuid == commandPayload.StudentGuid
+                        && s.StandardType == commandPayload.StandardType
+                )
                 .OrderByDescending(s => s.Points)
                 .Select(s => s.Points)
                 .FirstAsync();
 
             student.PointsForStandards -= points;
         }
-        
-        var adjustedStudentPointsAmount = AdjustStudentPointsAmount(student.PointsForStandards, standardsStudentHistoryEntity.Points);
+
+        var adjustedStudentPointsAmount = AdjustStudentPointsAmount(
+            student.PointsForStandards,
+            standardsStudentHistoryEntity.Points
+        );
 
         student.PointsForStandards = adjustedStudentPointsAmount;
-        
+
         _applicationContext.StandardsStudentsHistory.Add(standardsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
-        
+
         return Unit.Default;
     }
 

@@ -28,7 +28,7 @@ public static class DateOnlyGenerator
             {
                 throw new Exception("There is no day that is non-working");
             }
-            
+
             targetDate = targetDate.AddDays(1);
         }
 

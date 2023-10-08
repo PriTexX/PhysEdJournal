@@ -2,5 +2,6 @@
 
 public class ArchivedStudentNotFound : Exception
 {
-    public ArchivedStudentNotFound(string guid, string semesterName): base($"No archived student with guid: {guid} and semester name: {semesterName}"){}
+    public ArchivedStudentNotFound(string guid, string semesterName)
+        : base($"No archived student with guid: {guid} and semester name: {semesterName}") { }
 }

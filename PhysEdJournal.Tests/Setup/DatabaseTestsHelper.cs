@@ -9,8 +9,9 @@ public abstract class DatabaseTestsHelper
 {
     protected static ApplicationContext CreateContext(IMemoryCache? cache = null)
     {
-        var builder = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseNpgsql(PostgresContainerFixture.ConnectionString);
+        var builder = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(
+            PostgresContainerFixture.ConnectionString
+        );
         var memoryCash = cache ?? new MemoryCache(new MemoryCacheOptions());
         var dbContext = new ApplicationContext(builder.Options, memoryCash);
         return dbContext;

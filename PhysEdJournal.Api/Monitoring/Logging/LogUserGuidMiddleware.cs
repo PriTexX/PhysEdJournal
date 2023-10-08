@@ -37,7 +37,7 @@ public sealed class UserGuidLoggerMiddleware
         }
         else
         {
-            await _next(context);   
+            await _next(context);
         }
     }
 }

@@ -12,9 +12,12 @@ public sealed class AssignVisitValueCommandPayload
     public required double NewVisitValue { get; init; }
 }
 
-internal sealed class AssignVisitValueCommandValidator : ICommandValidator<AssignVisitValueCommandPayload>
+internal sealed class AssignVisitValueCommandValidator
+    : ICommandValidator<AssignVisitValueCommandPayload>
 {
-    public ValueTask<ValidationResult> ValidateCommandInputAsync(AssignVisitValueCommandPayload commandInput)
+    public ValueTask<ValidationResult> ValidateCommandInputAsync(
+        AssignVisitValueCommandPayload commandInput
+    )
     {
         if (commandInput.NewVisitValue <= 0)
         {
@@ -23,7 +26,7 @@ internal sealed class AssignVisitValueCommandValidator : ICommandValidator<Assig
 
         return ValidationResult.Success;
     }
-} 
+}
 
 public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPayload, Unit>
 {
@@ -35,7 +38,7 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
         _applicationContext = applicationContext;
         _validator = new AssignVisitValueCommandValidator();
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(AssignVisitValueCommandPayload commandPayload)
     {
         var validationResult = await _validator.ValidateCommandInputAsync(commandPayload);
@@ -44,7 +47,7 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
         {
             return validationResult.ToResult<Unit>();
         }
-        
+
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
 
         if (group is null)

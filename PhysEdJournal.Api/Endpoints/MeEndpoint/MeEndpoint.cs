@@ -16,11 +16,11 @@ public sealed class MeController : ControllerBase
         _meInfoService = meInfoService;
         _logger = logger;
     }
-    
+
     [HttpGet]
     [ResponseCache(Duration = 120, Location = ResponseCacheLocation.Client)]
     [Authorize]
-    public async Task<IActionResult> Get([FromQuery]MeRequest request)
+    public async Task<IActionResult> Get([FromQuery] MeRequest request)
     {
         var guidClaim = User.FindFirst(c => c.Type == "IndividualGuid");
 
@@ -40,11 +40,12 @@ public sealed class MeController : ControllerBase
                     {
                         if (exception is StudentNotFoundException)
                             return NotFound();
-                        
+
                         _logger.LogError(exception, "unhandled error in me endpoint");
                         return StatusCode(500);
-                    });
-            
+                    }
+                );
+
             case UserType.Professor:
                 var professorInfoResult = await _meInfoService.GetProfessorInfo(guidClaim.Value);
 
@@ -54,11 +55,12 @@ public sealed class MeController : ControllerBase
                     {
                         if (exception is TeacherNotFoundException)
                             return NotFound();
-                        
+
                         _logger.LogError(exception, "unhandled error in me endpoint");
                         return StatusCode(500);
-                    });
-            
+                    }
+                );
+
             default:
                 return StatusCode(500);
         }

@@ -8,7 +8,7 @@ public static class DoubleComparer
         {
             return true;
         }
-        
+
         return Math.Abs(first - second) < 1e-9 * Math.Max(first, second);
     }
 }

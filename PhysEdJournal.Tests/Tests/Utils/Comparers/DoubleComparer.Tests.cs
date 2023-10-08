@@ -18,7 +18,7 @@ public sealed class DoubleComparerTests
         // Assert
         Assert.True(isEqual);
     }
-    
+
     [Theory]
     [InlineData(0.1, 0.2, 0.29)]
     [InlineData(0.1, 0.2, 0.31)]

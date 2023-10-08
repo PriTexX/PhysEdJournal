@@ -28,9 +28,11 @@ public class PostgresContainerFixture : IDisposable
             .WithEnvironment("POSTGRES_PASSWORD", postgresPwd)
             .WithEnvironment("PGDATA", "/pgdata")
             .WithTmpfsMount("/pgdata")
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilCommandIsCompleted("psql -U postgres -c \"select 1\""))
+            .WithWaitStrategy(
+                Wait.ForUnixContainer().UntilCommandIsCompleted("psql -U postgres -c \"select 1\"")
+            )
             .Build();
-        
+
         _pgContainer.StartAsync().GetAwaiter().GetResult();
 
         ConnectionString = new NpgsqlConnectionStringBuilder
@@ -42,11 +44,10 @@ public class PostgresContainerFixture : IDisposable
             Username = "postgres"
         }.ConnectionString;
 
-        var builder = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseNpgsql(ConnectionString);
+        var builder = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(ConnectionString);
         var memoryCash = new MemoryCache(new MemoryCacheOptions());
         var dbContext = new ApplicationContext(builder.Options, memoryCash);
-        
+
         dbContext.Database.Migrate();
         dbContext.Dispose();
     }

@@ -14,10 +14,10 @@ public sealed class CreateCompetitionCommand : ICommand<string, Unit>
     {
         _applicationContext = applicationContext;
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(string competitionName)
     {
-        var comp = new CompetitionEntity{CompetitionName = competitionName};
+        var comp = new CompetitionEntity { CompetitionName = competitionName };
 
         _applicationContext.Competitions.Add(comp);
         await _applicationContext.SaveChangesAsync();

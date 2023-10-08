@@ -37,10 +37,8 @@ public readonly struct Success
 [GraphQLName("Success")]
 public class SuccessType : ScalarType<Success, BooleanValueNode>
 {
-    public SuccessType() : base("Success")
-    {
-    }
-
+    public SuccessType()
+        : base("Success") { }
 
     public override IValueNode ParseResult(object? resultValue)
     {

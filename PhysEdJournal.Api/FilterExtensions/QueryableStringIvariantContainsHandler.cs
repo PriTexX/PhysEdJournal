@@ -11,9 +11,7 @@ public class QueryableStringInvariantContainsHandler : QueryableStringOperationH
     // For creating a expression tree we need the `MethodInfo` of the `ToLower` method of string
     private static readonly MethodInfo ToLower = typeof(string)
         .GetMethods()
-        .Single(
-            x => x.Name == nameof(string.ToLower) &&
-                 x.GetParameters().Length == 0);
+        .Single(x => x.Name == nameof(string.ToLower) && x.GetParameters().Length == 0);
 
     // This is used to match the handler to all `contains` fields
     protected override int Operation => DefaultFilterOperations.Contains;
@@ -22,27 +20,29 @@ public class QueryableStringInvariantContainsHandler : QueryableStringOperationH
         QueryableFilterContext context,
         IFilterOperationField field,
         IValueNode value,
-        object? parsedValue)
+        object? parsedValue
+    )
     {
         // We get the instance of the context. This is the expression path to the property
         // e.g. ~> y.Street
         Expression property = context.GetInstance();
-        
+
         // the parsed value is what was specified in the query
         // e.g. ~> eq: "221B Baker Street"
         if (parsedValue is string str)
         {
-            
             // Creates and returns the operation
             // e.g. ~> y.Street.ToLower() == "221b baker street"
-            return FilterExpressionBuilder.Contains(Expression.Call(property, ToLower), str.ToLower());
+            return FilterExpressionBuilder.Contains(
+                Expression.Call(property, ToLower),
+                str.ToLower()
+            );
         }
 
         // Something went wrong 😱
         throw new InvalidOperationException();
     }
 
-    public QueryableStringInvariantContainsHandler(InputParser inputParser) : base(inputParser)
-    {
-    }
+    public QueryableStringInvariantContainsHandler(InputParser inputParser)
+        : base(inputParser) { }
 }

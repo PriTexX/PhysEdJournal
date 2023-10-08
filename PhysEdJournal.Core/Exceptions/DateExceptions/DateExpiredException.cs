@@ -2,5 +2,6 @@
 
 public class DateExpiredException : Exception
 {
-    public DateExpiredException(DateOnly date): base($"The ability to set points for {date} has expired") {}
+    public DateExpiredException(DateOnly date)
+        : base($"The ability to set points for {date} has expired") { }
 }

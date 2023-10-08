@@ -19,7 +19,12 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
         var command = new ActivateStudentCommand(context);
         var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
         var group = EntitiesFactory.CreateGroup("211-729");
-        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, isActive);
+        var student = EntitiesFactory.CreateStudent(
+            group.GroupName,
+            semester.Name,
+            false,
+            isActive
+        );
 
         await context.Semesters.AddAsync(semester);
         await context.Groups.AddAsync(group);
@@ -36,14 +41,14 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
         Assert.NotNull(studentFromDb);
         Assert.True(studentFromDb.IsActive);
     }
-    
+
     [Fact]
     public async Task ActivateStudentAsync_WithoutStudent_ShouldThrow()
     {
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new ActivateStudentCommand(context);
 
         // Act
@@ -51,10 +56,13 @@ public sealed class ActivateStudentCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.False(result.IsSuccess);
-        result.Match(_ => true, exception =>
-        {
-            Assert.IsType<StudentNotFoundException>(exception);
-            return true;
-        });
+        result.Match(
+            _ => true,
+            exception =>
+            {
+                Assert.IsType<StudentNotFoundException>(exception);
+                return true;
+            }
+        );
     }
 }

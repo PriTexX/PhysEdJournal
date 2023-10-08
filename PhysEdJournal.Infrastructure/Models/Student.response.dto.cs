@@ -9,7 +9,8 @@ public sealed class Student
     public required string Department { get; set; }
 }
 
-public sealed class PageInfo{
+public sealed class PageInfo
+{
     public required bool HasNextPage { get; set; }
 }
 

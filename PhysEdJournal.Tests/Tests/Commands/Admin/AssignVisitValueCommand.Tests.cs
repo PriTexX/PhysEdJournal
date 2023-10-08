@@ -16,7 +16,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new AssignVisitValueCommand(context);
         var group = EntitiesFactory.CreateGroup("Default");
         var payload = new AssignVisitValueCommandPayload
@@ -24,7 +24,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             GroupName = group.GroupName,
             NewVisitValue = visitValue
         };
-        
+
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
@@ -43,11 +43,13 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(double.MinValue)]
-    public async Task AssignVisitValueAsync_WithInvalidValue_ShouldReturnNullVisitValueException(double visitValue)
+    public async Task AssignVisitValueAsync_WithInvalidValue_ShouldReturnNullVisitValueException(
+        double visitValue
+    )
     {
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new AssignVisitValueCommand(context);
         var group = EntitiesFactory.CreateGroup("Default");
         var payload = new AssignVisitValueCommandPayload
@@ -55,32 +57,37 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             GroupName = group.GroupName,
             NewVisitValue = visitValue
         };
-        
+
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();
 
         // Act
         var result = await command.ExecuteAsync(payload);
-    
+
         // Assert
         Assert.False(result.IsSuccess);
-        result.Match(_ => true, exception =>
-        {
-            Assert.IsType<NullVisitValueException>(exception);
-            return true;
-        });
+        result.Match(
+            _ => true,
+            exception =>
+            {
+                Assert.IsType<NullVisitValueException>(exception);
+                return true;
+            }
+        );
     }
-    
+
     [Theory]
     [InlineData(5)]
     [InlineData(double.MaxValue)]
     [InlineData(4)]
-    public async Task AssignVisitValueAsync_WithoutGroup_ShouldReturnGroupNotFoundException(double visitValue)
+    public async Task AssignVisitValueAsync_WithoutGroup_ShouldReturnGroupNotFoundException(
+        double visitValue
+    )
     {
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new AssignVisitValueCommand(context);
         var payload = new AssignVisitValueCommandPayload
         {
@@ -93,10 +100,13 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.False(result.IsSuccess);
-        result.Match(_ => true, exception =>
-        {
-            Assert.IsType<GroupNotFoundException>(exception);
-            return true;
-        });
+        result.Match(
+            _ => true,
+            exception =>
+            {
+                Assert.IsType<GroupNotFoundException>(exception);
+                return true;
+            }
+        );
     }
 }
