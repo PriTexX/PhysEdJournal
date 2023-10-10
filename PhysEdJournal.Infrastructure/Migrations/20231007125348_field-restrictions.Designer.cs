@@ -13,6 +13,7 @@ namespace PhysEdJournal.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
     [Migration("20231007125348_field-restrictions")]
+    #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
     partial class fieldrestrictions
     {
         /// <inheritdoc />

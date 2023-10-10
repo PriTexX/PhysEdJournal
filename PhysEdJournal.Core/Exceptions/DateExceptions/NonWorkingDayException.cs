@@ -2,5 +2,6 @@
 
 public class NonWorkingDayException : Exception
 {
-    public NonWorkingDayException(DayOfWeek date): base($"{date} is a non-working day"){}
+    public NonWorkingDayException(DayOfWeek date)
+        : base($"{date} is a non-working day") { }
 }

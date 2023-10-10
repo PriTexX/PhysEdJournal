@@ -13,7 +13,8 @@ public static class StudentServiceFunctions
 {
     public static async IAsyncEnumerable<Student> GetAllStudentsAsync(string url, int pageSize)
     {
-        var query = @"query($pageSize: Int!, $skipSize: Int!) {
+        var query =
+            @"query($pageSize: Int!, $skipSize: Int!) {
             students(take: $pageSize, skip: $skipSize, where: {group: {neq: """"}}) {
                 pageInfo{hasNextPage}
                 items {
@@ -25,13 +26,17 @@ public static class StudentServiceFunctions
                 }
             }
          }";
-       
+
         var client = new GraphQLHttpClient(url, new NewtonsoftJsonSerializer());
         var skipSize = 0;
 
         while (true)
         {
-            var request = new GraphQLRequest { Query = query, Variables = new { pageSize, skipSize }};
+            var request = new GraphQLRequest
+            {
+                Query = query,
+                Variables = new { pageSize, skipSize },
+            };
             var response = await client.SendQueryAsync<PagedGraphQLStudent>(request);
 
             if (response.Errors != null && response.Errors.Any())
@@ -44,36 +49,50 @@ public static class StudentServiceFunctions
             {
                 yield return student;
             }
-            
-            if(!response.Data.Students.PageInfo.HasNextPage)
+
+            if (!response.Data.Students.PageInfo.HasNextPage)
+            {
                 break;
+            }
 
             skipSize += pageSize;
         }
     }
-    
-    public static async Task<IEnumerable<StudentEntity>> GetManyStudentsWithManyKeys(ApplicationContext applicationContext, string[] keys)
+
+    public static async Task<IEnumerable<StudentEntity>> GetManyStudentsWithManyKeys(
+        ApplicationContext applicationContext,
+        string[] keys
+    )
     {
-        return await applicationContext.Students.Where(s => keys.Contains(s.StudentGuid)).ToListAsync();
+        return await applicationContext.Students
+            .Where(s => keys.Contains(s.StudentGuid))
+            .ToListAsync();
     }
 
-    public static async Task CommitChangesToContext(ApplicationContext applicationContext, List<(bool, StudentEntity)> students)
+    public static async Task CommitChangesToContext(
+        ApplicationContext applicationContext,
+        List<(bool, StudentEntity)> students
+    )
     {
-        applicationContext.Students.AddRange(students
-            .Where(d => d.Item1)
-            .Where(p => p.Item2.GroupNumber != "")
-            .Where(p => p.Item2.GroupNumber[2] == '1')
-            .Select(p =>
-            {
-                p.Item2.FullName = PrettifyFullName(p.Item2.FullName);
-                return p;
-            })
-            .Select(p => p.Item2));
-        
-        applicationContext.Students.UpdateRange(students
-            .Where(d => !d.Item1)
-            .Where(p => p.Item2.GroupNumber != "")
-            .Select(p => p.Item2));
+        applicationContext.Students.AddRange(
+            students
+                .Where(d => d.Item1)
+                .Where(p => p.Item2.GroupNumber != string.Empty)
+                .Where(p => p.Item2.GroupNumber[2] == '1')
+                .Select(p =>
+                {
+                    p.Item2.FullName = PrettifyFullName(p.Item2.FullName);
+                    return p;
+                })
+                .Select(p => p.Item2)
+        );
+
+        applicationContext.Students.UpdateRange(
+            students
+                .Where(d => !d.Item1)
+                .Where(p => p.Item2.GroupNumber != string.Empty)
+                .Select(p => p.Item2)
+        );
 
         await applicationContext.SaveChangesAsync();
     }
@@ -82,8 +101,12 @@ public static class StudentServiceFunctions
     {
         return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fullName.ToLower().Trim());
     }
-    
-    public static (bool, StudentEntity) GetUpdatedOrCreatedStudentEntities(Student studentModel, StudentEntity? dbStudent, string currentSemesterName)
+
+    public static (bool, StudentEntity) GetUpdatedOrCreatedStudentEntities(
+        Student studentModel,
+        StudentEntity? dbStudent,
+        string currentSemesterName
+    )
     {
         if (dbStudent is null)
         {
@@ -91,21 +114,32 @@ public static class StudentServiceFunctions
         }
 
         if (dbStudent.GroupNumber != studentModel.Group)
+        {
             dbStudent.GroupNumber = studentModel.Group;
+        }
 
         if (dbStudent.FullName != studentModel.FullName)
+        {
             dbStudent.FullName = studentModel.FullName;
-        
+        }
+
         if (dbStudent.Course != studentModel.Course)
+        {
             dbStudent.Course = studentModel.Course;
-        
+        }
+
         if (dbStudent.Department != studentModel.Department)
+        {
             dbStudent.Department = studentModel.Department;
+        }
 
         return (false, dbStudent);
     }
 
-    private static StudentEntity CreateStudentEntityFromStudentModel(Student student, string currentSemesterName)
+    private static StudentEntity CreateStudentEntityFromStudentModel(
+        Student student,
+        string currentSemesterName
+    )
     {
         return new StudentEntity
         {
@@ -114,7 +148,7 @@ public static class StudentServiceFunctions
             GroupNumber = student.Group,
             Course = student.Course,
             Department = student.Department,
-            CurrentSemesterName = currentSemesterName
+            CurrentSemesterName = currentSemesterName,
         };
     }
 }

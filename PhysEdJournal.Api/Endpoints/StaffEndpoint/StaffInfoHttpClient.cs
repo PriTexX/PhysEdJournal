@@ -12,12 +12,16 @@ public sealed class StaffInfoHttpClient : IStaffInfoClient
 
     public StaffInfoHttpClient(IOptions<ApplicationOptions> settings)
     {
-        _graphQlClient = new GraphQLHttpClient(settings.Value.UserInfoServerURL, new NewtonsoftJsonSerializer());
+        _graphQlClient = new GraphQLHttpClient(
+            settings.Value.UserInfoServerURL,
+            new NewtonsoftJsonSerializer()
+        );
     }
 
     public async Task<PagedStaffResponse> GetStaffByFilterAsync(string filter, int pageSize)
     {
-        var query = @"query($pageSize: Int!, $filter: String!) {
+        var query =
+            @"query($pageSize: Int!, $filter: String!) {
             employees(
               take: $pageSize,
               order: { fullName: ASC },
@@ -30,9 +34,9 @@ public sealed class StaffInfoHttpClient : IStaffInfoClient
             }
         }";
 
-        var request = new GraphQLRequest {Query = query, Variables = new{pageSize, filter}};
+        var request = new GraphQLRequest { Query = query, Variables = new { pageSize, filter } };
         var response = await _graphQlClient.SendQueryAsync<PagedStaffResponse>(request);
-        
+
         return response.Data;
     }
 }

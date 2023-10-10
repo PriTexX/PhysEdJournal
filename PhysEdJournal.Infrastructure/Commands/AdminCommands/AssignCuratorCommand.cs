@@ -21,18 +21,18 @@ public sealed class AssignCuratorCommand : ICommand<AssignCuratorCommandPayload,
     {
         _applicationContext = applicationContext;
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(AssignCuratorCommandPayload commandPayload)
     {
         var teacher = await _applicationContext.Teachers.FindAsync(commandPayload.TeacherGuid);
-        
+
         if (teacher is null)
         {
             return new Result<Unit>(new TeacherNotFoundException(commandPayload.TeacherGuid));
         }
-    
+
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
-    
+
         if (group is null)
         {
             return new Result<Unit>(new GroupNotFoundException(commandPayload.GroupName));

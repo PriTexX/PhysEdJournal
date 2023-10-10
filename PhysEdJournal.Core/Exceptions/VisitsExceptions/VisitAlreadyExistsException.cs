@@ -2,5 +2,6 @@
 
 public class VisitAlreadyExistsException : Exception
 {
-    public VisitAlreadyExistsException(DateOnly date): base($"Visit for {date} already exists"){}
+    public VisitAlreadyExistsException(DateOnly date)
+        : base($"Visit for {date} already exists") { }
 }

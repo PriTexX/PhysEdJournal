@@ -2,6 +2,6 @@
 
 public class FitnessAlreadyExistsException : Exception
 {
-    public FitnessAlreadyExistsException() : base("Student already has points for external fitness")
-    {}
+    public FitnessAlreadyExistsException()
+        : base("Student already has points for external fitness") { }
 }

@@ -7,5 +7,5 @@ public enum TeacherPermissions
     SuperUser = 1,
     AdminAccess = 2,
     SecretaryAccess = 4,
-    OnlineCourseAccess = 8
+    OnlineCourseAccess = 8,
 }

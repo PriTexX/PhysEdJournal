@@ -13,14 +13,14 @@ public sealed class DeleteCompetitionCommandTests : DatabaseTestsHelper
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new DeleteCompetitionCommand(context);
         var competitionName = "прыжки";
-        var competition = new CompetitionEntity {CompetitionName = competitionName};
+        var competition = new CompetitionEntity { CompetitionName = competitionName };
 
         await context.Competitions.AddAsync(competition);
         await context.SaveChangesAsync();
-    
+
         // Act
         var result = await command.ExecuteAsync(competitionName);
 
@@ -30,28 +30,31 @@ public sealed class DeleteCompetitionCommandTests : DatabaseTestsHelper
         var competitionFromDb = await assertContext.Competitions.FindAsync(competitionName);
         Assert.Null(competitionFromDb);
     }
-     
+
     [Fact]
     public async Task DeleteCompetitionAsync_WhenNoCompetition_ShouldThrow()
     {
         // Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-        
+
         var command = new DeleteCompetitionCommand(context);
         var competitionName = "прыжки";
 
         await context.SaveChangesAsync();
-    
+
         // Act
         var result = await command.ExecuteAsync(competitionName);
-    
+
         // Assert
         Assert.False(result.IsSuccess);
-        result.Match(_ => true, exception =>
-        {
-            Assert.IsType<CompetitionNotFoundException>(exception);
-            return true;
-        });
+        result.Match(
+            _ => true,
+            exception =>
+            {
+                Assert.IsType<CompetitionNotFoundException>(exception);
+                return true;
+            }
+        );
     }
 }

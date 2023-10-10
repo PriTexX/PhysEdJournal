@@ -14,13 +14,15 @@ public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
     {
         _applicationContext = applicationContext;
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(string competitionName)
     {
         var comp = await _applicationContext.Competitions.FindAsync(competitionName);
 
         if (comp is null)
+        {
             return new Result<Unit>(new CompetitionNotFoundException(competitionName));
+        }
 
         _applicationContext.Competitions.Remove(comp);
         await _applicationContext.SaveChangesAsync();

@@ -2,21 +2,21 @@
 
 public sealed class StudentInfoResponse
 {
-    public double Points { get; init; }
+    public required double Points { get; init; }
 }
 
 public sealed class ProfessorInfoResponse
 {
-    public List<string> Permisions { get; init; }
+    public required List<string> Permisions { get; init; }
 }
 
 public enum UserType
 {
-    Student, Professor
+    Student,
+    Professor,
 }
-
 
 public sealed class MeRequest
 {
-    public UserType Type { get; init; } 
+    public UserType Type { get; init; }
 }

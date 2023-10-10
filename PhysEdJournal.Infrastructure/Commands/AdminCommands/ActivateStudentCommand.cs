@@ -20,9 +20,8 @@ public sealed class ActivateStudentCommand : ICommand<string, Unit>
     {
         var rowsAffected = await _applicationContext.Students
             .Where(s => s.StudentGuid == studentGuid)
-            .ExecuteUpdateAsync(p => p
-                .SetProperty(s => s.IsActive, true));
-        
+            .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsActive, true));
+
         if (rowsAffected == 0)
         {
             return new Result<Unit>(new StudentNotFoundException(studentGuid));

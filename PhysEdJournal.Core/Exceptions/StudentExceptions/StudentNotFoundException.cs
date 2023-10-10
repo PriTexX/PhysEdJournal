@@ -2,5 +2,6 @@
 
 public sealed class StudentNotFoundException : Exception
 {
-    public StudentNotFoundException(string guid): base($"No student with guid: {guid}"){}
+    public StudentNotFoundException(string guid)
+        : base($"No student with guid: {guid}") { }
 }

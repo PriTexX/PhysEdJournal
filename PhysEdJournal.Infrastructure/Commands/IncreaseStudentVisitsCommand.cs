@@ -19,8 +19,8 @@ public sealed class IncreaseStudentVisitsCommandPayload
     public required DateOnly Date { get; init; }
 }
 
-
-internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<IncreaseStudentVisitsCommandPayload>
+internal sealed class IncreaseStudentVisitsCommandValidator
+    : ICommandValidator<IncreaseStudentVisitsCommandPayload>
 {
     private readonly ApplicationContext _applicationContext;
 
@@ -29,13 +29,15 @@ internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(IncreaseStudentVisitsCommandPayload input)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(
+        IncreaseStudentVisitsCommandPayload input
+    )
     {
         if (input.Date > DateOnly.FromDateTime(DateTime.Now))
         {
             return new ActionFromFutureException(input.Date);
         }
-        
+
         if (input.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayException(input.Date.DayOfWeek);
@@ -45,7 +47,6 @@ internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<
         // {
         //     return new VisitExpiredException(input.Date);
         // }
-        
         var recordCopy = await _applicationContext.VisitsStudentsHistory
             .Where(v => v.StudentGuid == input.StudentGuid && v.Date == input.Date)
             .FirstOrDefaultAsync();
@@ -57,10 +58,10 @@ internal sealed class IncreaseStudentVisitsCommandValidator : ICommandValidator<
 
         return ValidationResult.Success;
     }
-} 
+}
 
-
-public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisitsCommandPayload, Unit>
+public sealed class IncreaseStudentVisitsCommand
+    : ICommand<IncreaseStudentVisitsCommandPayload, Unit>
 {
     private readonly ApplicationContext _applicationContext;
     private readonly IncreaseStudentVisitsCommandValidator _validator;
@@ -79,21 +80,21 @@ public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisit
         {
             return validation.ToResult<Unit>();
         }
-        
+
         var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
 
         if (student is null)
         {
             return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
         }
-        
+
         student.Visits++;
 
         var record = new VisitStudentHistoryEntity
         {
             Date = commandPayload.Date,
             StudentGuid = commandPayload.StudentGuid,
-            TeacherGuid = commandPayload.TeacherGuid
+            TeacherGuid = commandPayload.TeacherGuid,
         };
 
         _applicationContext.VisitsStudentsHistory.Add(record);
@@ -101,8 +102,7 @@ public sealed class IncreaseStudentVisitsCommand : ICommand<IncreaseStudentVisit
         await _applicationContext.SaveChangesAsync();
 
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
-        
+
         return Unit.Default;
     }
 }
-

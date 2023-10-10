@@ -2,5 +2,6 @@
 
 public class SemesterNameValidationException : Exception
 {
-    public SemesterNameValidationException() : base("Semester name must be like: 2022-2023/весна"){}
+    public SemesterNameValidationException()
+        : base("Semester name must be like: 2022-2023/весна") { }
 }

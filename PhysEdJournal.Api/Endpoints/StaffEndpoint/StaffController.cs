@@ -14,14 +14,17 @@ public sealed class StaffController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetStaffByFilterAsync([FromQuery]GetStaffByFilterRequest request)
+    public async Task<IActionResult> GetStaffByFilterAsync(
+        [FromQuery] GetStaffByFilterRequest request
+    )
     {
         var staff = await _staffInfoClient.GetStaffByFilterAsync(request.Filter, request.PageSize);
-        
-        var staffResponseModel = staff.Employees.Items
-            .Select(e => new EmployeeResponse{FullName = e.FullName, Guid = e.Guid});
+
+        var staffResponseModel = staff.Employees.Items.Select(
+            e => new EmployeeResponse { FullName = e.FullName, Guid = e.Guid }
+        );
         var response = new GetStaffByFilterResponse { Employees = staffResponseModel };
-        
+
         return new OkObjectResult(response);
     }
 }

@@ -6,5 +6,5 @@ public enum HealthGroupType
     Basic,
     Special,
     Preparatory,
-    HealthLimitations
+    HealthLimitations,
 }

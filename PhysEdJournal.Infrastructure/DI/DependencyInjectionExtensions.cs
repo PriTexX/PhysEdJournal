@@ -4,18 +4,19 @@ using Microsoft.Extensions.DependencyInjection;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Validators.Standards;
 
 namespace PhysEdJournal.Infrastructure.DI;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        services.AddDbContext<ApplicationContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
-        services.AddSingleton<StandardsValidator>();
+        services.AddDbContext<ApplicationContext>(
+            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+        );
 
         services.AddMemoryCache();
 
@@ -29,7 +30,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<AddPointsCommand>();
         services.AddScoped<IncreaseStudentVisitsCommand>();
         services.AddScoped<AddStandardPointsCommand>();
-        
+
         services.AddScoped<ActivateStudentCommand>();
         services.AddScoped<DeActivateStudentCommand>();
         services.AddScoped<ArchiveStudentCommand>();
@@ -43,5 +44,4 @@ public static class DependencyInjectionExtensions
         services.AddScoped<StartNewSemesterCommand>();
         services.AddScoped<UpdateStudentsInfoCommand>();
     }
-
 }

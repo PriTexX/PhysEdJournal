@@ -2,5 +2,8 @@
 
 public class CannotMigrateToNewSemesterException : Exception
 {
-    public CannotMigrateToNewSemesterException(string semester) : base($"Cannot archive student with semester: {semester} and migrate to an active semester as he already has an active semester"){}
+    public CannotMigrateToNewSemesterException(string semester)
+        : base(
+            $"Cannot archive student with semester: {semester} and migrate to an active semester as he already has an active semester"
+        ) { }
 }

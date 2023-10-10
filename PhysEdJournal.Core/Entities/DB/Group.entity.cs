@@ -8,16 +8,16 @@ public sealed class GroupEntity
 {
     [StringLength(30)]
     [Key]
-    public string GroupName { get; set; }
+    public required string GroupName { get; set; }
 
-    [DefaultValue(2.0)] 
+    [DefaultValue(2.0)]
     public double VisitValue { get; set; } = 2.0;
-    
+
     [StringLength(36)]
     public string? CuratorGuid { get; set; }
-    
+
     [ForeignKey("CuratorGuid")]
     public TeacherEntity? Curator { get; set; }
-    
-    public ICollection<StudentEntity> Students { get; set; }
+
+    public ICollection<StudentEntity>? Students { get; set; }
 }

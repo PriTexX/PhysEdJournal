@@ -5,7 +5,12 @@ namespace PhysEdJournal.Tests.Setup.Utils;
 
 public static class EntitiesFactory
 {
-    public static StudentEntity CreateStudent(string groupNumber, string currentSemesterName, bool hasDebtFromPreviousSemester, bool isActive)
+    public static StudentEntity CreateStudent(
+        string groupNumber,
+        string currentSemesterName,
+        bool hasDebtFromPreviousSemester,
+        bool isActive
+    )
     {
         return new StudentEntity
         {
@@ -24,8 +29,14 @@ public static class EntitiesFactory
             PointsForStandards = 2,
         };
     }
-    
-    public static StudentEntity CreateStudent(string groupNumber, string currentSemesterName, bool hasDebtFromPreviousSemester, bool isActive, int additionalPoints)
+
+    public static StudentEntity CreateStudent(
+        string groupNumber,
+        string currentSemesterName,
+        bool hasDebtFromPreviousSemester,
+        bool isActive,
+        int additionalPoints
+    )
     {
         return new StudentEntity
         {
@@ -51,13 +62,14 @@ public static class EntitiesFactory
 
         return semester;
     }
-    
+
     public static GroupEntity CreateGroup(string groupName)
     {
-        var group = new GroupEntity {GroupName = groupName};
+        var group = new GroupEntity { GroupName = groupName };
 
         return group;
     }
+
     public static GroupEntity CreateGroup(string groupName, double visitValue, string curatorGuid)
     {
         var group = new GroupEntity
@@ -69,7 +81,7 @@ public static class EntitiesFactory
 
         return group;
     }
-    
+
     public static TeacherEntity CreateTeacher(TeacherPermissions permissions)
     {
         var teacher = new TeacherEntity
@@ -80,15 +92,19 @@ public static class EntitiesFactory
         };
         return teacher;
     }
-    
-    public static PointsStudentHistoryEntity CreatePointsStudentHistoryEntity( string studentGuid, WorkType workType, string teacherGuid, DateOnly date, int points)
+
+    public static PointsStudentHistoryEntity CreatePointsStudentHistoryEntity(
+        string studentGuid,
+        WorkType workType,
+        string teacherGuid,
+        DateOnly date,
+        int points
+    )
     {
         var historyEntity = new PointsStudentHistoryEntity
         {
             StudentGuid = studentGuid,
-            Date = date == default
-                ? DateOnly.FromDateTime(DateTime.Today)
-                : date,
+            Date = date == default ? DateOnly.FromDateTime(DateTime.Today) : date,
             TeacherGuid = teacherGuid,
             WorkType = workType,
             Points = points,
@@ -96,8 +112,14 @@ public static class EntitiesFactory
 
         return historyEntity;
     }
-    
-    public static StandardsStudentHistoryEntity CreateStandardsHistoryEntity(string studentGuid, StandardType standardType, string teacherGuid, DateOnly date, int points)
+
+    public static StandardsStudentHistoryEntity CreateStandardsHistoryEntity(
+        string studentGuid,
+        StandardType standardType,
+        string teacherGuid,
+        DateOnly date,
+        int points
+    )
     {
         var historyEntity = new StandardsStudentHistoryEntity
         {

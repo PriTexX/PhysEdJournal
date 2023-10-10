@@ -7,8 +7,6 @@ using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
-
-
 public sealed class DeActivateStudentCommand : ICommand<string, Unit>
 {
     private readonly ApplicationContext _applicationContext;
@@ -22,8 +20,7 @@ public sealed class DeActivateStudentCommand : ICommand<string, Unit>
     {
         var rowsAffected = await _applicationContext.Students
             .Where(s => s.StudentGuid == studentGuid)
-            .ExecuteUpdateAsync(p => p
-                .SetProperty(s => s.IsActive, false));
+            .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsActive, false));
 
         if (rowsAffected == 0)
         {
