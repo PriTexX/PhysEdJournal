@@ -46,7 +46,6 @@ internal sealed class AddStandardPointsCommandValidator
         // {
         //     return new DateExpiredException(commandInput.Date);
         // }
-
         if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayException(commandInput.Date.DayOfWeek);
@@ -75,7 +74,9 @@ internal sealed class AddStandardPointsCommandValidator
         if (commandInput.IsOverride && duplicateHistoryEntity is not null)
         {
             if (commandInput.Points < duplicateHistoryEntity.Points)
+            {
                 return new LoweringTheScoreException(duplicateHistoryEntity.Points);
+            }
 
             return ValidationResult.Success;
         }
@@ -126,7 +127,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             SemesterName = student.CurrentSemesterName,
             Date = commandPayload.Date,
             Points = commandPayload.Points,
-            StandardType = commandPayload.StandardType
+            StandardType = commandPayload.StandardType,
         };
 
         if (commandPayload.IsOverride)

@@ -34,7 +34,7 @@ internal sealed class StudentArchiver
             GroupNumber = student.GroupNumber,
             TotalPoints = student.TotalPoints,
             Visits = student.Visits,
-            SemesterName = student.CurrentSemesterName
+            SemesterName = student.CurrentSemesterName,
         };
 
         _applicationContext.ArchivedStudents.Add(archivedStudent);
@@ -63,6 +63,8 @@ internal sealed class StudentArchiver
         ApplicationContext context
     )
     {
+        ArgumentNullException.ThrowIfNull(student.Group);
+
         if (!StudentRequiresArchiving(student))
         {
             return;
@@ -80,10 +82,10 @@ internal sealed class StudentArchiver
             StudentGuid = student.StudentGuid,
             TotalPoints = CalculateTotalPoints(
                 student.Visits,
-                student.Group.VisitValue,
+                student.Group!.VisitValue,
                 student.AdditionalPoints,
                 student.PointsForStandards
-            )
+            ),
         };
 
         await archiver.ArchiveStudentAsync(archivePayload);
@@ -91,8 +93,12 @@ internal sealed class StudentArchiver
 
     private static bool StudentRequiresArchiving(StudentEntity student)
     {
+        ArgumentNullException.ThrowIfNull(student.Group);
+
         if (!student.HasDebtFromPreviousSemester)
+        {
             return false;
+        }
 
         return CalculateTotalPoints(
                 student.Visits,

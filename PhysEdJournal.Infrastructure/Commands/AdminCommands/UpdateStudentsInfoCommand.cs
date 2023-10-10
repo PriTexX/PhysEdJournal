@@ -48,7 +48,7 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
                                 applicationContext,
                                 actualStudents.Select(s => s.Guid).ToArray()
                             )
-                        ).ToDictionary(d => d.StudentGuid)
+                        ).ToDictionary(d => d.StudentGuid),
                     }
             )
             .Select(

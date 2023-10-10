@@ -82,7 +82,6 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         // {
         //     return new DateExpiredException(commandInput.Date);
         // }
-
         if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayException(commandInput.Date.DayOfWeek);
@@ -127,7 +126,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
             Points = commandPayload.Points,
             WorkType = commandPayload.WorkType,
             SemesterName = student.CurrentSemesterName,
-            TeacherGuid = commandPayload.TeacherGuid
+            TeacherGuid = commandPayload.TeacherGuid,
         };
 
         student.AdditionalPoints += pointsStudentHistoryEntity.Points;

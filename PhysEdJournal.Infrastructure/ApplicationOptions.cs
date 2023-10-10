@@ -7,7 +7,7 @@ public sealed class ApplicationOptions
     public const string SectionName = "Application";
 
     [Required]
-    public string UserInfoServerURL { get; init; }
+    public string UserInfoServerURL { get; init; } = null!;
 
     [Required]
     public int PageSizeToQueryUserInfoServer { get; init; }
@@ -16,5 +16,5 @@ public sealed class ApplicationOptions
     public int PointBorderForSemester { get; init; }
 
     [Required]
-    public string RsaPublicKey { get; init; }
+    public string RsaPublicKey { get; init; } = null!;
 }

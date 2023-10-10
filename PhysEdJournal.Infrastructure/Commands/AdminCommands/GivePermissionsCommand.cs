@@ -22,9 +22,11 @@ internal sealed class GivePermissionsCommandValidator
     )
     {
         if (commandInput.TeacherPermissions == TeacherPermissions.SuperUser)
+        {
             return ValidationResult.Create(
                 new CannotGrantSuperUserPermissionsException(commandInput.TeacherGuid)
             );
+        }
 
         return ValidationResult.Success;
     }
