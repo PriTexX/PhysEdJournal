@@ -8,5 +8,5 @@ public enum WorkType
     OnlineWork, // СДО
     InternalTeam, // Сборная
     Activist,
-    Competition
+    Competition,
 }

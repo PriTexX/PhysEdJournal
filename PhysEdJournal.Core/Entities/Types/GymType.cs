@@ -10,5 +10,5 @@ public enum GymType // Скорее всего не понадобится
     Seventh = 7,
     Ninth = 9,
     Izmaylovo = 10,
-    Avtozavod = 11
+    Avtozavod = 11,
 }

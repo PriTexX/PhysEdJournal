@@ -16,18 +16,18 @@ public sealed class VisitStudentHistoryEntity
 
     [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
-    public string TeacherGuid { get; set; }
+    public required string TeacherGuid { get; set; }
 
     [DefaultValue(false)]
     public bool IsArchived { get; set; }
 
     [ForeignKey("TeacherGuid")]
-    public TeacherEntity Teacher { get; set; }
+    public TeacherEntity? Teacher { get; set; }
 
     [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
-    public string StudentGuid { get; set; }
+    public required string StudentGuid { get; set; }
 
     [ForeignKey("StudentGuid")]
-    public StudentEntity Student { get; set; }
+    public StudentEntity? Student { get; set; }
 }
