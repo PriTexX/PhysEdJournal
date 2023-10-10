@@ -10,15 +10,15 @@ public sealed class StudentEntity
     [StringLength(36)]
     [Key]
     [Required(AllowEmptyStrings = false)]
-    public string StudentGuid { get; set; }
+    public required string StudentGuid { get; set; }
 
     [StringLength(120)]
     [Required(AllowEmptyStrings = false)]
-    public string FullName { get; set; }
+    public required string FullName { get; set; }
 
     [StringLength(20)]
     [Required(AllowEmptyStrings = false)]
-    public string GroupNumber { get; set; }
+    public required string GroupNumber { get; set; }
 
     [DefaultValue(false)]
     public bool HasDebtFromPreviousSemester { get; set; } // Если студент не получил зачет из-за нехватки баллов
@@ -49,10 +49,10 @@ public sealed class StudentEntity
 
     [StringLength(32)]
     [Required(AllowEmptyStrings = false)]
-    public string CurrentSemesterName { get; set; }
+    public required string CurrentSemesterName { get; set; }
 
     [ForeignKey("CurrentSemesterName")]
-    public SemesterEntity Semester { get; set; }
+    public SemesterEntity? Semester { get; set; }
 
     [DefaultValue(HealthGroupType.None)]
     public HealthGroupType HealthGroup { get; set; }
@@ -60,9 +60,9 @@ public sealed class StudentEntity
     [StringLength(200)]
     public string? Department { get; set; }
 
-    public ICollection<PointsStudentHistoryEntity> PointsStudentHistory { get; set; }
+    public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
 
-    public ICollection<VisitStudentHistoryEntity> VisitsStudentHistory { get; set; }
+    public ICollection<VisitStudentHistoryEntity>? VisitsStudentHistory { get; set; }
 
-    public ICollection<StandardsStudentHistoryEntity> StandardsStudentHistory { get; set; }
+    public ICollection<StandardsStudentHistoryEntity>? StandardsStudentHistory { get; set; }
 }

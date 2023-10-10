@@ -6,5 +6,5 @@ public sealed class CompetitionEntity
 {
     [Key]
     [StringLength(255)]
-    public string CompetitionName { get; set; }
+    public required string CompetitionName { get; set; }
 }

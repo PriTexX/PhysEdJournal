@@ -13,5 +13,5 @@ public static class PointsConstants
         double visitValue,
         int additionalPoints,
         int pointsForStandards
-    ) => visits * visitValue + additionalPoints + pointsForStandards;
+    ) => (visits * visitValue) + additionalPoints + pointsForStandards;
 }

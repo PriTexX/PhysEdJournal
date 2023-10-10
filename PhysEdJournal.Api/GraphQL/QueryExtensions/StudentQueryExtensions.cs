@@ -10,7 +10,7 @@ public class StudentQueryExtensions
     [UseSorting]
     public IEnumerable<PointsStudentHistoryEntity> GetPointsHistory([Parent] StudentEntity student)
     {
-        return student.PointsStudentHistory;
+        return student.PointsStudentHistory!;
     }
 
     [BindMember(nameof(StudentEntity.VisitsStudentHistory))]
@@ -18,7 +18,7 @@ public class StudentQueryExtensions
     [UseSorting]
     public IEnumerable<VisitStudentHistoryEntity> GetVisitsHistory([Parent] StudentEntity student)
     {
-        return student.VisitsStudentHistory;
+        return student.VisitsStudentHistory!;
     }
 
     [BindMember(nameof(StudentEntity.StandardsStudentHistory))]
@@ -28,6 +28,6 @@ public class StudentQueryExtensions
         [Parent] StudentEntity student
     )
     {
-        return student.StandardsStudentHistory;
+        return student.StandardsStudentHistory!;
     }
 }

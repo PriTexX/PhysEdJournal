@@ -8,26 +8,26 @@ public sealed class ArchivedStudentEntity
 {
     [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
-    public string StudentGuid { get; set; }
+    public required string StudentGuid { get; set; }
 
     [StringLength(32)]
     [Required(AllowEmptyStrings = false)]
     [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
-    public string SemesterName { get; set; }
+    public required string SemesterName { get; set; }
 
     [ForeignKey("SemesterName")]
-    public SemesterEntity Semester { get; set; }
+    public required SemesterEntity Semester { get; set; }
 
     [StringLength(120)]
     [Required(AllowEmptyStrings = false)]
-    public string FullName { get; set; }
+    public required string FullName { get; set; }
 
     [StringLength(20)]
     [Required(AllowEmptyStrings = false)]
-    public string GroupNumber { get; set; }
+    public required string GroupNumber { get; set; }
 
     [ForeignKey("GroupNumber")]
-    public GroupEntity Group { get; set; }
+    public GroupEntity? Group { get; set; }
 
     [Required]
     public double TotalPoints { get; set; }
