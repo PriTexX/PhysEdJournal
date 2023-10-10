@@ -35,7 +35,7 @@ public static class StudentServiceFunctions
             var request = new GraphQLRequest
             {
                 Query = query,
-                Variables = new { pageSize, skipSize }
+                Variables = new { pageSize, skipSize },
             };
             var response = await client.SendQueryAsync<PagedGraphQLStudent>(request);
 
@@ -51,7 +51,9 @@ public static class StudentServiceFunctions
             }
 
             if (!response.Data.Students.PageInfo.HasNextPage)
+            {
                 break;
+            }
 
             skipSize += pageSize;
         }
@@ -75,7 +77,7 @@ public static class StudentServiceFunctions
         applicationContext.Students.AddRange(
             students
                 .Where(d => d.Item1)
-                .Where(p => p.Item2.GroupNumber != "")
+                .Where(p => p.Item2.GroupNumber != string.Empty)
                 .Where(p => p.Item2.GroupNumber[2] == '1')
                 .Select(p =>
                 {
@@ -86,7 +88,10 @@ public static class StudentServiceFunctions
         );
 
         applicationContext.Students.UpdateRange(
-            students.Where(d => !d.Item1).Where(p => p.Item2.GroupNumber != "").Select(p => p.Item2)
+            students
+                .Where(d => !d.Item1)
+                .Where(p => p.Item2.GroupNumber != string.Empty)
+                .Select(p => p.Item2)
         );
 
         await applicationContext.SaveChangesAsync();
@@ -109,16 +114,24 @@ public static class StudentServiceFunctions
         }
 
         if (dbStudent.GroupNumber != studentModel.Group)
+        {
             dbStudent.GroupNumber = studentModel.Group;
+        }
 
         if (dbStudent.FullName != studentModel.FullName)
+        {
             dbStudent.FullName = studentModel.FullName;
+        }
 
         if (dbStudent.Course != studentModel.Course)
+        {
             dbStudent.Course = studentModel.Course;
+        }
 
         if (dbStudent.Department != studentModel.Department)
+        {
             dbStudent.Department = studentModel.Department;
+        }
 
         return (false, dbStudent);
     }
@@ -135,7 +148,7 @@ public static class StudentServiceFunctions
             GroupNumber = student.Group,
             Course = student.Course,
             Department = student.Department,
-            CurrentSemesterName = currentSemesterName
+            CurrentSemesterName = currentSemesterName,
         };
     }
 }

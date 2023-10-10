@@ -20,7 +20,9 @@ public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
         var comp = await _applicationContext.Competitions.FindAsync(competitionName);
 
         if (comp is null)
+        {
             return new Result<Unit>(new CompetitionNotFoundException(competitionName));
+        }
 
         _applicationContext.Competitions.Remove(comp);
         await _applicationContext.SaveChangesAsync();

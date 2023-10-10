@@ -16,7 +16,7 @@ public sealed class ArchivedStudentEntity
     public required string SemesterName { get; set; }
 
     [ForeignKey("SemesterName")]
-    public required SemesterEntity Semester { get; set; }
+    public SemesterEntity? Semester { get; set; }
 
     [StringLength(120)]
     [Required(AllowEmptyStrings = false)]

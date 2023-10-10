@@ -7,16 +7,16 @@ namespace PhysEdJournal.Infrastructure.Database;
 public sealed class ApplicationContext : DbContext
 {
     private readonly IMemoryCache _memoryCache;
-    public DbSet<GroupEntity> Groups { get; set; }
-    public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; set; }
-    public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; set; }
-    public DbSet<StandardsStudentHistoryEntity> StandardsStudentsHistory { get; set; }
-    public DbSet<StudentEntity> Students { get; set; }
-    public DbSet<TeacherEntity> Teachers { get; set; }
-    public DbSet<ArchivedStudentEntity> ArchivedStudents { get; set; }
-    public DbSet<SemesterEntity> Semesters { get; set; }
+    public DbSet<GroupEntity> Groups { get; set; } = null!;
+    public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; set; } = null!;
+    public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; set; } = null!;
+    public DbSet<StandardsStudentHistoryEntity> StandardsStudentsHistory { get; set; } = null!;
+    public DbSet<StudentEntity> Students { get; set; } = null!;
+    public DbSet<TeacherEntity> Teachers { get; set; } = null!;
+    public DbSet<ArchivedStudentEntity> ArchivedStudents { get; set; } = null!;
+    public DbSet<SemesterEntity> Semesters { get; set; } = null!;
 
-    public DbSet<CompetitionEntity> Competitions { get; set; }
+    public DbSet<CompetitionEntity> Competitions { get; set; } = null!;
 
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
@@ -49,7 +49,7 @@ public sealed class ApplicationContext : DbContext
                 semester,
                 new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
                 }
             );
         }

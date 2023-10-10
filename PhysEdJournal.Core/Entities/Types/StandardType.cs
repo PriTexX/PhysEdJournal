@@ -10,4 +10,5 @@ public enum StandardType
     TorsoLifts, // Поднимания туловища
     FlexionAndExtensionOfArms, // Сгибания и разгибания рук
     ShuttleRun, // Челночный бег
+    Other,
 }

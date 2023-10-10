@@ -39,7 +39,7 @@ public sealed class ArchiveStudentCommand
                 s =>
                     new
                     {
-                        s.Group.VisitValue,
+                        s.Group!.VisitValue,
                         s.Visits,
                         s.AdditionalPoints,
                         s.PointsForStandards,
@@ -47,7 +47,7 @@ public sealed class ArchiveStudentCommand
                         s.GroupNumber,
                         s.HasDebtFromPreviousSemester,
                         s.ArchivedVisitValue,
-                        s.CurrentSemesterName
+                        s.CurrentSemesterName,
                     }
             )
             .FirstOrDefaultAsync();
@@ -75,7 +75,8 @@ public sealed class ArchiveStudentCommand
             studentFromDb.PointsForStandards
         );
 
-        if (commandPayload.IsForceMode || totalPoints >= REQUIRED_POINT_AMOUNT) // если превысил порог по баллам
+        // If student has enough points or he is force-archived
+        if (commandPayload.IsForceMode || totalPoints >= REQUIRED_POINT_AMOUNT)
         {
             var archiveStudentPayload = new InternalArchiveStudentPayload
             {
