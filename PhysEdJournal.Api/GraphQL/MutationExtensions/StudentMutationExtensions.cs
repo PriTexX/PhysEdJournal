@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Api.Monitoring;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -36,8 +35,7 @@ public class StudentMutationExtensions
         string? comment = null
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         switch (workType)
         {
@@ -102,8 +100,7 @@ public class StudentMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -147,8 +144,7 @@ public class StudentMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -159,20 +155,13 @@ public class StudentMutationExtensions
         {
             Date = date,
             StudentGuid = studentGuid,
-            TeacherGuid = callerGuid
+            TeacherGuid = callerGuid,
         };
 
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
-        var teacher = await applicationContext.Teachers.FindAsync(callerGuid);
 
         return res.Match(
-            _ =>
-            {
-                PhysEdMetrics.VisitsCounter
-                    .WithLabels(callerGuid, teacher.FullName, date.DayOfWeek.ToString())
-                    .Inc();
-                return true;
-            },
+            _ => true,
             exception =>
             {
                 logger.LogWarning(exception, "Something bad happened");
@@ -194,8 +183,7 @@ public class StudentMutationExtensions
         bool isForceMode = false
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -205,7 +193,7 @@ public class StudentMutationExtensions
         var archiveStudentPayload = new ArchiveStudentCommandPayload
         {
             StudentGuid = studentGuid,
-            IsForceMode = isForceMode
+            IsForceMode = isForceMode,
         };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
@@ -221,8 +209,7 @@ public class StudentMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -232,7 +219,7 @@ public class StudentMutationExtensions
         var unArchiveStudentPayload = new UnArchiveStudentCommandPayload
         {
             StudentGuid = studentGuid,
-            SemesterName = semesterName
+            SemesterName = semesterName,
         };
 
         var res = await unArchiveStudentCommand.ExecuteAsync(unArchiveStudentPayload);
@@ -249,14 +236,14 @@ public class StudentMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         Task.Run(async () =>
         {
             try
@@ -297,8 +284,7 @@ public class StudentMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -320,8 +306,7 @@ public class StudentMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -333,11 +318,14 @@ public class StudentMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
-    private static void ThrowIfCallerGuidIsNull(string? callerGuid)
+    private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
     {
+        var callerGuid = claimsPrincipal.Claims.First(c => c.Type == "IndividualGuid").Value;
         if (callerGuid is null)
         {
             throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
         }
+
+        return callerGuid;
     }
 }

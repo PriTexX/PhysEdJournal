@@ -21,8 +21,7 @@ public class GroupMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -32,7 +31,7 @@ public class GroupMutationExtensions
         var assignCuratorPayload = new AssignCuratorCommandPayload
         {
             GroupName = groupName,
-            TeacherGuid = teacherGuid
+            TeacherGuid = teacherGuid,
         };
 
         var res = await assignCuratorCommand.ExecuteAsync(assignCuratorPayload);
@@ -51,8 +50,7 @@ public class GroupMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -62,7 +60,7 @@ public class GroupMutationExtensions
         var assignVisitValuePayload = new AssignVisitValueCommandPayload
         {
             GroupName = groupName,
-            NewVisitValue = newVisitValue
+            NewVisitValue = newVisitValue,
         };
 
         var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
@@ -70,11 +68,14 @@ public class GroupMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
-    private static void ThrowIfCallerGuidIsNull(string? callerGuid)
+    private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
     {
+        var callerGuid = claimsPrincipal.Claims.First(c => c.Type == "IndividualGuid").Value;
         if (callerGuid is null)
         {
             throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
         }
+
+        return callerGuid;
     }
 }

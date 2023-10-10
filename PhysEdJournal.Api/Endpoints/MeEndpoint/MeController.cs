@@ -39,7 +39,9 @@ public sealed class MeController : ControllerBase
                     exception =>
                     {
                         if (exception is StudentNotFoundException)
+                        {
                             return NotFound();
+                        }
 
                         _logger.LogError(exception, "unhandled error in me endpoint");
                         return StatusCode(500);
@@ -54,7 +56,9 @@ public sealed class MeController : ControllerBase
                     exception =>
                     {
                         if (exception is TeacherNotFoundException)
+                        {
                             return NotFound();
+                        }
 
                         _logger.LogError(exception, "unhandled error in me endpoint");
                         return StatusCode(500);

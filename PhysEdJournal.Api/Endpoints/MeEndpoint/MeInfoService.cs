@@ -27,7 +27,7 @@ public sealed class MeInfoService
                         s.AdditionalPoints,
                         s.PointsForStandards,
                         s.Visits,
-                        s.Group.VisitValue
+                        s.Group!.VisitValue,
                     }
             )
             .FirstOrDefaultAsync();

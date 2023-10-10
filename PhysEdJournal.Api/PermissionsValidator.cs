@@ -45,7 +45,7 @@ public class PermissionValidator
                 teacher,
                 new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
                 }
             );
         }
@@ -53,6 +53,7 @@ public class PermissionValidator
         var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);
 
         if (!hasEnough)
+        {
             return new LanguageExt.Common.Result<bool>(
                 new NotEnoughPermissionsException(
                     teacherGuid,
@@ -60,6 +61,7 @@ public class PermissionValidator
                     requiredPermissions
                 )
             );
+        }
 
         return hasEnough;
     }
@@ -80,10 +82,14 @@ public class PermissionValidator
     )
     {
         if (permissions.HasFlag(TeacherPermissions.SuperUser))
+        {
             return true;
+        }
 
         if (requiredPermissions == 0)
+        {
             return true;
+        }
 
         return (permissions & requiredPermissions) != 0;
     }

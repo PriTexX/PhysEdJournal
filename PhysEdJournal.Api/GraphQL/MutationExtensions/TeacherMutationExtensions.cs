@@ -22,8 +22,7 @@ public class TeacherMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -34,7 +33,7 @@ public class TeacherMutationExtensions
         {
             TeacherGuid = teacherGuid,
             FullName = fullName,
-            Permissions = TeacherPermissions.DefaultAccess
+            Permissions = TeacherPermissions.DefaultAccess,
         };
 
         var result = await createTeacherCommand.ExecuteAsync(createTeacherPayload);
@@ -45,7 +44,7 @@ public class TeacherMutationExtensions
                 {
                     FullName = fullName,
                     TeacherGuid = teacherGuid,
-                    Permissions = TeacherPermissions.DefaultAccess
+                    Permissions = TeacherPermissions.DefaultAccess,
                 },
             exception => throw exception
         );
@@ -62,8 +61,7 @@ public class TeacherMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         var teacherPermissions = permissions.Aggregate((prev, next) => prev | next);
 
@@ -85,7 +83,7 @@ public class TeacherMutationExtensions
         var givePermissionsPayload = new GivePermissionsCommandPayload
         {
             TeacherGuid = teacherGuid,
-            TeacherPermissions = teacherPermissions
+            TeacherPermissions = teacherPermissions,
         };
 
         var result = await givePermissionsCommand.ExecuteAsync(givePermissionsPayload);
@@ -102,8 +100,7 @@ public class TeacherMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -125,8 +122,7 @@ public class TeacherMutationExtensions
         ClaimsPrincipal claimsPrincipal
     )
     {
-        var callerGuid = claimsPrincipal.FindFirstValue("IndividualGuid");
-        ThrowIfCallerGuidIsNull(callerGuid);
+        var callerGuid = GetCallerGuid(claimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -138,11 +134,14 @@ public class TeacherMutationExtensions
         return result.Match(_ => true, exception => throw exception);
     }
 
-    private static void ThrowIfCallerGuidIsNull(string? callerGuid)
+    private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
     {
+        var callerGuid = claimsPrincipal.Claims.First(c => c.Type == "IndividualGuid").Value;
         if (callerGuid is null)
         {
             throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
         }
+
+        return callerGuid;
     }
 }
