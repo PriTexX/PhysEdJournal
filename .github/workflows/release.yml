@@ -41,7 +41,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             
       - name: Disable husky in CI/CD
-        run: echo 0 >> $HUSKY
+        run: echo "0" >> $HUSKY
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
