@@ -108,6 +108,7 @@ public static class EntitiesFactory
             TeacherGuid = teacherGuid,
             WorkType = workType,
             Points = points,
+            SemesterName = "test-sem",
         };
 
         return historyEntity;
@@ -128,6 +129,7 @@ public static class EntitiesFactory
             TeacherGuid = teacherGuid,
             StandardType = standardType,
             Points = points,
+            SemesterName = "test-sem"
         };
 
         return historyEntity;

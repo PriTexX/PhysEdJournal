@@ -73,6 +73,19 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             }
         }
 
+        if (commandInput.WorkType == WorkType.GTO)
+        {
+            var anotherGTO = await _applicationContext.PointsStudentsHistory
+                .AsNoTracking()
+                .Where(p => p.StudentGuid == commandInput.StudentGuid && p.WorkType == WorkType.GTO)
+                .FirstOrDefaultAsync();
+
+            if (anotherGTO is not null)
+            {
+                return new GTOAlreadyExistsException();
+            }
+        }
+
         if (commandInput is { WorkType: WorkType.Science, Points: > 30 })
         {
             return new PointsExceededLimit(30);

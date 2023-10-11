@@ -42,6 +42,28 @@ internal sealed class AddStandardPointsCommandValidator
             return new ActionFromFutureException(commandInput.Date);
         }
 
+        var student = await _applicationContext.Students
+            .Include(s => s.Group)
+            .Where(s => s.StudentGuid == commandInput.StudentGuid)
+            .FirstOrDefaultAsync();
+
+        if (student is null)
+        {
+            return new StudentNotFoundException(commandInput.StudentGuid);
+        }
+
+        var totalPoints = CalculateTotalPoints(
+            student.Visits,
+            student.Group!.VisitValue,
+            student.AdditionalPoints,
+            student.PointsForStandards
+        );
+
+        if (totalPoints < 20)
+        {
+            return new NotEnoughPointsForStandardException();
+        }
+
         // if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
         // {
         //     return new DateExpiredException(commandInput.Date);
