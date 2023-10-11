@@ -82,7 +82,7 @@ internal sealed class StudentArchiver
             StudentGuid = student.StudentGuid,
             TotalPoints = CalculateTotalPoints(
                 student.Visits,
-                student.Group!.VisitValue,
+                student.Group.VisitValue,
                 student.AdditionalPoints,
                 student.PointsForStandards
             ),

@@ -135,7 +135,9 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             return validation.ToResult<Unit>();
         }
 
-        var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
+        var student = await _applicationContext.Students
+            .Include(s => s.Group)
+            .FirstOrDefaultAsync(s => s.StudentGuid == commandPayload.StudentGuid);
 
         if (student is null)
         {
