@@ -12,9 +12,9 @@ namespace PhysEdJournal.Infrastructure.Commands;
 public sealed class DeletePointsCommandPayload
 {
     public required string StudentGuid { get; init; }
-    
+
     public required int HistoryId { get; init; }
-    
+
     public required string TeacherGuid { get; init; }
 
     public required bool IgnoreDateIntervalCheck { get; init; } = false;
@@ -28,28 +28,41 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
     {
         _applicationContext = applicationContext;
     }
-    
+
     public async Task<Result<Unit>> ExecuteAsync(DeletePointsCommandPayload commandPayload)
     {
-        var student = await _applicationContext.Students.FirstOrDefaultAsync(s => s.StudentGuid == commandPayload.StudentGuid);
+        var student = await _applicationContext.Students.FirstOrDefaultAsync(
+            s => s.StudentGuid == commandPayload.StudentGuid
+        );
 
         if (student is null)
         {
             return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
         }
 
-        var history = await _applicationContext.PointsStudentsHistory.FirstOrDefaultAsync(s => s.Id == commandPayload.HistoryId);
+        var history = await _applicationContext.PointsStudentsHistory.FirstOrDefaultAsync(
+            s => s.Id == commandPayload.HistoryId
+        );
 
         if (history is null)
         {
-            return new Result<Unit>(new PointsStudentHistoryNotFoundException(commandPayload.HistoryId, commandPayload.StudentGuid));
+            return new Result<Unit>(
+                new PointsStudentHistoryNotFoundException(
+                    commandPayload.HistoryId,
+                    commandPayload.StudentGuid
+                )
+            );
         }
-        
-        if (DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber > DAYS_TO_DELETE_POINTS && !commandPayload.IgnoreDateIntervalCheck)
+
+        if (
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
+                > DAYS_TO_DELETE_POINTS
+            && !commandPayload.IgnoreDateIntervalCheck
+        )
         {
             return new Result<Unit>(new PointsOutdatedException(DAYS_TO_DELETE_POINTS));
         }
-        
+
         student.AdditionalPoints -= history.Points;
         _applicationContext.PointsStudentsHistory.Remove(history);
         _applicationContext.Students.Update(student);

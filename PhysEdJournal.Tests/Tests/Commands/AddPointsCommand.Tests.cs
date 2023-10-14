@@ -34,7 +34,8 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             workType,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10
+            10,
+            semester.Name
         );
         var payload = new AddPointsCommandPayload
         {
@@ -94,7 +95,8 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             workType,
             teacher.TeacherGuid,
             DateOnly.MaxValue,
-            10
+            10,
+            semester.Name
         );
         var payload = new AddPointsCommandPayload
         {
@@ -142,7 +144,8 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10
+            10,
+            semester.Name
         );
         var payload = new AddPointsCommandPayload
         {
@@ -191,7 +194,8 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             WorkType.OnlineWork,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(oldDate),
-            10
+            10,
+            semester.Name
         );
         var payload = new AddPointsCommandPayload
         {
@@ -240,7 +244,8 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetNonWorkingDate(),
-            10
+            10,
+            semester.Name
         );
         var payload = new AddPointsCommandPayload
         {
