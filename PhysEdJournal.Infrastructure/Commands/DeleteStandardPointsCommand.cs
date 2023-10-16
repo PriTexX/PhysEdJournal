@@ -2,6 +2,7 @@
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
+using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
@@ -9,7 +10,7 @@ using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
-public sealed class DeletePointsCommandPayload
+public sealed class DeleteStandardPointsCommandPayload
 {
     public required int HistoryId { get; init; }
 
@@ -18,25 +19,25 @@ public sealed class DeletePointsCommandPayload
     public required bool IsAdmin { get; init; } = false;
 }
 
-public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, Unit>
+public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsCommandPayload, Unit>
 {
     private readonly ApplicationContext _applicationContext;
 
-    public DeletePointsCommand(ApplicationContext applicationContext)
+    public DeleteStandardPointsCommand(ApplicationContext applicationContext)
     {
         _applicationContext = applicationContext;
     }
 
-    public async Task<Result<Unit>> ExecuteAsync(DeletePointsCommandPayload commandPayload)
+    public async Task<Result<Unit>> ExecuteAsync(DeleteStandardPointsCommandPayload commandPayload)
     {
-        var history = await _applicationContext.PointsStudentsHistory.FirstOrDefaultAsync(
+        var history = await _applicationContext.StandardsStudentsHistory.FirstOrDefaultAsync(
             s => s.Id == commandPayload.HistoryId
         );
 
         if (history is null)
         {
             return new Result<Unit>(
-                new PointsStudentHistoryNotFoundException(commandPayload.HistoryId)
+                new StandardsStudentHistoryNotFoundException(commandPayload.HistoryId)
             );
         }
 
@@ -63,8 +64,8 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
             return new Result<Unit>(new PointsOutdatedException(DAYS_TO_DELETE_POINTS));
         }
 
-        student.AdditionalPoints -= history.Points;
-        _applicationContext.PointsStudentsHistory.Remove(history);
+        student.PointsForStandards -= history.Points;
+        _applicationContext.StandardsStudentsHistory.Remove(history);
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
 

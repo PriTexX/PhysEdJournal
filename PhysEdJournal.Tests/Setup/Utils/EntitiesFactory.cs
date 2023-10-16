@@ -120,7 +120,8 @@ public static class EntitiesFactory
         StandardType standardType,
         string teacherGuid,
         DateOnly date,
-        int points
+        int points,
+        string semesterName
     )
     {
         var historyEntity = new StandardsStudentHistoryEntity
@@ -130,7 +131,7 @@ public static class EntitiesFactory
             TeacherGuid = teacherGuid,
             StandardType = standardType,
             Points = points,
-            SemesterName = "test-sem"
+            SemesterName = semesterName
         };
 
         return historyEntity;
