@@ -8,13 +8,15 @@
 
 После создания администраторов следует начать новый семестр и синхронизировать список студентов и групп. 
 
-![image.png](/.eraser/kO7ytSlW3WoJhTVHyhti___3F3ZMDr9LIPZl6wHMp1104f0ysG3____mF4Q04Jh9IeTzwa_Uf26.png "image.png")
+![Схема №1 | Создание журнала](/.eraser/kO7ytSlW3WoJhTVHyhti___3F3ZMDr9LIPZl6wHMp1104f0ysG3___---figure---hBt-Asj5XuZwGVP9tlyhl---figure---uztsA0uSegKd8j1Pokf5_w.png "Схема №1 | Создание журнала")
 
 Для каждого преподавателя или куратора создается отдельная учетная запись с уникальным логином и паролем.
 
 За преподавателем закрепляется журнал в котором он должен добавлять студентов и отмечать их посещаемость.
 
-![image.png](/.eraser/kO7ytSlW3WoJhTVHyhti___3F3ZMDr9LIPZl6wHMp1104f0ysG3___pTaoBqXXe4whA656kkpVd.png "image.png")
+![Схема №2 | Работа с журналом от лица преподавателя](/.eraser/kO7ytSlW3WoJhTVHyhti___3F3ZMDr9LIPZl6wHMp1104f0ysG3___---figure---e20LR2XrRZeX6secvCOLL---figure---QGDPfyjb7WkYXFsAQH6cnA.png "Схема №2 | Работа с журналом от лица преподавателя")
+
+
 
 
 
