@@ -3,6 +3,7 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
+using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
@@ -245,6 +246,7 @@ public class StudentMutationExtensions
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         Task.Run(async () =>
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         {
             try
             {
@@ -314,6 +316,105 @@ public class StudentMutationExtensions
         );
 
         var res = await deActivateStudentCommand.ExecuteAsync(studentGuid);
+
+        return res.Match(_ => true, exception => throw exception);
+    }
+
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(VisitsStudentHistoryNotFoundException))]
+    [Error(typeof(TeacherGuidMismatchException))]
+    [Error(typeof(ArchivedVisitDeletionException))]
+    [Error(typeof(VisitOutdatedException))]
+    public async Task<Success> DeleteStudentVisit(
+        int historyId,
+        [Service] DeleteStudentVisitCommand deleteStudentVisitCommand,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        var callerGuid = GetCallerGuid(claimsPrincipal);
+
+        var validationResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
+
+        var isAdmin = validationResult.IsSuccess;
+
+        var res = await deleteStudentVisitCommand.ExecuteAsync(
+            new DeleteStudentVisitCommandPayload
+            {
+                HistoryId = historyId,
+                IsAdmin = isAdmin,
+                TeacherGuid = callerGuid,
+            }
+        );
+
+        return res.Match(_ => true, exception => throw exception);
+    }
+
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(PointsStudentHistoryNotFoundException))]
+    [Error(typeof(TeacherGuidMismatchException))]
+    [Error(typeof(ArchivedPointsDeletionException))]
+    [Error(typeof(PointsOutdatedException))]
+    public async Task<Success> DeletePoints(
+        int historyId,
+        [Service] DeletePointsCommand deletePointsCommand,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        var callerGuid = GetCallerGuid(claimsPrincipal);
+
+        var validationResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
+
+        var isAdmin = validationResult.IsSuccess;
+
+        var res = await deletePointsCommand.ExecuteAsync(
+            new DeletePointsCommandPayload
+            {
+                HistoryId = historyId,
+                IsAdmin = isAdmin,
+                TeacherGuid = callerGuid,
+            }
+        );
+
+        return res.Match(_ => true, exception => throw exception);
+    }
+
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(StandardsStudentHistoryNotFoundException))]
+    [Error(typeof(TeacherGuidMismatchException))]
+    [Error(typeof(ArchivedPointsDeletionException))]
+    [Error(typeof(PointsOutdatedException))]
+    public async Task<Success> DeleteStandardPoints(
+        int historyId,
+        [Service] DeleteStandardPointsCommand deleteStandardPointsCommand,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        var callerGuid = GetCallerGuid(claimsPrincipal);
+
+        var validationResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
+
+        var isAdmin = validationResult.IsSuccess;
+
+        var res = await deleteStandardPointsCommand.ExecuteAsync(
+            new DeleteStandardPointsCommandPayload()
+            {
+                HistoryId = historyId,
+                IsAdmin = isAdmin,
+                TeacherGuid = callerGuid,
+            }
+        );
 
         return res.Match(_ => true, exception => throw exception);
     }

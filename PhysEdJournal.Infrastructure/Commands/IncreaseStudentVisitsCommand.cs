@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
@@ -42,10 +43,14 @@ internal sealed class IncreaseStudentVisitsCommandValidator
             return new NonWorkingDayException(input.Date.DayOfWeek);
         }
 
-        // if (DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber > VISIT_LIFE_DAYS)
-        // {
-        //     return new VisitExpiredException(input.Date);
-        // }
+        if (
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber
+            > VisitConstants.VISIT_LIFE_DAYS
+        )
+        {
+            return new VisitExpiredException(input.Date);
+        }
+
         var recordCopy = await _applicationContext.VisitsStudentsHistory
             .Where(v => v.StudentGuid == input.StudentGuid && v.Date == input.Date)
             .FirstOrDefaultAsync();

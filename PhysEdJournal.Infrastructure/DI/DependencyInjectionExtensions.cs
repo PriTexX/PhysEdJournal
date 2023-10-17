@@ -43,5 +43,8 @@ public static class DependencyInjectionExtensions
         services.AddScoped<GivePermissionsCommand>();
         services.AddScoped<StartNewSemesterCommand>();
         services.AddScoped<UpdateStudentsInfoCommand>();
+        services.AddScoped<DeleteStudentVisitCommand>();
+        services.AddScoped<DeleteStandardPointsCommand>();
+        services.AddScoped<DeletePointsCommand>();
     }
 }

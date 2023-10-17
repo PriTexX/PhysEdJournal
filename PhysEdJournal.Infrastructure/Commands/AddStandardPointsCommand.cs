@@ -64,10 +64,14 @@ internal sealed class AddStandardPointsCommandValidator
             return new NotEnoughPointsForStandardException();
         }
 
-        // if (DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber > POINTS_LIFE_DAYS)
-        // {
-        //     return new DateExpiredException(commandInput.Date);
-        // }
+        if (
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
+            > POINTS_LIFE_DAYS
+        )
+        {
+            return new DateExpiredException(commandInput.Date);
+        }
+
         if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayException(commandInput.Date.DayOfWeek);
