@@ -115,6 +115,22 @@ public static class EntitiesFactory
         return historyEntity;
     }
 
+    public static VisitStudentHistoryEntity CreateVisitStudentHistoryEntity(
+        DateOnly date,
+        string teacherGuid,
+        string studentGuid
+    )
+    {
+        var historyEntity = new VisitStudentHistoryEntity
+        {
+            Date = date,
+            TeacherGuid = teacherGuid,
+            StudentGuid = studentGuid
+        };
+
+        return historyEntity;
+    }
+
     public static StandardsStudentHistoryEntity CreateStandardsHistoryEntity(
         string studentGuid,
         StandardType standardType,
