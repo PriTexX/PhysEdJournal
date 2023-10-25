@@ -91,6 +91,7 @@ public static class StudentServiceFunctions
             students
                 .Where(d => !d.Item1)
                 .Where(p => p.Item2.GroupNumber != string.Empty)
+                .Where(p => p.Item2.GroupNumber[2] == '1')
                 .Select(p => p.Item2)
         );
 
