@@ -48,7 +48,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
-            IsOverride = false
+            IsOverride = false,
         };
 
         await context.Semesters.AddAsync(semester);

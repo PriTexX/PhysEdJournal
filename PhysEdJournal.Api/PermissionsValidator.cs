@@ -22,11 +22,6 @@ public class PermissionValidator
         TeacherPermissions requiredPermissions
     )
     {
-        if (requiredPermissions == TeacherPermissions.DefaultAccess)
-        {
-            return new LanguageExt.Common.Result<bool>(true);
-        }
-
         _memoryCache.TryGetValue(teacherGuid, out TeacherEntity? teacher);
 
         if (teacher is null)
@@ -48,6 +43,11 @@ public class PermissionValidator
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
                 }
             );
+        }
+
+        if (requiredPermissions == TeacherPermissions.DefaultAccess)
+        {
+            return new LanguageExt.Common.Result<bool>(true);
         }
 
         var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);

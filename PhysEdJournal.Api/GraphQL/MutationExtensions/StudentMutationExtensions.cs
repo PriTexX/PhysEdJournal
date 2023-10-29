@@ -24,6 +24,10 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(ActionFromFutureException))]
     [Error(typeof(FitnessAlreadyExistsException))]
+    [Error(typeof(DateExpiredException))]
+    [Error(typeof(PointsExceededLimit))]
+    [Error(typeof(NegativePointAmount))]
+    [Error(typeof(NonWorkingDayException))]
     public async Task<Success> AddPointsToStudent(
         [Service] AddPointsCommand addPointsCommand,
         [Service] PermissionValidator permissionValidator,
@@ -86,9 +90,14 @@ public class StudentMutationExtensions
     [Error(typeof(StudentNotFoundException))]
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(OverAbundanceOfPointsForStudentException))]
     [Error(typeof(StandardAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
+    [Error(typeof(LoweringTheScoreException))]
+    [Error(typeof(NotEnoughPointsForStandardException))]
+    [Error(typeof(DateExpiredException))]
+    [Error(typeof(NonWorkingDayException))]
+    [Error(typeof(PointsOverflowException))]
+    [Error(typeof(NegativePointAmount))]
     public async Task<Success> AddPointsForStandardToStudent(
         string studentGuid,
         int pointsAmount,
@@ -98,7 +107,8 @@ public class StudentMutationExtensions
         [Service] AddStandardPointsCommand addStandardPointsCommand,
         [Service] PermissionValidator permissionValidator,
         [Service] ILogger<StudentMutationExtensions> logger,
-        ClaimsPrincipal claimsPrincipal
+        ClaimsPrincipal claimsPrincipal,
+        string? comment = null
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
@@ -116,6 +126,7 @@ public class StudentMutationExtensions
             Date = date,
             StandardType = standardType,
             IsOverride = isOverride,
+            Comment = comment,
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 

@@ -5,7 +5,7 @@ using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
-public class StandardsStudentHistoryEntity
+public sealed class StandardsStudentHistoryEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -46,4 +46,6 @@ public class StandardsStudentHistoryEntity
 
     [ForeignKey("StudentGuid")]
     public StudentEntity? Student { get; set; }
+
+    public string? Comment { get; set; }
 }

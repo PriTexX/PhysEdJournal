@@ -21,6 +21,7 @@ public sealed class AddStandardPointsCommandPayload
     public required string TeacherGuid { get; init; }
     public required StandardType StandardType { get; init; }
     public required bool IsOverride { get; init; }
+    public string? Comment { get; init; }
 }
 
 internal sealed class AddStandardPointsCommandValidator
@@ -156,6 +157,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             Date = commandPayload.Date,
             Points = commandPayload.Points,
             StandardType = commandPayload.StandardType,
+            Comment = commandPayload.Comment,
         };
 
         if (commandPayload.IsOverride)
