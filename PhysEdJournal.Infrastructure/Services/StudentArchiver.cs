@@ -2,7 +2,6 @@
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Models;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Services;
 
@@ -56,56 +55,6 @@ internal sealed class StudentArchiver
         await transaction.CommitAsync();
 
         return archivedStudent;
-    }
-
-    public static async ValueTask TryArchiveStudentIfHisDebtIsClosed(
-        StudentEntity student,
-        ApplicationContext context
-    )
-    {
-        ArgumentNullException.ThrowIfNull(student.Group);
-
-        if (!StudentRequiresArchiving(student))
-        {
-            return;
-        }
-
-        var archiver = new StudentArchiver(context);
-
-        var archivePayload = new InternalArchiveStudentPayload
-        {
-            ActiveSemesterName = (await context.GetActiveSemester()).Name,
-            Visits = student.Visits,
-            CurrentSemesterName = student.CurrentSemesterName,
-            FullName = student.FullName,
-            GroupNumber = student.GroupNumber,
-            StudentGuid = student.StudentGuid,
-            TotalPoints = CalculateTotalPoints(
-                student.Visits,
-                student.Group.VisitValue,
-                student.AdditionalPoints,
-                student.PointsForStandards
-            ),
-        };
-
-        await archiver.ArchiveStudentAsync(archivePayload);
-    }
-
-    private static bool StudentRequiresArchiving(StudentEntity student)
-    {
-        ArgumentNullException.ThrowIfNull(student.Group);
-
-        if (!student.HasDebtFromPreviousSemester)
-        {
-            return false;
-        }
-
-        return CalculateTotalPoints(
-                student.Visits,
-                student.Group.VisitValue,
-                student.AdditionalPoints,
-                student.PointsForStandards
-            ) >= REQUIRED_POINT_AMOUNT;
     }
 
     private async Task ArchiveCurrentSemesterHistoryAsync(

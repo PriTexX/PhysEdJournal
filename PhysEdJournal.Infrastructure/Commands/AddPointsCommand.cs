@@ -177,8 +177,6 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
             return new Result<Unit>(new ConcurrencyError());
         }
 
-        await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
-
         return Unit.Default;
     }
 }
