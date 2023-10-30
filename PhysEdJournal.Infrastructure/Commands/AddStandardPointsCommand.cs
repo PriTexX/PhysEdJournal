@@ -199,8 +199,6 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             return new Result<Unit>(new ConcurrencyError());
         }
 
-        await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
-
         return Unit.Default;
     }
 

@@ -118,8 +118,6 @@ public sealed class IncreaseStudentVisitsCommand
             return new Result<Unit>(new ConcurrencyError());
         }
 
-        await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
-
         return Unit.Default;
     }
 }
