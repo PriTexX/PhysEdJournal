@@ -48,6 +48,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false,
         };
 
@@ -113,6 +114,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Date = historyEntity.Date,
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
+            IsAdmin = false,
             StandardType = StandardType.Tilts,
             IsOverride = false
         };
@@ -172,6 +174,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 
@@ -228,6 +231,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 
@@ -279,6 +283,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 
@@ -329,6 +334,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 
@@ -379,6 +385,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 
@@ -432,6 +439,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
         var payload2 = new AddStandardPointsCommandPayload
@@ -441,6 +449,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points + 2,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = true
         };
 
@@ -496,6 +505,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
         var payload2 = new AddStandardPointsCommandPayload
@@ -505,6 +515,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points - 2,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = true
         };
 
@@ -559,6 +570,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 
@@ -610,6 +622,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
             StandardType = StandardType.Tilts,
+            IsAdmin = false,
             IsOverride = false
         };
 

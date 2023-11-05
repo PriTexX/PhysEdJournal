@@ -27,6 +27,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
             StudentGuid = student.StudentGuid,
             Date = DateOnlyGenerator.GetWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
+            IsAdmin = false,
         };
 
         await context.Semesters.AddAsync(semester);
@@ -62,6 +63,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
             StudentGuid = "Default",
             Date = DateOnlyGenerator.GetWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
+            IsAdmin = false,
         };
 
         await context.Semesters.AddAsync(semester);
@@ -101,6 +103,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
             StudentGuid = student.StudentGuid,
             Date = DateOnlyGenerator.GetWorkingDate(DateOnly.MaxValue),
             TeacherGuid = teacher.TeacherGuid,
+            IsAdmin = false,
         };
 
         await context.Semesters.AddAsync(semester);
@@ -141,6 +144,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
             StudentGuid = student.StudentGuid,
             Date = DateOnlyGenerator.GetWorkingDate(DateOnly.MinValue.AddDays(2)),
             TeacherGuid = teacher.TeacherGuid,
+            IsAdmin = false,
         };
 
         await context.Semesters.AddAsync(semester);
@@ -181,6 +185,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
             StudentGuid = student.StudentGuid,
             Date = DateOnlyGenerator.GetWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
+            IsAdmin = false,
         };
 
         await context.Semesters.AddAsync(semester);
@@ -223,6 +228,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
             StudentGuid = student.StudentGuid,
             Date = DateOnlyGenerator.GetNonWorkingDate(),
             TeacherGuid = teacher.TeacherGuid,
+            IsAdmin = false,
         };
 
         await context.Semesters.AddAsync(semester);

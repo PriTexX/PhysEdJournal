@@ -43,6 +43,7 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             Date = historyEntity.Date,
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
+            IsAdmin = false,
             WorkType = historyEntity.WorkType
         };
 
@@ -104,6 +105,7 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             Date = historyEntity.Date,
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
+            IsAdmin = false,
             WorkType = historyEntity.WorkType
         };
 
@@ -153,6 +155,7 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             Date = historyEntity.Date,
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
+            IsAdmin = false,
             WorkType = historyEntity.WorkType
         };
 
@@ -203,6 +206,7 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             Date = historyEntity.Date,
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
+            IsAdmin = false,
             WorkType = historyEntity.WorkType
         };
 
@@ -253,6 +257,7 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
             Date = historyEntity.Date,
             Points = historyEntity.Points,
             TeacherGuid = historyEntity.TeacherGuid,
+            IsAdmin = false,
             WorkType = historyEntity.WorkType
         };
 
