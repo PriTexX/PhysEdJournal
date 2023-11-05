@@ -1,6 +1,4 @@
-﻿using System.Reactive;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
@@ -29,8 +27,10 @@ public sealed class ArchiveStudentJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
+        var succArchivedStudents = 0;
         try
         {
+            _logger.LogInformation("Archiving job has started");
             var students = await _applicationContext.Students
                 .Include(s => s.Group)
                 .Where(s => s.HasDebtFromPreviousSemester)
@@ -43,8 +43,6 @@ public sealed class ArchiveStudentJob : IJob
 
             foreach (var stud in students)
             {
-                ArgumentNullException.ThrowIfNull(students);
-
                 if (!StudentRequiresArchiving(stud))
                 {
                     continue;
@@ -56,26 +54,34 @@ public sealed class ArchiveStudentJob : IJob
                     IsForceMode = false,
                 };
 
-                await _command.ExecuteAsync(archivePayload);
+                var result = await _command.ExecuteAsync(archivePayload);
+
+                if (result.IsSuccess)
+                {
+                    succArchivedStudents++;
+                    continue;
+                }
+
+                throw new Exception(
+                    $"Failed to archive student with guid{archivePayload.StudentGuid}"
+                );
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error: {EMessage}", e.Message);
+            _logger.LogError(e, "Unexpected error");
             return;
         }
 
-        _logger.LogInformation("Архивация прошла успешно");
+        _logger.LogInformation(
+            "Archiving job is over. Archived students: {SuccArchivedStudents}",
+            succArchivedStudents
+        );
     }
 
     private static bool StudentRequiresArchiving(StudentEntity student)
     {
         ArgumentNullException.ThrowIfNull(student.Group);
-
-        if (!student.HasDebtFromPreviousSemester)
-        {
-            return false;
-        }
 
         return CalculateTotalPoints(
                 student.Visits,
