@@ -156,7 +156,7 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
         var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
         student.PointsForStandards = 10;
         var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var date = DateOnly.FromDateTime(DateTime.Now).AddDays(-8);
+        var date = DateOnly.FromDateTime(DateTime.Now).AddDays(-32);
         var historyEntity = EntitiesFactory.CreateStandardsHistoryEntity(
             student.StudentGuid,
             StandardType.Jumps,

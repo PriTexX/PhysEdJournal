@@ -171,7 +171,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             10
         );
         var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var date = DateOnly.FromDateTime(DateTime.Now).AddDays(-8);
+        var date = DateOnly.FromDateTime(DateTime.Now).AddDays(-32);
         var historyEntity = EntitiesFactory.CreatePointsStudentHistoryEntity(
             student.StudentGuid,
             WorkType.Activist,
