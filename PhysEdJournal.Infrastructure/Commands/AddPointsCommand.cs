@@ -20,6 +20,7 @@ public sealed class AddPointsCommandPayload
     public required int Points { get; init; }
     public required string TeacherGuid { get; init; }
     public required WorkType WorkType { get; init; }
+    public required bool IsAdmin { get; init; }
     public string? Comment { get; init; }
 }
 
@@ -51,6 +52,17 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             return new NegativePointAmount();
         }
 
+        var student = await _applicationContext.Students
+            .Include(s => s.Group)
+            .FirstOrDefaultAsync(s => s.StudentGuid == commandInput.StudentGuid);
+
+        if (student is null)
+        {
+            return new StudentNotFoundException(commandInput.StudentGuid);
+        }
+
+        var activeSemesterName = student.CurrentSemesterName;
+
         if (commandInput.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext.PointsStudentsHistory
@@ -59,6 +71,7 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
                     p =>
                         p.StudentGuid == commandInput.StudentGuid
                         && p.WorkType == WorkType.ExternalFitness
+                        && p.SemesterName == activeSemesterName
                 )
                 .FirstOrDefaultAsync();
 
@@ -77,7 +90,12 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         {
             var anotherGTO = await _applicationContext.PointsStudentsHistory
                 .AsNoTracking()
-                .Where(p => p.StudentGuid == commandInput.StudentGuid && p.WorkType == WorkType.GTO)
+                .Where(
+                    p =>
+                        p.StudentGuid == commandInput.StudentGuid
+                        && p.WorkType == WorkType.GTO
+                        && p.SemesterName == activeSemesterName
+                )
                 .FirstOrDefaultAsync();
 
             if (anotherGTO is not null)
@@ -93,7 +111,8 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-            > PointsConstants.POINTS_LIFE_DAYS
+                > PointsConstants.POINTS_LIFE_DAYS
+            && !commandInput.IsAdmin
         )
         {
             return new DateExpiredException(commandInput.Date);
@@ -130,12 +149,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
 
         var student = await _applicationContext.Students
             .Include(s => s.Group)
-            .FirstOrDefaultAsync(s => s.StudentGuid == commandPayload.StudentGuid);
-
-        if (student is null)
-        {
-            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
-        }
+            .FirstAsync(s => s.StudentGuid == commandPayload.StudentGuid);
 
         var pointsStudentHistoryEntity = new PointsStudentHistoryEntity
         {

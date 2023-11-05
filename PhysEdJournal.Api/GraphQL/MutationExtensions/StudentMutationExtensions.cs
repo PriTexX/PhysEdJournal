@@ -65,6 +65,13 @@ public class StudentMutationExtensions
             }
         }
 
+        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+        );
+
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+
         var addPointsPayload = new AddPointsCommandPayload
         {
             StudentGuid = studentGuid,
@@ -72,6 +79,7 @@ public class StudentMutationExtensions
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
+            IsAdmin = isAdminOrSecretary,
             Comment = comment,
         };
 
@@ -118,6 +126,13 @@ public class StudentMutationExtensions
             TeacherPermissions.DefaultAccess
         );
 
+        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+        );
+
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+
         var addPointsForStandardPayload = new AddStandardPointsCommandPayload
         {
             StudentGuid = studentGuid,
@@ -126,6 +141,7 @@ public class StudentMutationExtensions
             Date = date,
             StandardType = standardType,
             IsOverride = isOverride,
+            IsAdmin = isAdminOrSecretary,
             Comment = comment,
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
@@ -163,11 +179,19 @@ public class StudentMutationExtensions
             TeacherPermissions.DefaultAccess
         );
 
+        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+        );
+
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+
         var increaseStudentVisitsPayload = new IncreaseStudentVisitsCommandPayload
         {
             Date = date,
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
+            IsAdmin = isAdminOrSecretary,
         };
 
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);

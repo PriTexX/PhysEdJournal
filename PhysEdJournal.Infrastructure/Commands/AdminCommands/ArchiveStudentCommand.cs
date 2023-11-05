@@ -93,6 +93,7 @@ public sealed class ArchiveStudentCommand
             return new Result<ArchivedStudentEntity>(archivedStudent);
         }
 
+        // If student is not force-archived and does not have enough points
         await _applicationContext.Students
             .Where(s => s.StudentGuid == commandPayload.StudentGuid)
             .ExecuteUpdateAsync(

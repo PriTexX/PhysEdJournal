@@ -21,6 +21,7 @@ public sealed class AddStandardPointsCommandPayload
     public required string TeacherGuid { get; init; }
     public required StandardType StandardType { get; init; }
     public required bool IsOverride { get; init; }
+    public required bool IsAdmin { get; init; }
     public string? Comment { get; init; }
 }
 
@@ -67,7 +68,8 @@ internal sealed class AddStandardPointsCommandValidator
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-            > POINTS_LIFE_DAYS
+                > POINTS_LIFE_DAYS
+            && !commandInput.IsAdmin
         )
         {
             return new DateExpiredException(commandInput.Date);
@@ -94,6 +96,7 @@ internal sealed class AddStandardPointsCommandValidator
                 s =>
                     s.StudentGuid == commandInput.StudentGuid
                     && s.StandardType == commandInput.StandardType
+                    && s.SemesterName == student.CurrentSemesterName
             )
             .OrderByDescending(s => s.Points)
             .FirstOrDefaultAsync();

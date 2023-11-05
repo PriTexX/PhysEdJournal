@@ -16,6 +16,7 @@ public sealed class IncreaseStudentVisitsCommandPayload
 {
     public required string StudentGuid { get; init; }
     public required string TeacherGuid { get; init; }
+    public required bool IsAdmin { get; init; }
     public required DateOnly Date { get; init; }
 }
 
@@ -30,34 +31,35 @@ internal sealed class IncreaseStudentVisitsCommandValidator
     }
 
     public async ValueTask<ValidationResult> ValidateCommandInputAsync(
-        IncreaseStudentVisitsCommandPayload input
+        IncreaseStudentVisitsCommandPayload commandInput
     )
     {
-        if (input.Date > DateOnly.FromDateTime(DateTime.Now))
+        if (commandInput.Date > DateOnly.FromDateTime(DateTime.Now))
         {
-            return new ActionFromFutureException(input.Date);
+            return new ActionFromFutureException(commandInput.Date);
         }
 
-        if (input.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
-            return new NonWorkingDayException(input.Date.DayOfWeek);
+            return new NonWorkingDayException(commandInput.Date.DayOfWeek);
         }
 
         if (
-            DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber
-            > VisitConstants.VISIT_LIFE_DAYS
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
+                > VisitConstants.VISIT_LIFE_DAYS
+            && !commandInput.IsAdmin
         )
         {
-            return new VisitExpiredException(input.Date);
+            return new VisitExpiredException(commandInput.Date);
         }
 
         var recordCopy = await _applicationContext.VisitsStudentsHistory
-            .Where(v => v.StudentGuid == input.StudentGuid && v.Date == input.Date)
+            .Where(v => v.StudentGuid == commandInput.StudentGuid && v.Date == commandInput.Date)
             .FirstOrDefaultAsync();
 
         if (recordCopy is not null)
         {
-            return new VisitAlreadyExistsException(input.Date);
+            return new VisitAlreadyExistsException(commandInput.Date);
         }
 
         return ValidationResult.Success;

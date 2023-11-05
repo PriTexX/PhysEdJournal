@@ -78,7 +78,7 @@ public static class StudentServiceFunctions
             students
                 .Where(d => d.Item1)
                 .Where(p => p.Item2.GroupNumber != string.Empty)
-                .Where(p => p.Item2.GroupNumber[2] == '1')
+                .Where(p => p.Item2.GroupNumber[2] == '1' || p.Item2.GroupNumber[2] == '9')
                 .Select(p =>
                 {
                     p.Item2.FullName = PrettifyFullName(p.Item2.FullName);
@@ -91,7 +91,7 @@ public static class StudentServiceFunctions
             students
                 .Where(d => !d.Item1)
                 .Where(p => p.Item2.GroupNumber != string.Empty)
-                .Where(p => p.Item2.GroupNumber[2] == '1')
+                .Where(p => p.Item2.GroupNumber[2] == '1' || p.Item2.GroupNumber[2] == '9')
                 .Select(p => p.Item2)
         );
 
