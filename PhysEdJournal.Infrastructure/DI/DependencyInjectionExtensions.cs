@@ -68,7 +68,7 @@ public static class DependencyInjectionExtensions
                 opts =>
                     opts.ForJob(jobKey)
                         .WithIdentity("ArchiveStudentJob-trigger")
-                        .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(3, 0))
+                        .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
             );
         });
         services.AddQuartzServer(q => q.WaitForJobsToComplete = true);
