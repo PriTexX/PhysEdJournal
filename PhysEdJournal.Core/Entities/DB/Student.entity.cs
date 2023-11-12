@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HotChocolate;
 using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
@@ -61,6 +62,7 @@ public sealed class StudentEntity
     public string? Department { get; set; }
 
     [Timestamp]
+    [GraphQLIgnore]
     public uint Version { get; set; }
 
     public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
