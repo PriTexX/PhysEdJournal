@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
@@ -67,7 +68,15 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
         student.PointsForStandards -= history.Points;
         _applicationContext.StandardsStudentsHistory.Remove(history);
         _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
+
+        try
+        {
+            await _applicationContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new Result<Unit>(new ConcurrencyError());
+        }
 
         return Unit.Default;
     }

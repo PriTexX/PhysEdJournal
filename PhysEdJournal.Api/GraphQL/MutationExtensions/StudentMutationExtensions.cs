@@ -2,6 +2,7 @@
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
@@ -28,6 +29,7 @@ public class StudentMutationExtensions
     [Error(typeof(PointsExceededLimit))]
     [Error(typeof(NegativePointAmount))]
     [Error(typeof(NonWorkingDayException))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<Success> AddPointsToStudent(
         [Service] AddPointsCommand addPointsCommand,
         [Service] PermissionValidator permissionValidator,
@@ -106,6 +108,7 @@ public class StudentMutationExtensions
     [Error(typeof(NonWorkingDayException))]
     [Error(typeof(PointsOverflowException))]
     [Error(typeof(NegativePointAmount))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<Success> AddPointsForStandardToStudent(
         string studentGuid,
         int pointsAmount,
@@ -162,6 +165,7 @@ public class StudentMutationExtensions
     [Error(typeof(VisitExpiredException))]
     [Error(typeof(VisitAlreadyExistsException))]
     [Error(typeof(ActionFromFutureException))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<Success> IncreaseStudentVisits(
         string studentGuid,
         DateOnly date,
@@ -211,6 +215,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
     [Error(typeof(CannotMigrateToNewSemesterException))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<ArchivedStudentEntity> ArchiveStudent(
         [Service] ArchiveStudentCommand archiveStudentCommand,
         [Service] PermissionValidator permissionValidator,
@@ -360,6 +365,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherGuidMismatchException))]
     [Error(typeof(ArchivedVisitDeletionException))]
     [Error(typeof(VisitOutdatedException))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<Success> DeleteStudentVisit(
         int historyId,
         [Service] DeleteStudentVisitCommand deleteStudentVisitCommand,
@@ -393,6 +399,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherGuidMismatchException))]
     [Error(typeof(ArchivedPointsDeletionException))]
     [Error(typeof(PointsOutdatedException))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<Success> DeletePoints(
         int historyId,
         [Service] DeletePointsCommand deletePointsCommand,
@@ -426,6 +433,7 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherGuidMismatchException))]
     [Error(typeof(ArchivedPointsDeletionException))]
     [Error(typeof(PointsOutdatedException))]
+    [Error(typeof(ConcurrencyError))]
     public async Task<Success> DeleteStandardPoints(
         int historyId,
         [Service] DeleteStandardPointsCommand deleteStandardPointsCommand,

@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -66,7 +67,15 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
         student.AdditionalPoints -= history.Points;
         _applicationContext.PointsStudentsHistory.Remove(history);
         _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
+
+        try
+        {
+            await _applicationContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new Result<Unit>(new ConcurrencyError());
+        }
 
         return Unit.Default;
     }

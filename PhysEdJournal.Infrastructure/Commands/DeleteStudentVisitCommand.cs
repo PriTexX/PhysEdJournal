@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -71,7 +72,15 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
         student.Visits--;
         _applicationContext.VisitsStudentsHistory.Remove(history);
         _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
+
+        try
+        {
+            await _applicationContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new Result<Unit>(new ConcurrencyError());
+        }
 
         return Unit.Default;
     }
