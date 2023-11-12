@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
@@ -166,7 +167,15 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
 
         _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
+
+        try
+        {
+            await _applicationContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new Result<Unit>(new ConcurrencyError());
+        }
 
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
 

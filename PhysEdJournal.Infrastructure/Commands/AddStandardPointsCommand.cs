@@ -3,6 +3,7 @@ using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
@@ -111,7 +112,7 @@ internal sealed class AddStandardPointsCommandValidator
             return ValidationResult.Success;
         }
 
-        if (duplicateHistoryEntity is not null)
+        if (duplicateHistoryEntity is not null && commandInput.StandardType != StandardType.Other)
         {
             return new StandardAlreadyExistsException(
                 commandInput.StudentGuid,
@@ -188,7 +189,15 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
 
         _applicationContext.StandardsStudentsHistory.Add(standardsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
+
+        try
+        {
+            await _applicationContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new Result<Unit>(new ConcurrencyError());
+        }
 
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
 

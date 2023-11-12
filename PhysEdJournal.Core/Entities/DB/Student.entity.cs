@@ -60,6 +60,9 @@ public sealed class StudentEntity
     [StringLength(200)]
     public string? Department { get; set; }
 
+    [Timestamp]
+    public uint Version { get; set; }
+
     public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
 
     public ICollection<VisitStudentHistoryEntity>? VisitsStudentHistory { get; set; }

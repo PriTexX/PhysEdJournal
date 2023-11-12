@@ -3,6 +3,7 @@ using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
@@ -107,7 +108,15 @@ public sealed class IncreaseStudentVisitsCommand
 
         _applicationContext.VisitsStudentsHistory.Add(record);
         _applicationContext.Students.Update(student);
-        await _applicationContext.SaveChangesAsync();
+
+        try
+        {
+            await _applicationContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new Result<Unit>(new ConcurrencyError());
+        }
 
         await StudentArchiver.TryArchiveStudentIfHisDebtIsClosed(student, _applicationContext);
 
