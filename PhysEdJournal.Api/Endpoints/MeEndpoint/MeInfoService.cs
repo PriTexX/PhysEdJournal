@@ -14,9 +14,7 @@ public sealed class MeInfoService
         _applicationContext = applicationContext;
     }
 
-    public async Task<LanguageExt.Common.Result<StudentInfoResponse>> GetStudentInfo(
-        string studentGuid
-    )
+    public async Task<PResult.Result<StudentInfoResponse>> GetStudentInfo(string studentGuid)
     {
         var studentActivity = await _applicationContext.Students
             .Where(s => s.StudentGuid == studentGuid)
@@ -34,7 +32,7 @@ public sealed class MeInfoService
 
         if (studentActivity is null)
         {
-            return new LanguageExt.Common.Result<StudentInfoResponse>(
+            return new PResult.Result<StudentInfoResponse>(
                 new StudentNotFoundException(studentGuid)
             );
         }
@@ -47,9 +45,7 @@ public sealed class MeInfoService
         return new StudentInfoResponse { Points = studentPoints };
     }
 
-    public async Task<LanguageExt.Common.Result<ProfessorInfoResponse>> GetProfessorInfo(
-        string professorGuid
-    )
+    public async Task<PResult.Result<ProfessorInfoResponse>> GetProfessorInfo(string professorGuid)
     {
         var teacherPermissions = await _applicationContext.Teachers
             .Where(t => t.TeacherGuid == professorGuid)
@@ -58,7 +54,7 @@ public sealed class MeInfoService
 
         if (teacherPermissions is null)
         {
-            return new LanguageExt.Common.Result<ProfessorInfoResponse>(
+            return new PResult.Result<ProfessorInfoResponse>(
                 new TeacherNotFoundException(professorGuid)
             );
         }

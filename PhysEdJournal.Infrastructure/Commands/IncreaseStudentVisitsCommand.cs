@@ -1,6 +1,4 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions;
@@ -9,7 +7,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Services;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -85,7 +83,7 @@ public sealed class IncreaseStudentVisitsCommand
 
         if (validation.IsFailed)
         {
-            return validation.ToResult<Unit>();
+            return validation.ValidationException;
         }
 
         var student = await _applicationContext.Students

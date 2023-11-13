@@ -1,6 +1,4 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
@@ -10,7 +8,7 @@ using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Services;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -145,7 +143,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
 
         if (validation.IsFailed)
         {
-            return validation.ToResult<Unit>();
+            return validation.ValidationException;
         }
 
         var student = await _applicationContext.Students
