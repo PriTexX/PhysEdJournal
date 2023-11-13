@@ -194,7 +194,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
         }
         catch (DbUpdateConcurrencyException)
         {
-            return new Result<Unit>(new ConcurrencyError());
+            return new ConcurrencyError();
         }
 
         return Unit.Default;

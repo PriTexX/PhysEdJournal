@@ -1,11 +1,10 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 using static PhysEdJournal.Core.Constants.VisitConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
@@ -77,7 +76,7 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
         }
         catch (DbUpdateConcurrencyException)
         {
-            return new Result<Unit>(new ConcurrencyError());
+            return new ConcurrencyError();
         }
 
         return Unit.Default;
