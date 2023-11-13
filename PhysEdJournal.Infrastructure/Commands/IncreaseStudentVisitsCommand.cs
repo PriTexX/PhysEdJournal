@@ -113,7 +113,7 @@ public sealed class IncreaseStudentVisitsCommand
         }
         catch (DbUpdateConcurrencyException)
         {
-            return new Result<Unit>(new ConcurrencyError());
+            return new ConcurrencyError();
         }
 
         return Unit.Default;
