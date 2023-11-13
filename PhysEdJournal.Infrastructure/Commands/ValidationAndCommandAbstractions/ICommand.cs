@@ -1,4 +1,4 @@
-﻿using LanguageExt.Common;
+﻿using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 

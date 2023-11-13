@@ -17,7 +17,7 @@ public class PermissionValidator
         _memoryCache = memoryCache;
     }
 
-    public async ValueTask<LanguageExt.Common.Result<bool>> ValidateTeacherPermissions(
+    public async ValueTask<PResult.Result<bool>> ValidateTeacherPermissions(
         string teacherGuid,
         TeacherPermissions requiredPermissions
     )
@@ -30,9 +30,7 @@ public class PermissionValidator
 
             if (teacher is null)
             {
-                return new LanguageExt.Common.Result<bool>(
-                    new TeacherNotFoundException(teacherGuid)
-                );
+                return new PResult.Result<bool>(new TeacherNotFoundException(teacherGuid));
             }
 
             _memoryCache.Set(
@@ -47,14 +45,14 @@ public class PermissionValidator
 
         if (requiredPermissions == TeacherPermissions.DefaultAccess)
         {
-            return new LanguageExt.Common.Result<bool>(true);
+            return new PResult.Result<bool>(true);
         }
 
         var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);
 
         if (!hasEnough)
         {
-            return new LanguageExt.Common.Result<bool>(
+            return new PResult.Result<bool>(
                 new NotEnoughPermissionsException(
                     teacherGuid,
                     teacher.Permissions,
