@@ -45,10 +45,6 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
 
         if (validationResult.IsFailed)
         {
-            Debug.Assert(
-                validationResult.ValidationException != null,
-                "validationResult.ValidationException != null"
-            );
             return validationResult.ValidationException;
         }
 

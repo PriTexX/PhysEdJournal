@@ -5,7 +5,6 @@ using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
-using ValidationResult = PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions.ValidationResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
