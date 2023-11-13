@@ -1,5 +1,4 @@
-﻿using HotChocolate.Data.Projections;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
@@ -28,26 +27,18 @@ public sealed class ArchiveStudentJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
+        var totalStudents = 0;
+        var successfullyArchivedStudentsCounter = 0;
         try
         {
             _logger.LogInformation("Archiving job has started");
 
-            _logger.LogInformation("Archiving job has started");
             var students = await _applicationContext.Students
                 .Include(s => s.Group)
                 .Where(s => s.HasDebtFromPreviousSemester)
                 .ToListAsync();
 
-            if (students.Count == 0)
-            {
-                _logger.LogInformation(
-                    "Archiving job has finished with success. 0 out of 0 students were archived"
-                );
-                return;
-            }
-
-            var totalStudents = students.Count;
-            var successfullyArchivedStudentsCounter = 0;
+            totalStudents = students.Count;
             foreach (var stud in students)
             {
                 if (!StudentRequiresArchiving(stud))
@@ -61,28 +52,46 @@ public sealed class ArchiveStudentJob : IJob
                     IsForceMode = false,
                 };
 
-                var result = await _command.ExecuteAsync(archivePayload);
+                try
+                {
+                    var result = await _command.ExecuteAsync(archivePayload);
 
-                if (result.IsFaulted)
+                    if (result.IsError)
+                    {
+                        _logger.LogWarning(
+                            result.UnsafeError,
+                            "Failed to archive student with guid = {ArchivePayloadStudentGuid}",
+                            archivePayload.StudentGuid
+                        );
+                        continue;
+                    }
+
+                    successfullyArchivedStudentsCounter++;
+                }
+                catch (Exception e)
                 {
                     _logger.LogWarning(
+                        e,
                         "Failed to archive student with guid = {ArchivePayloadStudentGuid}",
                         archivePayload.StudentGuid
                     );
                 }
-
-                successfullyArchivedStudentsCounter++;
             }
 
             _logger.LogInformation(
-                "Archiving job has finished with success. {SuccArchivedStudents} out of {TotalStudents} students were archived",
+                "Archiving job has finished with success. {SuccessfullyArchivedStudentsCounter} out of {TotalStudents} students were archived",
                 successfullyArchivedStudentsCounter,
                 totalStudents
             );
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Archiving job has finished with error");
+            _logger.LogError(
+                e,
+                "Archiving job has finished with error. {SuccessfullyArchivedStudentsCounter} out of {TotalStudents} students were archived",
+                successfullyArchivedStudentsCounter,
+                totalStudents
+            );
         }
     }
 
