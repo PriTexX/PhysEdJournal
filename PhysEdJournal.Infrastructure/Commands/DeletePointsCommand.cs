@@ -36,14 +36,12 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
 
         if (history is null)
         {
-            return new Result<Unit>(
-                new PointsStudentHistoryNotFoundException(commandPayload.HistoryId)
-            );
+            return new PointsStudentHistoryNotFoundException(commandPayload.HistoryId);
         }
 
         if (commandPayload.TeacherGuid != history.TeacherGuid && !commandPayload.IsAdmin)
         {
-            return new Result<Unit>(new TeacherGuidMismatchException(history.TeacherGuid));
+            return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
         var student = await _applicationContext.Students.FirstAsync(
@@ -52,7 +50,7 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
 
         if (history.IsArchived)
         {
-            return new Result<Unit>(new ArchivedPointsDeletionException());
+            return new ArchivedPointsDeletionException();
         }
 
         if (
@@ -61,7 +59,7 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
             && !commandPayload.IsAdmin
         )
         {
-            return new Result<Unit>(new PointsOutdatedException(DAYS_TO_DELETE_POINTS));
+            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
         }
 
         student.AdditionalPoints -= history.Points;

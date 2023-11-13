@@ -30,7 +30,7 @@ public class PermissionValidator
 
             if (teacher is null)
             {
-                return new PResult.Result<bool>(new TeacherNotFoundException(teacherGuid));
+                return new TeacherNotFoundException(teacherGuid);
             }
 
             _memoryCache.Set(
@@ -45,19 +45,17 @@ public class PermissionValidator
 
         if (requiredPermissions == TeacherPermissions.DefaultAccess)
         {
-            return new PResult.Result<bool>(true);
+            return true;
         }
 
         var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);
 
         if (!hasEnough)
         {
-            return new PResult.Result<bool>(
-                new NotEnoughPermissionsException(
-                    teacherGuid,
-                    teacher.Permissions,
-                    requiredPermissions
-                )
+            return new NotEnoughPermissionsException(
+                teacherGuid,
+                teacher.Permissions,
+                requiredPermissions
             );
         }
 

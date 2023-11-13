@@ -38,9 +38,7 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
 
         if (history is null)
         {
-            return new Result<Unit>(
-                new VisitsStudentHistoryNotFoundException(commandCommandPayload.HistoryId)
-            );
+            return new VisitsStudentHistoryNotFoundException(commandCommandPayload.HistoryId);
         }
 
         if (
@@ -48,7 +46,7 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
             && !commandCommandPayload.IsAdmin
         )
         {
-            return new Result<Unit>(new TeacherGuidMismatchException(history.TeacherGuid));
+            return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
         var student = await _applicationContext.Students.FirstAsync(
@@ -57,7 +55,7 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
 
         if (history.IsArchived)
         {
-            return new Result<Unit>(new ArchivedVisitDeletionException());
+            return new ArchivedVisitDeletionException();
         }
 
         if (
@@ -66,7 +64,7 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
             && !commandCommandPayload.IsAdmin
         )
         {
-            return new Result<Unit>(new VisitOutdatedException(DAYS_TO_DELETE_VISIT));
+            return new VisitOutdatedException(DAYS_TO_DELETE_VISIT);
         }
 
         student.Visits--;

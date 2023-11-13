@@ -26,7 +26,7 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
         var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
         if (student is null)
         {
-            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+            return new StudentNotFoundException(commandPayload.StudentGuid);
         }
 
         var archivedStudent = await _applicationContext.ArchivedStudents.FindAsync(
@@ -35,8 +35,9 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
         );
         if (archivedStudent is null)
         {
-            return new Result<Unit>(
-                new ArchivedStudentNotFound(commandPayload.StudentGuid, commandPayload.SemesterName)
+            return new ArchivedStudentNotFound(
+                commandPayload.StudentGuid,
+                commandPayload.SemesterName
             );
         }
 

@@ -56,7 +56,7 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
 
         if (group is null)
         {
-            return new Result<Unit>(new GroupNotFoundException(commandPayload.GroupName));
+            return new GroupNotFoundException(commandPayload.GroupName);
         }
 
         group.VisitValue = commandPayload.NewVisitValue;
@@ -64,6 +64,6 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
         _applicationContext.Groups.Update(group);
         await _applicationContext.SaveChangesAsync();
 
-        return new Result<Unit>(Unit.Default);
+        return Unit.Default;
     }
 }

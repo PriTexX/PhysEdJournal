@@ -92,7 +92,7 @@ public sealed class IncreaseStudentVisitsCommand
 
         if (student is null)
         {
-            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+            return new StudentNotFoundException(commandPayload.StudentGuid);
         }
 
         student.Visits++;

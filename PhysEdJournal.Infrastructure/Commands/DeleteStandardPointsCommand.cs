@@ -37,14 +37,12 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         if (history is null)
         {
-            return new Result<Unit>(
-                new StandardsStudentHistoryNotFoundException(commandPayload.HistoryId)
-            );
+            return new StandardsStudentHistoryNotFoundException(commandPayload.HistoryId);
         }
 
         if (commandPayload.TeacherGuid != history.TeacherGuid && !commandPayload.IsAdmin)
         {
-            return new Result<Unit>(new TeacherGuidMismatchException(history.TeacherGuid));
+            return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
         var student = await _applicationContext.Students.FirstAsync(
@@ -53,7 +51,7 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         if (history.IsArchived)
         {
-            return new Result<Unit>(new ArchivedPointsDeletionException());
+            return new ArchivedPointsDeletionException();
         }
 
         if (
@@ -62,7 +60,7 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
             && !commandPayload.IsAdmin
         )
         {
-            return new Result<Unit>(new PointsOutdatedException(DAYS_TO_DELETE_POINTS));
+            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
         }
 
         student.PointsForStandards -= history.Points;
