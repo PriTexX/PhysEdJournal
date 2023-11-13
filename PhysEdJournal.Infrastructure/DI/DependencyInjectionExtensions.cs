@@ -4,6 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Services.Quartz.Jobs;
+using Quartz;
+using Quartz.AspNetCore;
+using Quartz.Simpl;
 
 namespace PhysEdJournal.Infrastructure.DI;
 
@@ -21,6 +25,8 @@ public static class DependencyInjectionExtensions
         services.AddMemoryCache();
 
         services.AddCommands();
+
+        services.AddMyQuartz();
 
         return services;
     }
@@ -46,5 +52,25 @@ public static class DependencyInjectionExtensions
         services.AddScoped<DeleteStudentVisitCommand>();
         services.AddScoped<DeleteStandardPointsCommand>();
         services.AddScoped<DeletePointsCommand>();
+    }
+
+    private static void AddMyQuartz(this IServiceCollection services)
+    {
+        services.AddScoped<ArchiveStudentJob>();
+
+        services.AddQuartz(q =>
+        {
+            q.UseJobFactory<MicrosoftDependencyInjectionJobFactory>();
+            var jobKey = new JobKey("ArchiveStudentJob");
+            q.AddJob<ArchiveStudentJob>(opts => opts.WithIdentity(jobKey));
+
+            q.AddTrigger(
+                opts =>
+                    opts.ForJob(jobKey)
+                        .WithIdentity("ArchiveStudentJob-trigger")
+                        .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
+            );
+        });
+        services.AddQuartzServer(q => q.WaitForJobsToComplete = true);
     }
 }

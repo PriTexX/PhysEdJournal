@@ -1,8 +1,8 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
+﻿using System.Diagnostics;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -45,14 +45,14 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
 
         if (validationResult.IsFailed)
         {
-            return validationResult.ToResult<Unit>();
+            return validationResult.ValidationException;
         }
 
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
 
         if (group is null)
         {
-            return new Result<Unit>(new GroupNotFoundException(commandPayload.GroupName));
+            return new GroupNotFoundException(commandPayload.GroupName);
         }
 
         group.VisitValue = commandPayload.NewVisitValue;
@@ -60,6 +60,6 @@ public sealed class AssignVisitValueCommand : ICommand<AssignVisitValueCommandPa
         _applicationContext.Groups.Update(group);
         await _applicationContext.SaveChangesAsync();
 
-        return new Result<Unit>(Unit.Default);
+        return Unit.Default;
     }
 }

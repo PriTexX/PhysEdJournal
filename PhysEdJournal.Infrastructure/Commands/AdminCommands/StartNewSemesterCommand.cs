@@ -1,12 +1,11 @@
 ﻿using System.Text.RegularExpressions;
-using LanguageExt;
-using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -45,7 +44,7 @@ public sealed class StartNewSemesterCommand : ICommand<string, Unit>
 
         if (validationResult.IsFailed)
         {
-            return new Result<Unit>(validationResult.ValidationException);
+            return validationResult.ValidationException;
         }
 
         var currentSemester = await _applicationContext.Semesters

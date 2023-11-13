@@ -16,7 +16,6 @@ using PhysEdJournal.Api.Monitoring.Logging;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
-using Prometheus;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -159,7 +158,6 @@ app.UseCors(corsPolicyBuilder =>
     corsPolicyBuilder.AllowAnyOrigin();
     corsPolicyBuilder.AllowAnyHeader();
 });
-app.UseMetricServer();
 
 app.UseSerilogRequestLogging();
 

@@ -1,9 +1,8 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -27,7 +26,7 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
         var student = await _applicationContext.Students.FindAsync(commandPayload.StudentGuid);
         if (student is null)
         {
-            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+            return new StudentNotFoundException(commandPayload.StudentGuid);
         }
 
         var archivedStudent = await _applicationContext.ArchivedStudents.FindAsync(
@@ -36,8 +35,9 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
         );
         if (archivedStudent is null)
         {
-            return new Result<Unit>(
-                new ArchivedStudentNotFound(commandPayload.StudentGuid, commandPayload.SemesterName)
+            return new ArchivedStudentNotFound(
+                commandPayload.StudentGuid,
+                commandPayload.SemesterName
             );
         }
 

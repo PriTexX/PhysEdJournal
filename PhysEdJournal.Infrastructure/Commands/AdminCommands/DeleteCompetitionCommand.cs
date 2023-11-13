@@ -1,8 +1,7 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+﻿using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -21,7 +20,7 @@ public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
 
         if (comp is null)
         {
-            return new Result<Unit>(new CompetitionNotFoundException(competitionName));
+            return new CompetitionNotFoundException(competitionName);
         }
 
         _applicationContext.Competitions.Remove(comp);

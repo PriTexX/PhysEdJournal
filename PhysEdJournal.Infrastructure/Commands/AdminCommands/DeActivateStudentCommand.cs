@@ -1,9 +1,8 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -24,7 +23,7 @@ public sealed class DeActivateStudentCommand : ICommand<string, Unit>
 
         if (rowsAffected == 0)
         {
-            return new Result<Unit>(new StudentNotFoundException(studentGuid));
+            return new StudentNotFoundException(studentGuid);
         }
 
         return Unit.Default;

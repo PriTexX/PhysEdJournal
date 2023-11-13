@@ -1,10 +1,10 @@
-﻿using LanguageExt.Common;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -53,16 +53,14 @@ public sealed class GivePermissionsCommand : ICommand<GivePermissionsCommandPayl
 
         if (validationResult.IsFailed)
         {
-            return validationResult.ToResult<TeacherEntity>();
+            return validationResult.ValidationException;
         }
 
         var teacher = await _applicationContext.Teachers.FindAsync(commandPayload.TeacherGuid);
 
         if (teacher is null)
         {
-            return new Result<TeacherEntity>(
-                new TeacherNotFoundException(commandPayload.TeacherGuid)
-            );
+            return new TeacherNotFoundException(commandPayload.TeacherGuid);
         }
 
         teacher.Permissions = commandPayload.TeacherPermissions;

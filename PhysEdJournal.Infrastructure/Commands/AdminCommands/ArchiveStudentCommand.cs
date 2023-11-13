@@ -1,11 +1,11 @@
-﻿using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Models;
 using PhysEdJournal.Infrastructure.Services;
+using PResult;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
@@ -54,18 +54,14 @@ public sealed class ArchiveStudentCommand
 
         if (studentFromDb is null)
         {
-            return new Result<ArchivedStudentEntity>(
-                new StudentNotFoundException(commandPayload.StudentGuid)
-            );
+            return new StudentNotFoundException(commandPayload.StudentGuid);
         }
 
         var activeSemesterName = (await _applicationContext.GetActiveSemester()).Name;
 
         if (studentFromDb.CurrentSemesterName == activeSemesterName)
         {
-            return new Result<ArchivedStudentEntity>(
-                new CannotMigrateToNewSemesterException(activeSemesterName)
-            );
+            return new CannotMigrateToNewSemesterException(activeSemesterName);
         }
 
         var totalPoints = CalculateTotalPoints(
@@ -90,7 +86,7 @@ public sealed class ArchiveStudentCommand
             };
 
             var archivedStudent = await _studentArchiver.ArchiveStudentAsync(archiveStudentPayload);
-            return new Result<ArchivedStudentEntity>(archivedStudent);
+            return archivedStudent;
         }
 
         // If student is not force-archived and does not have enough points
@@ -102,8 +98,6 @@ public sealed class ArchiveStudentCommand
                         .SetProperty(s => s.ArchivedVisitValue, studentFromDb.VisitValue)
             );
 
-        return new Result<ArchivedStudentEntity>(
-            new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints)
-        );
+        return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
     }
 }

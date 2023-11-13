@@ -1,12 +1,11 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
@@ -37,14 +36,12 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         if (history is null)
         {
-            return new Result<Unit>(
-                new StandardsStudentHistoryNotFoundException(commandPayload.HistoryId)
-            );
+            return new StandardsStudentHistoryNotFoundException(commandPayload.HistoryId);
         }
 
         if (commandPayload.TeacherGuid != history.TeacherGuid && !commandPayload.IsAdmin)
         {
-            return new Result<Unit>(new TeacherGuidMismatchException(history.TeacherGuid));
+            return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
         var student = await _applicationContext.Students.FirstAsync(
@@ -53,7 +50,7 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         if (history.IsArchived)
         {
-            return new Result<Unit>(new ArchivedPointsDeletionException());
+            return new ArchivedPointsDeletionException();
         }
 
         if (
@@ -62,7 +59,7 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
             && !commandPayload.IsAdmin
         )
         {
-            return new Result<Unit>(new PointsOutdatedException(DAYS_TO_DELETE_POINTS));
+            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
         }
 
         student.PointsForStandards -= history.Points;
@@ -75,7 +72,7 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
         }
         catch (DbUpdateConcurrencyException)
         {
-            return new Result<Unit>(new ConcurrencyError());
+            return new ConcurrencyError();
         }
 
         return Unit.Default;

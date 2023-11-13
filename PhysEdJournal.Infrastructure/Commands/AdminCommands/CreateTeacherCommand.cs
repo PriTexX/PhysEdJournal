@@ -1,11 +1,10 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -35,7 +34,7 @@ public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload,
 
         if (teacherGuid is not null)
         {
-            return new Result<Unit>(new TeacherAlreadyExistsException(teacherGuid));
+            return new TeacherAlreadyExistsException(teacherGuid);
         }
 
         var teacherEntity = new TeacherEntity
