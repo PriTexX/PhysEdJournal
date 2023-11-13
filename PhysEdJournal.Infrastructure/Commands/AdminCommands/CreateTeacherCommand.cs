@@ -34,7 +34,7 @@ public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload,
 
         if (teacherGuid is not null)
         {
-            return new Result<Unit>(new TeacherAlreadyExistsException(teacherGuid));
+            return new TeacherAlreadyExistsException(teacherGuid);
         }
 
         var teacherEntity = new TeacherEntity

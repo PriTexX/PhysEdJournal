@@ -32,9 +32,7 @@ public sealed class MeInfoService
 
         if (studentActivity is null)
         {
-            return new PResult.Result<StudentInfoResponse>(
-                new StudentNotFoundException(studentGuid)
-            );
+            return new StudentNotFoundException(studentGuid);
         }
 
         var studentPoints =
@@ -54,9 +52,7 @@ public sealed class MeInfoService
 
         if (teacherPermissions is null)
         {
-            return new PResult.Result<ProfessorInfoResponse>(
-                new TeacherNotFoundException(professorGuid)
-            );
+            return new TeacherNotFoundException(professorGuid);
         }
 
         var textTeacherPermissions = teacherPermissions.Permissions

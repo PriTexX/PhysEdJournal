@@ -148,7 +148,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
 
         if (student is null)
         {
-            return new Result<Unit>(new StudentNotFoundException(commandPayload.StudentGuid));
+            return new StudentNotFoundException(commandPayload.StudentGuid);
         }
 
         var standardsStudentHistoryEntity = new StandardsStudentHistoryEntity

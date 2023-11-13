@@ -61,9 +61,7 @@ public sealed class GivePermissionsCommand : ICommand<GivePermissionsCommandPayl
 
         if (teacher is null)
         {
-            return new Result<TeacherEntity>(
-                new TeacherNotFoundException(commandPayload.TeacherGuid)
-            );
+            return new TeacherNotFoundException(commandPayload.TeacherGuid);
         }
 
         teacher.Permissions = commandPayload.TeacherPermissions;

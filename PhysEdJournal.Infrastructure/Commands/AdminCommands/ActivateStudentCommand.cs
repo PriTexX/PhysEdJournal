@@ -23,7 +23,7 @@ public sealed class ActivateStudentCommand : ICommand<string, Unit>
 
         if (rowsAffected == 0)
         {
-            return new Result<Unit>(new StudentNotFoundException(studentGuid));
+            return new StudentNotFoundException(studentGuid);
         }
 
         return Unit.Default;

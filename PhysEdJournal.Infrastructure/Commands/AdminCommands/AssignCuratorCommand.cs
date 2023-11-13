@@ -27,14 +27,14 @@ public sealed class AssignCuratorCommand : ICommand<AssignCuratorCommandPayload,
 
         if (teacher is null)
         {
-            return new Result<Unit>(new TeacherNotFoundException(commandPayload.TeacherGuid));
+            return new TeacherNotFoundException(commandPayload.TeacherGuid);
         }
 
         var group = await _applicationContext.Groups.FindAsync(commandPayload.GroupName);
 
         if (group is null)
         {
-            return new Result<Unit>(new GroupNotFoundException(commandPayload.GroupName));
+            return new GroupNotFoundException(commandPayload.GroupName);
         }
 
         group.Curator = teacher;
@@ -43,6 +43,6 @@ public sealed class AssignCuratorCommand : ICommand<AssignCuratorCommandPayload,
         _applicationContext.Groups.Update(group);
         await _applicationContext.SaveChangesAsync();
 
-        return new Result<Unit>(Unit.Default);
+        return Unit.Default;
     }
 }
