@@ -35,27 +35,32 @@ public partial class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
 
         var allStudents = GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize);
 
-        var filteredStudents = await allStudents
-            .Where(student => MyRegex().IsMatch(student.Group)) // Так-то единственное осмысленное изменение
-            .ToListAsync();
-
-        await UpdateGroups(applicationContext, filteredStudents);
-
         var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
 
-        var updatedEntities = new List<(bool, StudentEntity)>();
+        const int batchSize = 500;
 
-        foreach (var student in filteredStudents)
+        await foreach (var batch in allStudents.Buffer(batchSize))
         {
-            var dbStudent = await applicationContext.Students
-                .FindAsync(student.Guid);
+            var filteredStudents = batch
+                .Where(student => MyRegex().IsMatch(student.Group))
+                .ToList();
 
-            var updatedEntity = GetUpdatedOrCreatedStudentEntities(student, dbStudent, currentSemesterName);
+            await UpdateGroups(applicationContext, filteredStudents);
 
-            updatedEntities.Add(updatedEntity);
+            var updatedEntities = new List<(bool, StudentEntity)>();
+
+            foreach (var student in filteredStudents)
+            {
+                var dbStudent = await applicationContext.Students
+                    .FindAsync(student.Guid);
+
+                var updatedEntity = GetUpdatedOrCreatedStudentEntities(student, dbStudent, currentSemesterName);
+
+                updatedEntities.Add(updatedEntity);
+            }
+
+            await CommitChangesToContext(applicationContext, updatedEntities);
         }
-
-        await CommitChangesToContext(applicationContext, updatedEntities);
 
         return Unit.Default;
     }
