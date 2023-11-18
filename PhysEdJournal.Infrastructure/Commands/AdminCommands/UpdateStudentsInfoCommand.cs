@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using System.Text.RegularExpressions;
+using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,11 +7,12 @@ using Microsoft.Extensions.Options;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
+using PhysEdJournal.Infrastructure.Models;
 using static PhysEdJournal.Infrastructure.Services.StaticFunctions.StudentServiceFunctions;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
-public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
+public partial class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly string _userInfoServerUrl;
@@ -31,64 +33,40 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
         await using var scope = _serviceScopeFactory.CreateAsyncScope(); // Использую ServiceLocator т.к. команда запускается в бэкграунде и переданный ей ApplicationContext закрывается до завершения работы команды
         var applicationContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-        await UpdateGroups(applicationContext);
+        var allStudents = GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize);
+
+        var filteredStudents = await allStudents
+            .Where(student => MyRegex().IsMatch(student.Group)) // Так-то единственное осмысленное изменение
+            .ToListAsync();
+
+        await UpdateGroups(applicationContext, filteredStudents);
 
         var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
 
-        const int batchSize = 500;
-        var updateTasks = GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize)
-            .Buffer(batchSize)
-            .SelectAwait(
-                async actualStudents =>
-                    new
-                    {
-                        actualStudents = actualStudents.ToDictionary(s => s.Guid),
-                        dbStudents = (
-                            await GetManyStudentsWithManyKeys(
-                                applicationContext,
-                                actualStudents.Select(s => s.Guid).ToArray()
-                            )
-                        ).ToDictionary(d => d.StudentGuid),
-                    }
-            )
-            .Select(
-                s =>
-                    s.actualStudents.Keys.Select(
-                        actualStudentGuid =>
-                            (
-                                s.actualStudents[actualStudentGuid],
-                                s.dbStudents.GetValueOrDefault(actualStudentGuid)
-                            )
-                    )
-            )
-            .Select(
-                d =>
-                    d.Select(
-                        s =>
-                            GetUpdatedOrCreatedStudentEntities(
-                                s.Item1,
-                                s.Item2,
-                                currentSemesterName
-                            )
-                    )
-            )
-            .Select(s => CommitChangesToContext(applicationContext, s.ToList()));
+        var updatedEntities = new List<(bool, StudentEntity)>();
 
-        await foreach (var updateTask in updateTasks)
+        foreach (var student in filteredStudents)
         {
-            await updateTask;
+            var dbStudent = await applicationContext.Students
+                .FindAsync(student.Guid);
+
+            var updatedEntity = GetUpdatedOrCreatedStudentEntities(student, dbStudent, currentSemesterName);
+
+            updatedEntities.Add(updatedEntity);
         }
+
+        await CommitChangesToContext(applicationContext, updatedEntities);
 
         return Unit.Default;
     }
 
-    private async Task UpdateGroups(ApplicationContext applicationContext)
+    private static async Task UpdateGroups(ApplicationContext applicationContext, List<Student> students)
     {
-        var distinctGroups = await GetAllStudentsAsync(_userInfoServerUrl, pageSize: _pageSize)
+        var distinctGroups = students
             .Select(s => s.Group)
             .Where(g => !string.IsNullOrEmpty(g))
             .Distinct()
-            .ToListAsync();
+            .ToList();
 
         var dbGroups = await applicationContext.Groups.ToDictionaryAsync(g => g.GroupName);
 
@@ -99,4 +77,7 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
         applicationContext.Groups.AddRange(newGroups);
         await applicationContext.SaveChangesAsync();
     }
+
+    [GeneratedRegex(@"^2\d[1-9]-\d{3}$")]
+    private static partial Regex MyRegex();
 }
