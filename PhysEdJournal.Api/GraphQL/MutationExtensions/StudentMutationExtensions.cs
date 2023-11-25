@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions;
@@ -69,7 +70,7 @@ public class StudentMutationExtensions
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
@@ -131,7 +132,7 @@ public class StudentMutationExtensions
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
@@ -185,7 +186,7 @@ public class StudentMutationExtensions
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
