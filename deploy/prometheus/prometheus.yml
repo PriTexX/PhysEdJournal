@@ -15,7 +15,3 @@ scrape_configs:
   - job_name: cadvisor
     static_configs:
       - targets: [cadvisor:8080]
-
-  - job_name: physedjournal
-    static_configs:
-      - targets: [ physedjournal:80 ]
