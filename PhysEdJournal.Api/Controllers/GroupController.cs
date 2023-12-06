@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using PhysEdJournal.Api.Controllers.Requests;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
@@ -10,18 +11,13 @@ namespace PhysEdJournal.Api.Controllers;
 [Route("api/[controller][action]")]
 public sealed class GroupController : Controller
 {
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AssignCuratorToGroup(
-        string groupName,
-        string teacherGuid,
-        [Service] AssignCuratorCommand assignCuratorCommand,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
+        AssignCuratorToGroupRequest request,
+        [FromServices] AssignCuratorCommand assignCuratorCommand,
+        [FromServices] PermissionValidator permissionValidator
     )
     {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
+        var callerGuid = GetCallerGuid(request.ClaimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -30,8 +26,8 @@ public sealed class GroupController : Controller
 
         var assignCuratorPayload = new AssignCuratorCommandPayload
         {
-            GroupName = groupName,
-            TeacherGuid = teacherGuid,
+            GroupName = request.GroupName,
+            TeacherGuid = request.TeacherGuid,
         };
 
         var res = await assignCuratorCommand.ExecuteAsync(assignCuratorPayload);
@@ -55,22 +51,13 @@ public sealed class GroupController : Controller
         );
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(NullVisitValueException))]
     public async Task<IActionResult> AssignVisitValue(
-        string groupName,
-        double newVisitValue,
-        [Service] AssignVisitValueCommand assignVisitValueCommand,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
+        AssignVisitValueRequest request,
+        [FromServices] AssignVisitValueCommand assignVisitValueCommand,
+        [FromServices] PermissionValidator permissionValidator
     )
     {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
+        var callerGuid = GetCallerGuid(request.ClaimsPrincipal);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -79,8 +66,8 @@ public sealed class GroupController : Controller
 
         var assignVisitValuePayload = new AssignVisitValueCommandPayload
         {
-            GroupName = groupName,
-            NewVisitValue = newVisitValue,
+            GroupName = request.GroupName,
+            NewVisitValue = request.NewVisitValue,
         };
 
         var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
