@@ -1,17 +1,14 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Controllers.Requests;
-using PhysEdJournal.Core.Exceptions.GroupExceptions;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using PhysEdJournal.Api.Rest.Requests;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Controllers;
+namespace PhysEdJournal.Api.Rest.Handlers;
 
-[Route("api/[controller][action]")]
-public sealed class GroupController : Controller
+public static class AssignHandler
 {
-    public async Task<IActionResult> AssignCuratorToGroup(
+    public static async Task<IResult> AssignCuratorToGroup(
         AssignCuratorToGroupRequest request,
         [FromServices] AssignCuratorCommand assignCuratorCommand,
         [FromServices] PermissionValidator permissionValidator
@@ -33,25 +30,12 @@ public sealed class GroupController : Controller
         var res = await assignCuratorCommand.ExecuteAsync(assignCuratorPayload);
 
         return res.Match(
-            _ => StatusCode(StatusCodes.Status200OK),
-            exception =>
-            {
-                if (exception is NotEnoughPermissionsException)
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden);
-                }
-
-                if (exception is TeacherNotFoundException or GroupNotFoundException)
-                {
-                    return NotFound();
-                }
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            _ => Results.Ok(),
+            exception => Results.StatusCode(StatusCodes.Status500InternalServerError)
         );
     }
 
-    public async Task<IActionResult> AssignVisitValue(
+    public static async Task<IResult> AssignVisitValue(
         AssignVisitValueRequest request,
         [FromServices] AssignVisitValueCommand assignVisitValueCommand,
         [FromServices] PermissionValidator permissionValidator
@@ -73,27 +57,9 @@ public sealed class GroupController : Controller
         var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
 
         return res.Match(
-            _ => StatusCode(StatusCodes.Status200OK),
-            exception =>
-            {
-                if (exception is NotEnoughPermissionsException)
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden);
-                }
-
-                if (exception is TeacherNotFoundException)
-                {
-                    return NotFound();
-                }
-
-                if (exception is NullVisitValueException)
-                {
-                    return BadRequest();
-                }
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        );
+            _ => Results.Ok(),
+            exception => Results.StatusCode(StatusCodes.Status500InternalServerError)
+            );
     }
 
     private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
