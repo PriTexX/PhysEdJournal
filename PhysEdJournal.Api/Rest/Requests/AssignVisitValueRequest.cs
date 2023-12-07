@@ -1,12 +1,12 @@
 ﻿using System.Security.Claims;
 
-namespace PhysEdJournal.Api.Controllers.Requests;
+namespace PhysEdJournal.Api.Rest.Requests;
 
-public sealed class AssignCuratorToGroupRequest
+public sealed class AssignVisitValueRequest
 {
     public required string GroupName { get; init; }
 
-    public required string TeacherGuid { get; init; }
+    public required double NewVisitValue { get; init; }
 
     public required ClaimsPrincipal ClaimsPrincipal { get; init; }
 }
