@@ -4,9 +4,9 @@ using PhysEdJournal.Api.Rest.Requests;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Rest.Handlers;
+namespace PhysEdJournal.Api.Rest.Controllers;
 
-public static class AssignHandler
+public static class GroupController
 {
     public static async Task<IResult> AssignCuratorToGroup(
         AssignCuratorToGroupRequest request,
