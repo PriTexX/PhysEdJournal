@@ -1,20 +1,30 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Rest.Requests;
+using PhysEdJournal.Api.Api.Group.Contracts;
+using PhysEdJournal.Api.Controllers;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Rest.Controllers;
+namespace PhysEdJournal.Api.Api.Group;
 
 public static class GroupController
 {
+    public static void MapGroupEndpoints(IEndpointRouteBuilder router)
+    {
+        ErrorHandler.AddErrors(GroupErrors.Errors);
+
+        router.MapPost("/AssignCurator", AssignCuratorToGroup);
+        router.MapPost("/AssignVisitValue", AssignVisitValue);
+    }
+
     public static async Task<IResult> AssignCuratorToGroup(
-        AssignCuratorToGroupRequest request,
+        [FromBody] AssignCuratorToGroupRequest request,
         [FromServices] AssignCuratorCommand assignCuratorCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] PermissionValidator permissionValidator,
+        HttpContext ctx
     )
     {
-        var callerGuid = GetCallerGuid(request.ClaimsPrincipal);
+        var callerGuid = GetCallerGuid(ctx.User);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -31,17 +41,18 @@ public static class GroupController
 
         return res.Match(
             _ => Results.Ok(),
-            exception => Results.StatusCode(StatusCodes.Status500InternalServerError)
+            ErrorHandler.HandleErrorResult
         );
     }
 
     public static async Task<IResult> AssignVisitValue(
-        AssignVisitValueRequest request,
+        [FromBody] AssignVisitValueRequest request,
         [FromServices] AssignVisitValueCommand assignVisitValueCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] PermissionValidator permissionValidator,
+        HttpContext ctx
     )
     {
-        var callerGuid = GetCallerGuid(request.ClaimsPrincipal);
+        var callerGuid = GetCallerGuid(ctx.User);
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -58,7 +69,7 @@ public static class GroupController
 
         return res.Match(
             _ => Results.Ok(),
-            exception => Results.StatusCode(StatusCodes.Status500InternalServerError)
+            ErrorHandler.HandleErrorResult
             );
     }
 

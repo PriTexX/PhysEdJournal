@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PhysEdJournal.Api.Rest;
+namespace PhysEdJournal.Api.Api;
 
 [JsonConverter(typeof(CustomProblemDetailsJsonConverter))]
 public sealed class ProblemDetailsResponse
@@ -36,7 +36,7 @@ public sealed class ProblemDetailsResult : IActionResult
     {
         var objectResult = new ObjectResult(_problemDetails)
         {
-            StatusCode = _problemDetails.Status
+            StatusCode = _problemDetails.Status,
         };
         return objectResult.ExecuteResultAsync(context);
     }
