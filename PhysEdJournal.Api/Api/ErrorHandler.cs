@@ -35,143 +35,115 @@ public static class ErrorHandler
         {
             {
                 nameof(NotEnoughPermissionsException),
-                err =>
-                {
-                    var message = ((NotEnoughPermissionsException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status403Forbidden,
                         Type = "not-enough-permissions",
                         Title = "Not enough permissions",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail = "User must have more permissions to perform this action",
+                    }
             },
             {
                 nameof(TeacherNotFoundException),
-                err =>
-                {
-                    var message = ((TeacherNotFoundException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "no-teacher",
                         Title = "Teacher not found",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail = "Teacher was not found in the system",
+                    }
             },
             {
                 nameof(StudentNotFoundException),
-                err =>
-                {
-                    var message = ((StudentNotFoundException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status404NotFound,
-                        Type = "not-found",
+                        Type = "no-student",
                         Title = "Student not found",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail = "Student was not found in the system",
+                    }
             },
             {
                 nameof(ActionFromFutureException),
-                err =>
-                {
-                    var message = ((ActionFromFutureException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "bad-request",
+                        Type = "action-from-future",
                         Title = "Action was committed in the future",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail =
+                            "The system does not operate with information that comes from the future",
+                    }
             },
             {
                 nameof(DateExpiredException),
-                err =>
-                {
-                    var message = ((DateExpiredException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "bad-request",
+                        Type = "date-expired",
                         Title = "Action was performed after the deadline",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail = "Action should be performed before its deadline",
+                    }
             },
             {
                 nameof(NegativePointAmount),
-                err =>
-                {
-                    var message = ((NegativePointAmount)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "bad-request",
-                        Title = "Attempt to perform action after the deadline",
-                        Detail = $"{message}",
-                    };
-                }
+                        Type = "negative-points",
+                        Title = "Points amount is less than or equal to zero",
+                        Detail = "Cannot grant negative or zero amount of points",
+                    }
             },
             {
                 nameof(NonWorkingDayException),
-                err =>
-                {
-                    var message = ((NonWorkingDayException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "bad-request",
+                        Type = "non-working-day",
                         Title = "Attempt to perform action on the non working day",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail = "Non Working days: Sunday, Monday",
+                    }
             },
             {
                 nameof(ConcurrencyError),
-                err =>
-                {
-                    var message = ((ConcurrencyError)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status409Conflict,
-                        Type = "conflict", // TODO: уникальный тип сделать
+                        Type = "concurrency",
                         Title = "Attempt to perform one action twice",
-                        Detail = $"{message}",
-                    };
-                }
+                        Detail = "Only one of each type of action at a time",
+                    }
             },
             {
                 nameof(TeacherGuidMismatchException),
-                err =>
-                {
-                    var message = ((TeacherGuidMismatchException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "bad-request",
+                        Type = "wrong-teacher",
                         Title = "This action should be done by another teacher",
-                        Detail = message, // TODO: сделать ошибки для клиентов
-                    };
-                }
+                        Detail =
+                            "Teacher can manage the data that he has entered. He can't change other people's records.",
+                    }
             },
             {
                 nameof(ArchivedPointsDeletionException),
-                err =>
-                {
-                    var message = ((ArchivedPointsDeletionException)err).Message;
-                    return new ProblemDetailsResponse
+                _ =>
+                    new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "bad-request",
+                        Type = "archive-points-deletion",
                         Title = "Attempt to delete archived points",
-                        Detail = message,
-                    };
-                }
+                        Detail = "You cannot delete points that are in the archive",
+                    }
             },
         };
 
