@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhysEdJournal.Api;
 using PhysEdJournal.Api.Api;
+using PhysEdJournal.Api.Api.AddPoints.Contracts;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
 using PhysEdJournal.Api.Endpoints.StaffEndpoint;
@@ -105,6 +106,8 @@ builder.Services.AddScoped<MeInfoService>();
  */
 
 builder.Services.AddSingleton<AssignVisitValueRequest.Validator>();
+builder.Services.AddSingleton<AssignCuratorToGroupRequest.Validator>();
+builder.Services.AddSingleton<AddPointsToStudentRequest.Validator>();
 
 /*
     Utils
