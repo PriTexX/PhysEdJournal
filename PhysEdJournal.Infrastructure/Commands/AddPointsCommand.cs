@@ -9,6 +9,7 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
+using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -36,9 +37,9 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         AddPointsCommandPayload commandInput
     )
     {
-        if (commandInput.Points > 50)
+        if (commandInput.Points > MaxPointsAmount)
         {
-            return new PointsExceededLimit(50);
+            return new PointsExceededLimit(MaxPointsAmount);
         }
 
         if (commandInput.Date > DateOnly.FromDateTime(DateTime.UtcNow))
@@ -76,9 +77,9 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
                 return new FitnessAlreadyExistsException();
             }
 
-            if (commandInput.Points > 10)
+            if (commandInput.Points > MaxPointsForExternalFitness)
             {
-                return new PointsExceededLimit(10);
+                return new PointsExceededLimit(MaxPointsForExternalFitness);
             }
         }
 
@@ -95,9 +96,9 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             }
         }
 
-        if (commandInput is { WorkType: WorkType.Science, Points: > 30 })
+        if (commandInput is { WorkType: WorkType.Science, Points: > MaxPointsForScience })
         {
-            return new PointsExceededLimit(30);
+            return new PointsExceededLimit(MaxPointsForScience);
         }
 
         if (
