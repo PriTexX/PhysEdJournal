@@ -12,7 +12,7 @@ public static class GroupErrors
                 _ =>
                     new ProblemDetailsResponse
                     {
-                        Status = StatusCodes.Status403Forbidden,
+                        Status = StatusCodes.Status400BadRequest,
                         Type = "no-visit-value",
                         Title = "Visit value was not provided",
                         Detail = "Visit value cannot be negative.",
