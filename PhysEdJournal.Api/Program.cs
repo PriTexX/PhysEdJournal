@@ -1,10 +1,13 @@
 using System.Security.Cryptography;
+using FluentValidation;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhysEdJournal.Api;
+using PhysEdJournal.Api.Api;
+using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
 using PhysEdJournal.Api.Endpoints.StaffEndpoint;
 using PhysEdJournal.Api.FilterExtensions;
@@ -98,6 +101,12 @@ builder.Services.AddScoped<PermissionValidator>();
 builder.Services.AddScoped<MeInfoService>();
 
 /*
+    Validators
+ */
+
+builder.Services.AddSingleton<AssignVisitValueRequest.Validator>();
+
+/*
     Utils
  */
 
@@ -151,6 +160,13 @@ builder.Services
     );
 
 var app = builder.Build();
+
+/*
+    Rest
+ */
+
+var root = app.MapGroup("/api");
+root.AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory);
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>
