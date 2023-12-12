@@ -108,6 +108,6 @@ public sealed class ArchiveStudentJob : IJob
                 student.Group.VisitValue,
                 student.AdditionalPoints,
                 student.PointsForStandards
-            ) >= REQUIRED_POINT_AMOUNT;
+            ) >= REQUIRED_POINTS_AMOUNT;
     }
 }
