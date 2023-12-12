@@ -1,3 +1,6 @@
+using PhysEdJournal.Core.Exceptions.PointsExceptions;
+using PhysEdJournal.Core.Exceptions.StudentExceptions;
+
 namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
 
 public static class AddPointsErrors
@@ -6,14 +9,25 @@ public static class AddPointsErrors
         new()
         {
             {
-                nameof(NullVisitValueException),
+                nameof(FitnessAlreadyExistsException),
                 _ =>
                     new ProblemDetailsResponse
                     {
-                        Status = StatusCodes.Status403Forbidden,
-                        Type = "no-visit-value",
-                        Title = "Visit value was not provided",
-                        Detail = "Visit value cannot be negative.",
+                        Status = StatusCodes.Status400BadRequest,
+                        Type = "fitness-duplicate",
+                        Title = "Record for fitness already exists",
+                        Detail = "Only one record of points for external fitness per semester",
+                    }
+            },
+            {
+                nameof(PointsExceededLimit),
+                _ =>
+                    new ProblemDetailsResponse
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Type = "points-out-of-limit",
+                        Title = "Points limit is exceeded",
+                        Detail = "You can't give this much points for such an activity",
                     }
             },
         };
