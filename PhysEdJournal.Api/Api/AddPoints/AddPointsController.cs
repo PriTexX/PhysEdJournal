@@ -23,7 +23,6 @@ public static class AddPointsController
         [FromBody] AddPointsToStudentRequest request,
         [FromServices] AddPointsCommand addPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
-        [FromServices] ILogger logger,
         HttpContext ctx
     )
     {
@@ -72,14 +71,7 @@ public static class AddPointsController
 
         var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
 
-        return res.Match(
-            _ => Results.Ok(),
-            err =>
-            {
-                logger.LogWarning(err, "Something bad happened");
-                return ErrorHandler.HandleErrorResult(err);
-            }
-        );
+        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
     }
 
     private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
