@@ -9,14 +9,12 @@ namespace PhysEdJournal.Api.Controllers;
 
 public static class ErrorHandler
 {
-    public static IResult HandleErrorResult(
-        Exception error
-    )
+    public static IResult HandleErrorResult(Exception error)
     {
         var errorName = error.GetType().Name;
         return Errors.TryGetValue(errorName, out var errorProblemDetailsBuilder)
             ? ToResult(errorProblemDetailsBuilder(error))
-                : ToResult(DefaultProblemDetailsResponse);
+            : ToResult(DefaultProblemDetailsResponse);
     }
 
     public static void AddErrors(Dictionary<string, Func<Exception, ProblemDetailsResponse>> errors)

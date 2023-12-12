@@ -1,5 +1,3 @@
 namespace PhysEdJournal.Api.Api.Teacher;
 
-public static class TeacherController
-{
-}
+public static class TeacherController { }

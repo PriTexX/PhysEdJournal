@@ -1,8 +1,6 @@
-using PhysEdJournal.Core.Exceptions.GroupExceptions;
+namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
 
-namespace PhysEdJournal.Api.Api.Group.Contracts;
-
-public static class GroupErrors
+public static class AddPointsErrors
 {
     public static readonly Dictionary<string, Func<Exception, ProblemDetailsResponse>> Errors =
         new()

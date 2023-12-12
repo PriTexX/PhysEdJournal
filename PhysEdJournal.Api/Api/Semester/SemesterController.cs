@@ -1,5 +1,3 @@
 namespace PhysEdJournal.Api.Api.Semester;
 
-public static class SemesterController
-{
-}
+public static class SemesterController { }

@@ -39,10 +39,7 @@ public static class GroupController
 
         var res = await assignCuratorCommand.ExecuteAsync(assignCuratorPayload);
 
-        return res.Match(
-            _ => Results.Ok(),
-            ErrorHandler.HandleErrorResult
-        );
+        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
     }
 
     public static async Task<IResult> AssignVisitValue(
@@ -67,10 +64,7 @@ public static class GroupController
 
         var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
 
-        return res.Match(
-            _ => Results.Ok(),
-            ErrorHandler.HandleErrorResult
-            );
+        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
     }
 
     private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)

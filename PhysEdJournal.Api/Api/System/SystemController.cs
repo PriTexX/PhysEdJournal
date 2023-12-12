@@ -1,5 +1,3 @@
 namespace PhysEdJournal.Api.Api.System;
 
-public static class SystemController
-{
-}
+public static class SystemController { }

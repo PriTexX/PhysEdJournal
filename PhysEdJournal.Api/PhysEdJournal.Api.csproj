@@ -35,7 +35,6 @@
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
 
     <ItemGroup>
-      <Folder Include="Api\AddPoints\Contracts\" />
       <Folder Include="Api\Archive\Contracts\" />
       <Folder Include="Api\Competition\Contracts\" />
       <Folder Include="Api\DeletePoints\Contracts\" />

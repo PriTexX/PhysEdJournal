@@ -1,5 +1,3 @@
 namespace PhysEdJournal.Api.Api.Competition;
 
-public static class CompetitionController
-{
-}
+public static class CompetitionController { }

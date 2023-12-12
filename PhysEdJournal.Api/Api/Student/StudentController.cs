@@ -1,5 +1,3 @@
 namespace PhysEdJournal.Api.Api.Student;
 
-public static class StudentController
-{
-}
+public static class StudentController { }
