@@ -10,6 +10,7 @@ public static class PointsConstants
     public const int MaxPointsAmount = 50;
     public const int MaxPointsForExternalFitness = 10;
     public const int MaxPointsForScience = 30;
+    public const int MinimalTotalPointsToBeAbleToPassStandards = 20;
     public const int MAX_POINTS_FOR_ONE_STANDARD = 10;
 
     public static double CalculateTotalPoints(
