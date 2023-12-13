@@ -60,7 +60,7 @@ internal sealed class AddStandardPointsCommandValidator
             student.PointsForStandards
         );
 
-        if (totalPoints < 30)
+        if (totalPoints < MinimalTotalPointsToBeAbleToPassStandards)
         {
             return new NotEnoughPointsForStandardException();
         }
@@ -95,6 +95,7 @@ internal sealed class AddStandardPointsCommandValidator
                 s =>
                     s.StudentGuid == commandInput.StudentGuid
                     && s.StandardType == commandInput.StandardType
+                    && s.SemesterName == student.CurrentSemesterName
             )
             .OrderByDescending(s => s.Points)
             .FirstOrDefaultAsync();
@@ -154,6 +155,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
         {
             StudentGuid = commandPayload.StudentGuid,
             TeacherGuid = commandPayload.TeacherGuid,
+            SemesterName = student.CurrentSemesterName,
             Date = commandPayload.Date,
             Points = commandPayload.Points,
             StandardType = commandPayload.StandardType,
