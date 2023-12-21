@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Controllers;
+using PhysEdJournal.Api.GraphQL.MutationExtensions;
+using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
-using ILogger = Serilog.ILogger;
 
 namespace PhysEdJournal.Api.Api.AddPoints;
 
@@ -17,6 +18,7 @@ public static class AddPointsController
         ErrorHandler.AddErrors(GroupErrors.Errors);
 
         router.MapPost("/AddPointsToStudent", AddPointsToStudent);
+        router.MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent);
     }
 
     public static async Task<IResult> AddPointsToStudent(
@@ -70,6 +72,43 @@ public static class AddPointsController
         };
 
         var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
+
+        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+    }
+
+    public static async Task<IResult> AddPointsForStandardToStudent(
+        [FromBody] AddPointsForStandardToStudentRequest request,
+        [FromServices] AddStandardPointsCommand addStandardPointsCommand,
+        [FromServices] PermissionValidator permissionValidator,
+        HttpContext ctx
+    )
+    {
+        var callerGuid = GetCallerGuid(ctx.User);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            TeacherPermissions.DefaultAccess
+        );
+
+        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
+        );
+
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+
+        var addPointsForStandardPayload = new AddStandardPointsCommandPayload
+        {
+            StudentGuid = request.StudentGuid,
+            TeacherGuid = callerGuid,
+            Points = request.PointsAmount,
+            Date = request.Date,
+            StandardType = request.StandardType,
+            IsOverride = request.IsOverride,
+            IsAdmin = isAdminOrSecretary,
+            Comment = request.Comment,
+        };
+        var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 
         return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
     }
