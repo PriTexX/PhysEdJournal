@@ -5,7 +5,6 @@ using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Controllers;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
-using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.Api.AddPoints;
@@ -18,6 +17,7 @@ public static class AddPointsController
 
         router.MapPost("/AddPointsToStudent", AddPointsToStudent);
         router.MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent);
+        router.MapPost("/IncreaseStudentVisits", IncreaseStudentVisits);
     }
 
     public static async Task<IResult> AddPointsToStudent(
