@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Controllers;
@@ -24,7 +23,7 @@ public static class GroupController
         HttpContext ctx
     )
     {
-        var callerGuid = GetCallerGuid(ctx.User);
+        var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -49,7 +48,7 @@ public static class GroupController
         HttpContext ctx
     )
     {
-        var callerGuid = GetCallerGuid(ctx.User);
+        var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
@@ -65,16 +64,5 @@ public static class GroupController
         var res = await assignVisitValueCommand.ExecuteAsync(assignVisitValuePayload);
 
         return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
-    }
-
-    private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
-    {
-        var callerGuid = claimsPrincipal.Claims.First(c => c.Type == "IndividualGuid").Value;
-        if (callerGuid is null)
-        {
-            throw new Exception("IndividualGuid cannot be empty. Wrong token was passed");
-        }
-
-        return callerGuid;
     }
 }
