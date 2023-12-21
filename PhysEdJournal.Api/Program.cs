@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhysEdJournal.Api;
 using PhysEdJournal.Api.Api;
+using PhysEdJournal.Api.Api.AddPoints;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
+using PhysEdJournal.Api.Api.Group;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
 using PhysEdJournal.Api.Endpoints.StaffEndpoint;
@@ -108,6 +110,8 @@ builder.Services.AddScoped<MeInfoService>();
 builder.Services.AddSingleton<AssignVisitValueRequest.Validator>();
 builder.Services.AddSingleton<AssignCuratorToGroupRequest.Validator>();
 builder.Services.AddSingleton<AddPointsToStudentRequest.Validator>();
+builder.Services.AddSingleton<AddPointsForStandardToStudentRequest.Validator>();
+builder.Services.AddSingleton<IncreaseStudentVisitsRequest.Validator>();
 
 /*
     Utils
@@ -170,6 +174,9 @@ var app = builder.Build();
 
 var root = app.MapGroup("/api");
 root.AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory);
+
+AddPointsController.MapAddPointsEndpoints(root);
+GroupController.MapGroupEndpoints(root);
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>
