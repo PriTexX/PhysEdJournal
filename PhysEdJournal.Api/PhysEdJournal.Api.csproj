@@ -37,7 +37,6 @@
     <ItemGroup>
       <Folder Include="Api\Archive\Contracts\" />
       <Folder Include="Api\Competition\Contracts\" />
-      <Folder Include="Api\DeletePoints\Contracts\" />
       <Folder Include="Api\Semester\Contracts\" />
       <Folder Include="Api\Student\Contracts\" />
       <Folder Include="Api\System\Contracts\" />
