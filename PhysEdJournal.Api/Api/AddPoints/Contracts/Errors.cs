@@ -1,5 +1,6 @@
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
+using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 
 namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
 
@@ -28,6 +29,28 @@ public static class AddPointsErrors
                         Type = "points-out-of-limit",
                         Title = "Points limit is exceeded",
                         Detail = "You can't give this much points for such an activity",
+                    }
+            },
+            {
+                nameof(VisitExpiredException),
+                _ =>
+                    new ProblemDetailsResponse
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Type = "visit-expired",
+                        Title = "This visit is too old",
+                        Detail = "You can't set visit for a day that was so long ago.",
+                    }
+            },
+            {
+                nameof(VisitAlreadyExistsException),
+                _ =>
+                    new ProblemDetailsResponse
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Type = "visit-exists",
+                        Title = "This visit already exists",
+                        Detail = "You cannot set more than one visit per day",
                     }
             },
         };
