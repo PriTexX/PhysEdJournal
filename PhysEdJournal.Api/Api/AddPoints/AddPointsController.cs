@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Controllers;
-using PhysEdJournal.Api.GraphQL.MutationExtensions;
-using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
+using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.Api.AddPoints;
@@ -109,6 +108,40 @@ public static class AddPointsController
             Comment = request.Comment,
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
+
+        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+    }
+
+    public static async Task<IResult> IncreaseStudentVisits(
+        [FromBody] IncreaseStudentVisitsRequest request,
+        [FromServices] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
+        [FromServices] PermissionValidator permissionValidator,
+        HttpContext ctx
+    )
+    {
+        var callerGuid = GetCallerGuid(ctx.User);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            TeacherPermissions.DefaultAccess
+        );
+
+        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
+        );
+
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+
+        var increaseStudentVisitsPayload = new IncreaseStudentVisitsCommandPayload
+        {
+            Date = request.Date,
+            StudentGuid = request.StudentGuid,
+            TeacherGuid = callerGuid,
+            IsAdmin = isAdminOrSecretary,
+        };
+
+        var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
 
         return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
     }
