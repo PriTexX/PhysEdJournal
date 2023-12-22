@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using FluentValidation;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Types.Pagination;
@@ -9,6 +8,7 @@ using PhysEdJournal.Api;
 using PhysEdJournal.Api.Api;
 using PhysEdJournal.Api.Api.AddPoints;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
+using PhysEdJournal.Api.Api.DeletePoints;
 using PhysEdJournal.Api.Api.Group;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
@@ -177,6 +177,7 @@ root.AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory);
 
 AddPointsController.MapAddPointsEndpoints(root);
 GroupController.MapGroupEndpoints(root);
+DeletePointsController.MapDeletePointsEndpoints(root);
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>
