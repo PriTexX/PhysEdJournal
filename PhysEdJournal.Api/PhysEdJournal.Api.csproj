@@ -33,6 +33,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
+        <ProjectReference Include="..\PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Api\Archive\Contracts\" />
@@ -42,17 +44,4 @@
       <Folder Include="Api\System\Contracts\" />
       <Folder Include="Api\Teacher\Contracts\" />
     </ItemGroup>
-
-      <ProjectReference Include="..\PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj" />
-
-
-
-
-
-
-    </ItemGroup>
-
-
-
-
 </Project>
