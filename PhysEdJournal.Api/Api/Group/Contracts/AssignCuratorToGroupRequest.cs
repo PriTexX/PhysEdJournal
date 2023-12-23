@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Api.Api.Group.Contracts;
 
@@ -12,8 +13,8 @@ public sealed class AssignCuratorToGroupRequest
     {
         public Validator()
         {
-            RuleFor(request => request.GroupName).NotEmpty();
-            RuleFor(request => request.TeacherGuid).NotEmpty();
+            RuleFor(request => request.GroupName).Length(1, 30).NotEmpty();
+            RuleFor(request => request.TeacherGuid).Length(GuidLength, GuidLength).NotEmpty();
         }
     }
 }

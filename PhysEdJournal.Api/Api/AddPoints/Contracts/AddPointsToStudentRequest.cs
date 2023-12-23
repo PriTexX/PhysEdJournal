@@ -1,5 +1,6 @@
 using FluentValidation;
 using PhysEdJournal.Core.Entities.Types;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
@@ -16,7 +17,7 @@ public class AddPointsToStudentRequest
     {
         public Validator()
         {
-            RuleFor(request => request.StudentGuid).NotEmpty();
+            RuleFor(request => request.StudentGuid).Length(GuidLength, GuidLength).NotEmpty();
             RuleFor(request => request.PointsAmount)
                 .NotEmpty()
                 .GreaterThan(0)

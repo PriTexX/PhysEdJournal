@@ -1,4 +1,5 @@
 using FluentValidation;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
 
@@ -11,7 +12,7 @@ public sealed class IncreaseStudentVisitsRequest
     {
         public Validator()
         {
-            RuleFor(request => request.StudentGuid).NotEmpty();
+            RuleFor(request => request.StudentGuid).Length(GuidLength, GuidLength).NotEmpty();
             RuleFor(request => request.Date).NotEmpty();
         }
     }

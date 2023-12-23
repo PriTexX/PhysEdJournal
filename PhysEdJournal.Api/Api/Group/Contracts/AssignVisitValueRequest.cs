@@ -12,8 +12,8 @@ public sealed class AssignVisitValueRequest
     {
         public Validator()
         {
-            RuleFor(request => request.GroupName).NotEmpty();
-            RuleFor(request => request.NewVisitValue).NotEmpty().GreaterThan(0);
+            RuleFor(request => request.GroupName).Length(1, 30).NotEmpty();
+            RuleFor(request => request.NewVisitValue).NotEmpty();
         }
     }
 }
