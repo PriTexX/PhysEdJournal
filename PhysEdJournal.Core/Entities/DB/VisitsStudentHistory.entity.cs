@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
@@ -13,14 +14,14 @@ public sealed class VisitStudentHistoryEntity
     [Required(AllowEmptyStrings = false)]
     public DateOnly Date { get; set; }
 
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     [Required(AllowEmptyStrings = false)]
     public required string TeacherGuid { get; set; }
 
     [ForeignKey("TeacherGuid")]
     public TeacherEntity? Teacher { get; set; }
 
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     [Required(AllowEmptyStrings = false)]
     public required string StudentGuid { get; set; }
 

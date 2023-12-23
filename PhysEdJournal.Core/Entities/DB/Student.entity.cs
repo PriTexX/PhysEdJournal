@@ -3,12 +3,13 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using HotChocolate;
 using PhysEdJournal.Core.Entities.Types;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
 public sealed class StudentEntity
 {
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     [Key]
     [Required(AllowEmptyStrings = false)]
     public required string StudentGuid { get; set; }
