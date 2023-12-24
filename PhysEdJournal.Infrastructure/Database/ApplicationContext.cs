@@ -6,7 +6,6 @@ namespace PhysEdJournal.Infrastructure.Database;
 
 public sealed class ApplicationContext : DbContext
 {
-    private readonly IMemoryCache _memoryCache;
     public DbSet<GroupEntity> Groups { get; set; } = null!;
     public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; set; } = null!;
     public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; set; } = null!;
@@ -18,14 +17,8 @@ public sealed class ApplicationContext : DbContext
 
     public DbSet<CompetitionEntity> Competitions { get; set; } = null!;
 
-    public ApplicationContext(
-        DbContextOptions<ApplicationContext> options,
-        IMemoryCache memoryCache
-    )
-        : base(options)
-    {
-        _memoryCache = memoryCache;
-    }
+    public ApplicationContext(DbContextOptions<ApplicationContext> options)
+        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,22 +31,6 @@ public sealed class ApplicationContext : DbContext
 
     public async ValueTask<SemesterEntity> GetActiveSemester()
     {
-        _memoryCache.TryGetValue("activeSemester", out SemesterEntity? semester);
-
-        if (semester is null)
-        {
-            semester = await Semesters.Where(s => s.IsCurrent).SingleAsync();
-
-            _memoryCache.Set(
-                "activeSemester",
-                semester,
-                new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
-                }
-            );
-        }
-
-        return semester;
+        return await Semesters.Where(s => s.IsCurrent).SingleAsync();
     }
 }

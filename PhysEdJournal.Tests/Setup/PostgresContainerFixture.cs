@@ -46,7 +46,7 @@ public class PostgresContainerFixture : IDisposable
 
         var builder = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(ConnectionString);
         var memoryCash = new MemoryCache(new MemoryCacheOptions());
-        var dbContext = new ApplicationContext(builder.Options, memoryCash);
+        var dbContext = new ApplicationContext(builder.Options);
 
         dbContext.Database.Migrate();
         dbContext.Dispose();

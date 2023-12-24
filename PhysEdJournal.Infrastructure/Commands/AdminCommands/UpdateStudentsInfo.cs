@@ -28,7 +28,8 @@ public class UpdateStudentsInfoCommand : ICommand<EmptyPayload, Unit>
     public async Task<Result<Unit>> ExecuteAsync(EmptyPayload commandPayload)
     {
         await using var scope = _serviceScopeFactory.CreateAsyncScope(); // Использую ServiceLocator т.к. команда запускается в бэкграунде и переданный ей ApplicationContext закрывается до завершения работы команды
-        var applicationContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+        await using var applicationContext =
+            scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
         await UpdateGroups(applicationContext);
 

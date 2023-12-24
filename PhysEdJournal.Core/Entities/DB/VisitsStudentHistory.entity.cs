@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysEdJournal.Core.Entities.DB;
@@ -17,9 +16,6 @@ public sealed class VisitStudentHistoryEntity
     [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public required string TeacherGuid { get; set; }
-
-    [DefaultValue(false)]
-    public bool IsArchived { get; set; }
 
     [ForeignKey("TeacherGuid")]
     public TeacherEntity? Teacher { get; set; }

@@ -38,8 +38,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             standardType,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -105,8 +104,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            points,
-            semester.Name
+            points
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -164,8 +162,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            points,
-            semester.Name
+            points
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -221,8 +218,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            points,
-            semester.Name
+            points
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -273,8 +269,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(DateOnly.MaxValue),
-            10,
-            semester.Name
+            10
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -324,8 +319,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -375,8 +369,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            8,
-            semester.Name
+            8
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -429,8 +422,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            8,
-            semester.Name
+            8
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -495,8 +487,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            8,
-            semester.Name
+            8
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -560,8 +551,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Jumps,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(oldDate),
-            10,
-            semester.Name
+            10
         );
         var payload = new AddStandardPointsCommandPayload
         {
@@ -612,8 +602,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Tilts,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetNonWorkingDate(),
-            10,
-            semester.Name
+            10
         );
         var payload = new AddStandardPointsCommandPayload
         {

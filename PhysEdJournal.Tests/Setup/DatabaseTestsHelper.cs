@@ -13,7 +13,7 @@ public abstract class DatabaseTestsHelper
             PostgresContainerFixture.ConnectionString
         );
         var memoryCash = cache ?? new MemoryCache(new MemoryCacheOptions());
-        var dbContext = new ApplicationContext(builder.Options, memoryCash);
+        var dbContext = new ApplicationContext(builder.Options);
         return dbContext;
     }
 

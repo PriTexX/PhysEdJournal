@@ -15,7 +15,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
         await using var context = CreateContext(cache);
         await ClearDatabase(context);
 
-        var command = new StartNewSemesterCommand(context, cache);
+        var command = new StartNewSemesterCommand(context);
         var validSemesterName = "2022-2023/spring";
 
         // Act
@@ -37,7 +37,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
         await using var context = CreateContext(cache);
         await ClearDatabase(context);
 
-        var command = new StartNewSemesterCommand(context, cache);
+        var command = new StartNewSemesterCommand(context);
         var invalidSemesterName = "invalid_name";
 
         // Act

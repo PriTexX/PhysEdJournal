@@ -1,11 +1,11 @@
-﻿using PhysEdJournal.Core.Entities.DB;
+﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Tests.Setup;
 using PhysEdJournal.Tests.Setup.Utils;
 using PhysEdJournal.Tests.Setup.Utils.Comparers;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Tests.Tests.Commands.Admin;
 
@@ -32,26 +32,30 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             true,
             additionalPoints
         );
-
-        var archivedStudent = new ArchivedStudentEntity
-        {
-            StudentGuid = student.StudentGuid,
-            SemesterName = lastSemester.Name,
-            FullName = student.FullName,
-            GroupNumber = student.GroupNumber,
-            TotalPoints = CalculateTotalPoints(
-                student.Visits,
-                group.VisitValue,
-                student.AdditionalPoints,
-                student.PointsForStandards
-            ),
-            Visits = student.Visits
-        };
+        var pointsEntity = EntitiesFactory.CreatePointsStudentHistoryEntity(
+            student.StudentGuid,
+            WorkType.Science,
+            teacher.TeacherGuid,
+            DateOnly.FromDateTime(DateTime.Now),
+            10
+        );
+        var visitsEntity = EntitiesFactory.CreateVisitStudentHistoryEntity(
+            DateOnly.FromDateTime(DateTime.Now),
+            teacher.TeacherGuid,
+            student.StudentGuid
+        );
+        var standardsEntity = EntitiesFactory.CreateStandardsHistoryEntity(
+            student.StudentGuid,
+            StandardType.Jumps,
+            teacher.TeacherGuid,
+            DateOnly.FromDateTime(DateTime.Now),
+            4
+        );
 
         var payload = new ArchiveStudentCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            IsForceMode = false,
+            SemesterName = currentSemester.Name,
         };
 
         await context.Semesters.AddAsync(lastSemester);
@@ -59,6 +63,9 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         await context.Groups.AddAsync(group);
         await context.Students.AddAsync(student);
         await context.Teachers.AddAsync(teacher);
+        await context.PointsStudentsHistory.AddAsync(pointsEntity);
+        await context.VisitsStudentsHistory.AddAsync(visitsEntity);
+        await context.StandardsStudentsHistory.AddAsync(standardsEntity);
         await context.SaveChangesAsync();
 
         //Act
@@ -71,20 +78,123 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             student.StudentGuid,
             lastSemester.Name
         );
+        var activeStudent = await assertContext.Students
+            .Where(s => s.StudentGuid == student.StudentGuid)
+            .Include(s => s.PointsStudentHistory)
+            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.StandardsStudentHistory)
+            .FirstOrDefaultAsync();
+
         Assert.NotNull(archivedStudentFromDb);
-        Assert.True(ArchiveStudentComparer.Compare(archivedStudentFromDb, archivedStudent));
+        Assert.NotNull(activeStudent);
+        Assert.Equal(0, student.ArchivedVisitValue);
+        Assert.False(student.HasDebtFromPreviousSemester);
+        Assert.Equal(activeStudent.StudentGuid, archivedStudentFromDb.StudentGuid);
+
+        Assert.Empty(activeStudent.PointsStudentHistory!);
+        Assert.Empty(activeStudent.StandardsStudentHistory!);
+        Assert.Empty(activeStudent.VisitsStudentHistory!);
+
+        Assert.NotNull(archivedStudentFromDb.VisitsHistory);
+        Assert.NotNull(archivedStudentFromDb.StandardsHistory);
+        Assert.NotNull(archivedStudentFromDb.PointsHistory);
+
+        Assert.NotEmpty(archivedStudentFromDb.VisitsHistory);
+        Assert.NotEmpty(archivedStudentFromDb.StandardsHistory);
+        Assert.NotEmpty(archivedStudentFromDb.PointsHistory);
+
+        Assert.True(
+            ArchivedHistoryComparer.ComparePointsRecordWithArchivedPointsRecord(
+                pointsEntity,
+                archivedStudentFromDb.PointsHistory[0]
+            )
+        );
+        Assert.True(
+            ArchivedHistoryComparer.CompareStandardsRecordWithArchivedStandardsRecord(
+                standardsEntity,
+                archivedStudentFromDb.StandardsHistory[0]
+            )
+        );
+        Assert.True(
+            ArchivedHistoryComparer.CompareVisitsRecordWithArchivedHistoryRecord(
+                visitsEntity,
+                archivedStudentFromDb.VisitsHistory[0]
+            )
+        );
     }
 
-    [Theory]
-    [InlineData(50)]
-    [InlineData(int.MaxValue)]
-    [InlineData(49)]
-    [InlineData(1)]
-    [InlineData(0)]
-    [InlineData(int.MinValue)]
-    public async Task ArchiveStudentAsync_ArchivesStudentForceMode_ShouldWorkProperly(
-        int additionalPoints
-    )
+    [Fact]
+    public async Task ArchiveStudentAsync_TransfersPoints_ShouldWorkProperly()
+    {
+        //Arrange
+        await using var context = CreateContext();
+        await ClearDatabase(context);
+
+        var command = new ArchiveStudentCommand(context);
+        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
+        var lastSemester = EntitiesFactory.CreateSemester("2022-2023/spring", false);
+        var currentSemester = EntitiesFactory.CreateSemester("2021-2023/autumn", true);
+        var group = EntitiesFactory.CreateGroup("211-729", 2, teacher.TeacherGuid);
+        var student = EntitiesFactory.CreateStudent(
+            group.GroupName,
+            lastSemester.Name,
+            true,
+            true,
+            51
+        );
+        student.ArchivedVisitValue = 1;
+        student.Visits = 1;
+
+        var points = CreatePointsHistory(student.StudentGuid, teacher.TeacherGuid, 51);
+
+        var visits = CreateVisitsHistory(student.StudentGuid, teacher.TeacherGuid, 1);
+
+        var standards = CreateStandardsHistory(student.StudentGuid, teacher.TeacherGuid, 1);
+
+        var payload = new ArchiveStudentCommandPayload
+        {
+            StudentGuid = student.StudentGuid,
+            SemesterName = currentSemester.Name,
+        };
+
+        await context.Semesters.AddAsync(lastSemester);
+        await context.Semesters.AddAsync(currentSemester);
+        await context.Groups.AddAsync(group);
+        await context.Students.AddAsync(student);
+        await context.Teachers.AddAsync(teacher);
+        await context.PointsStudentsHistory.AddRangeAsync(points);
+        await context.VisitsStudentsHistory.AddRangeAsync(visits);
+        await context.StandardsStudentsHistory.AddRangeAsync(standards);
+        await context.SaveChangesAsync();
+
+        //Act
+        var result = await command.ExecuteAsync(payload);
+
+        //Assert
+        Assert.True(result.IsSuccess);
+        await using var assertContext = CreateContext();
+        var archivedStudentFromDb = await assertContext.ArchivedStudents.FindAsync(
+            student.StudentGuid,
+            lastSemester.Name
+        );
+        var activeStudent = await assertContext.Students
+            .Where(s => s.StudentGuid == student.StudentGuid)
+            .Include(s => s.PointsStudentHistory)
+            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.StandardsStudentHistory)
+            .FirstOrDefaultAsync();
+
+        Assert.NotNull(archivedStudentFromDb);
+        Assert.NotNull(activeStudent);
+        Assert.Equal(activeStudent.StudentGuid, archivedStudentFromDb.StudentGuid);
+
+        Assert.Equal(1, student.PointsStudentHistory?.Count);
+        Assert.Equal(1, student.StandardsStudentHistory?.Count);
+        Assert.Equal(1, student.VisitsStudentHistory?.Count);
+    }
+
+    [Fact]
+    public async Task ArchiveStudentAsync_NoTransfersPointsWhenHasNoDebt_ShouldWorkProperly()
     {
         //Arrange
         await using var context = CreateContext();
@@ -100,28 +210,21 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             lastSemester.Name,
             false,
             true,
-            additionalPoints
+            51
         );
+        student.ArchivedVisitValue = 1;
+        student.Visits = 1;
 
-        var archivedStudent = new ArchivedStudentEntity
-        {
-            StudentGuid = student.StudentGuid,
-            SemesterName = lastSemester.Name,
-            FullName = student.FullName,
-            GroupNumber = student.GroupNumber,
-            TotalPoints = CalculateTotalPoints(
-                student.Visits,
-                group.VisitValue,
-                student.AdditionalPoints,
-                student.PointsForStandards
-            ),
-            Visits = student.Visits
-        };
+        var points = CreatePointsHistory(student.StudentGuid, teacher.TeacherGuid, 51);
+
+        var visits = CreateVisitsHistory(student.StudentGuid, teacher.TeacherGuid, 1);
+
+        var standards = CreateStandardsHistory(student.StudentGuid, teacher.TeacherGuid, 1);
 
         var payload = new ArchiveStudentCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            IsForceMode = true,
+            SemesterName = currentSemester.Name,
         };
 
         await context.Semesters.AddAsync(lastSemester);
@@ -129,6 +232,9 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         await context.Groups.AddAsync(group);
         await context.Students.AddAsync(student);
         await context.Teachers.AddAsync(teacher);
+        await context.PointsStudentsHistory.AddRangeAsync(points);
+        await context.VisitsStudentsHistory.AddRangeAsync(visits);
+        await context.StandardsStudentsHistory.AddRangeAsync(standards);
         await context.SaveChangesAsync();
 
         //Act
@@ -141,8 +247,20 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             student.StudentGuid,
             lastSemester.Name
         );
+        var activeStudent = await assertContext.Students
+            .Where(s => s.StudentGuid == student.StudentGuid)
+            .Include(s => s.PointsStudentHistory)
+            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.StandardsStudentHistory)
+            .FirstOrDefaultAsync();
+
         Assert.NotNull(archivedStudentFromDb);
-        Assert.True(ArchiveStudentComparer.Compare(archivedStudentFromDb, archivedStudent));
+        Assert.NotNull(activeStudent);
+        Assert.Equal(activeStudent.StudentGuid, archivedStudentFromDb.StudentGuid);
+
+        Assert.Equal(0, student.PointsStudentHistory?.Count);
+        Assert.Equal(0, student.StandardsStudentHistory?.Count);
+        Assert.Equal(0, student.VisitsStudentHistory?.Count);
     }
 
     [Theory]
@@ -175,7 +293,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var payload = new ArchiveStudentCommandPayload
         {
             StudentGuid = student.StudentGuid,
-            IsForceMode = false,
+            SemesterName = currentSemester.Name,
         };
 
         await context.Semesters.AddAsync(lastSemester);
@@ -221,7 +339,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var payload = new ArchiveStudentCommandPayload
         {
             StudentGuid = "student.StudentGuid ",
-            IsForceMode = false,
+            SemesterName = currentSemester.Name
         };
 
         await context.Semesters.AddAsync(lastSemester);
@@ -245,49 +363,99 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         );
     }
 
-    [Fact]
-    public async Task ArchiveStudentAsync_CannotMigrateToNewSemesterException_ShouldThrowException()
+    /// <summary>
+    /// Метод генерирует массив историй баллов для тестов архиваций.
+    /// По умолчанию берем минимально возможные значения для очков == 1, так как это упростит тестирование.
+    /// </summary>
+    /// <param name="studentGuid"></param>
+    /// <param name="teacherGuid"></param>
+    /// <param name="recordsCount"></param>
+    /// <returns></returns>
+    private IEnumerable<PointsStudentHistoryEntity> CreatePointsHistory(
+        string studentGuid,
+        string teacherGuid,
+        int recordsCount
+    )
     {
-        //Arrange
-        await using var context = CreateContext();
-        await ClearDatabase(context);
+        var history = new List<PointsStudentHistoryEntity>();
 
-        var command = new ArchiveStudentCommand(context);
-        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var currentSemester = EntitiesFactory.CreateSemester("2021-2023/autumn", true);
-        var group = EntitiesFactory.CreateGroup("211-729", 2, teacher.TeacherGuid);
-        var student = EntitiesFactory.CreateStudent(
-            group.GroupName,
-            currentSemester.Name,
-            false,
-            true,
-            50
-        );
-
-        var payload = new ArchiveStudentCommandPayload
+        while (recordsCount > 0)
         {
-            StudentGuid = student.StudentGuid,
-            IsForceMode = false,
-        };
+            history.Add(
+                EntitiesFactory.CreatePointsStudentHistoryEntity(
+                    studentGuid,
+                    WorkType.Science,
+                    teacherGuid,
+                    DateOnly.FromDateTime(DateTime.Now),
+                    1
+                )
+            );
+            recordsCount--;
+        }
 
-        await context.Semesters.AddAsync(currentSemester);
-        await context.Groups.AddAsync(group);
-        await context.Students.AddAsync(student);
-        await context.Teachers.AddAsync(teacher);
-        await context.SaveChangesAsync();
+        return history;
+    }
 
-        //Act
-        var result = await command.ExecuteAsync(payload);
+    /// <summary>
+    /// Метод генерирует массив историй посещений для тестов архиваций.
+    /// </summary>
+    /// <param name="studentGuid"></param>
+    /// <param name="teacherGuid"></param>
+    /// <param name="recordsCount"></param>
+    /// <returns></returns>
+    private IEnumerable<VisitStudentHistoryEntity> CreateVisitsHistory(
+        string studentGuid,
+        string teacherGuid,
+        int recordsCount
+    )
+    {
+        var history = new List<VisitStudentHistoryEntity>();
 
-        //Assert
-        Assert.False(result.IsSuccess);
-        result.Match(
-            _ => true,
-            exception =>
-            {
-                Assert.IsType<CannotMigrateToNewSemesterException>(exception);
-                return true;
-            }
-        );
+        while (recordsCount > 0)
+        {
+            history.Add(
+                EntitiesFactory.CreateVisitStudentHistoryEntity(
+                    DateOnly.FromDateTime(DateTime.Now),
+                    teacherGuid,
+                    studentGuid
+                )
+            );
+            recordsCount--;
+        }
+
+        return history;
+    }
+
+    /// <summary>
+    /// Метод генерирует массив историй нормативов для тестов архиваций.
+    /// По умолчанию берем минимально возможные значения для очков == 1, так как это упростит тестирование.
+    /// </summary>
+    /// <param name="studentGuid"></param>
+    /// <param name="teacherGuid"></param>
+    /// <param name="recordsCount"></param>
+    /// <returns></returns>
+    private IEnumerable<StandardsStudentHistoryEntity> CreateStandardsHistory(
+        string studentGuid,
+        string teacherGuid,
+        int recordsCount
+    )
+    {
+        var history = new List<StandardsStudentHistoryEntity>();
+
+        while (recordsCount > 0)
+        {
+            history.Add(
+                EntitiesFactory.CreateStandardsHistoryEntity(
+                    studentGuid,
+                    StandardType.Jumps,
+                    teacherGuid,
+                    DateOnly.FromDateTime(DateTime.Now),
+                    1
+                )
+            );
+            recordsCount--;
+        }
+
+        return history;
     }
 }

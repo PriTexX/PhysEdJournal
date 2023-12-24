@@ -48,8 +48,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -113,8 +112,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(date),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -177,8 +175,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(date),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -237,8 +234,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -270,69 +266,6 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
     }
 
     [Fact]
-    public async Task DeletePointsAsync_ArchivedPointsDeletionException_ShouldThrow()
-    {
-        // Arrange
-        await using var context = CreateContext();
-        await ClearDatabase(context);
-
-        const int expectedAdditionalPoints = 0;
-
-        var command = new DeletePointsCommand(context);
-        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
-        var group = EntitiesFactory.CreateGroup("211-729");
-        var student = EntitiesFactory.CreateStudent(
-            group.GroupName,
-            semester.Name,
-            false,
-            true,
-            10
-        );
-        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var historyEntity = EntitiesFactory.CreatePointsStudentHistoryEntity(
-            student.StudentGuid,
-            WorkType.Activist,
-            teacher.TeacherGuid,
-            DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
-        );
-        historyEntity.IsArchived = true;
-
-        await context.Semesters.AddAsync(semester);
-        await context.Groups.AddAsync(group);
-        await context.Students.AddAsync(student);
-        await context.Teachers.AddAsync(teacher);
-        await context.PointsStudentsHistory.AddAsync(historyEntity);
-        await context.SaveChangesAsync();
-
-        var historyObj = context.PointsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
-        );
-
-        var payload = new DeletePointsCommandPayload
-        {
-            TeacherGuid = historyEntity.TeacherGuid,
-            HistoryId = historyObj!.Id,
-            IsAdmin = false,
-        };
-
-        // Act
-        var result = await command.ExecuteAsync(payload);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        result.Match(
-            _ => true,
-            exception =>
-            {
-                Assert.IsType<ArchivedPointsDeletionException>(exception);
-                return true;
-            }
-        );
-    }
-
-    [Fact]
     public async Task DeletePointsAsync_TeacherGuidMismatchException_ShouldThrow()
     {
         // Arrange
@@ -358,8 +291,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(date),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -421,8 +353,7 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
             WorkType.Activist,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(date),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);

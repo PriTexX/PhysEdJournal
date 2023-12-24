@@ -1,8 +1,29 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Core.Entities.DB;
+
+public class ArchivedHistory
+{
+    public required DateOnly Date { get; set; }
+    public required double Points { get; set; }
+    public required string TeacherGuid { get; set; }
+    public required string StudentGuid { get; set; }
+}
+
+public sealed class ArchivedPointsHistory : ArchivedHistory
+{
+    public required WorkType WorkType { get; set; }
+    public string? Comment { get; set; }
+}
+
+public sealed class ArchivedStandardsHistory : ArchivedHistory
+{
+    public required StandardType StandardType { get; set; }
+    public string? Comment { get; set; }
+}
 
 public sealed class ArchivedStudentEntity
 {
@@ -29,9 +50,15 @@ public sealed class ArchivedStudentEntity
     [ForeignKey("GroupNumber")]
     public GroupEntity? Group { get; set; }
 
-    [Required]
-    public double TotalPoints { get; set; }
-
     [DefaultValue(0)]
-    public int Visits { get; set; }
+    public required int Visits { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public required List<ArchivedHistory> VisitsHistory { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public required List<ArchivedPointsHistory> PointsHistory { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public required List<ArchivedStandardsHistory> StandardsHistory { get; set; }
 }
