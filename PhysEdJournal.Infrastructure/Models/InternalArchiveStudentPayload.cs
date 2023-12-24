@@ -1,4 +1,6 @@
-﻿namespace PhysEdJournal.Infrastructure.Models;
+﻿using PhysEdJournal.Core.Entities.DB;
+
+namespace PhysEdJournal.Infrastructure.Models;
 
 internal sealed class InternalArchiveStudentPayload
 {
@@ -9,4 +11,12 @@ internal sealed class InternalArchiveStudentPayload
     public required string CurrentSemesterName { get; init; }
     public required string ActiveSemesterName { get; init; }
     public required double TotalPoints { get; init; }
+
+    public required bool HasDebt { get; init; }
+
+    public required ICollection<VisitStudentHistoryEntity>? VisitStudentHistory { get; init; }
+
+    public required ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; init; }
+
+    public required ICollection<StandardsStudentHistoryEntity>? StandardsStudentHistory { get; init; }
 }

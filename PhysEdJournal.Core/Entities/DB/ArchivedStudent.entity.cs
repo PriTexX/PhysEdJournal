@@ -34,4 +34,10 @@ public sealed class ArchivedStudentEntity
 
     [DefaultValue(0)]
     public int Visits { get; set; }
+
+    public ICollection<VisitStudentHistoryEntity>? VisitStudentHistory { get; set; }
+
+    public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
+
+    public ICollection<StandardsStudentHistoryEntity>? StandardsStudentHistory { get; set; }
 }
