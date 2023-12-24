@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotChocolate.Language;
+using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -48,6 +49,9 @@ public sealed class ArchiveStudentCommand
                         s.HasDebtFromPreviousSemester,
                         s.ArchivedVisitValue,
                         s.CurrentSemesterName,
+                        s.PointsStudentHistory,
+                        s.StandardsStudentHistory,
+                        s.VisitsStudentHistory,
                     }
             )
             .FirstOrDefaultAsync();
@@ -71,6 +75,17 @@ public sealed class ArchiveStudentCommand
             studentFromDb.PointsForStandards
         );
 
+        if (studentFromDb.HasDebtFromPreviousSemester)
+        {
+            TrySavePointsFromCurrentSemester(
+                totalPoints,
+                oldVisitValue: 0, // TODO: узнать откуда брать
+                studentFromDb.PointsStudentHistory,
+                studentFromDb.StandardsStudentHistory,
+                studentFromDb.VisitsStudentHistory
+            );
+        }
+
         // If student has enough points or he is force-archived
         if (commandPayload.IsForceMode || totalPoints >= REQUIRED_POINT_AMOUNT)
         {
@@ -83,6 +98,10 @@ public sealed class ArchiveStudentCommand
                 TotalPoints = totalPoints,
                 ActiveSemesterName = activeSemesterName,
                 CurrentSemesterName = studentFromDb.CurrentSemesterName,
+                HasDebt = false,
+                VisitStudentHistory = studentFromDb.VisitsStudentHistory,
+                PointsStudentHistory = studentFromDb.PointsStudentHistory,
+                StandardsStudentHistory = studentFromDb.StandardsStudentHistory,
             };
 
             var archivedStudent = await _studentArchiver.ArchiveStudentAsync(archiveStudentPayload);
@@ -99,5 +118,136 @@ public sealed class ArchiveStudentCommand
             );
 
         return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
+    }
+
+    private (
+        ICollection<VisitStudentHistoryEntity>,
+        ICollection<PointsStudentHistoryEntity>,
+        ICollection<StandardsStudentHistoryEntity>
+    ) TrySavePointsFromCurrentSemester(
+        double totalPoints,
+        double oldVisitValue,
+        ICollection<PointsStudentHistoryEntity>? pointsHistory,
+        ICollection<StandardsStudentHistoryEntity>? standardsHistory,
+        ICollection<VisitStudentHistoryEntity>? visitsHistory
+    )
+    {
+        if (pointsHistory is null && standardsHistory is null && visitsHistory is null)
+        {
+            return (
+                new List<VisitStudentHistoryEntity>(),
+                new List<PointsStudentHistoryEntity>(),
+                new List<StandardsStudentHistoryEntity>()
+            );
+        }
+
+        if (totalPoints <= REQUIRED_POINT_AMOUNT)
+        {
+            return (
+                new List<VisitStudentHistoryEntity>(),
+                new List<PointsStudentHistoryEntity>(),
+                new List<StandardsStudentHistoryEntity>()
+            );
+        }
+
+        var allHistory = new List<SuperHistoryEntity>();
+
+        foreach (var r in pointsHistory)
+        {
+            allHistory.Add(
+                new SuperHistoryEntity
+                {
+                    Id = r.Id,
+                    Date = r.Date,
+                    HistoryType = nameof(r),
+                    Points = r.Points,
+                }
+            );
+        }
+
+        foreach (var r in visitsHistory)
+        {
+            allHistory.Add(
+                new SuperHistoryEntity
+                {
+                    Id = r.Id,
+                    Date = r.Date,
+                    HistoryType = nameof(r),
+                    Points = oldVisitValue,
+                }
+            );
+        }
+
+        foreach (var r in standardsHistory)
+        {
+            allHistory.Add(
+                new SuperHistoryEntity
+                {
+                    Id = r.Id,
+                    Date = r.Date,
+                    HistoryType = nameof(r),
+                    Points = r.Points,
+                }
+            );
+        }
+
+        allHistory = allHistory.OrderByDescending(r => r.Date).ToList();
+
+        double sum = 0;
+        do
+        {
+            var record = allHistory.Pop();
+            sum += record.Points;
+        } while (sum < REQUIRED_POINT_AMOUNT);
+
+        var newVisits = new List<VisitStudentHistoryEntity>();
+        var newPoints = new List<PointsStudentHistoryEntity>();
+        var newStandards = new List<StandardsStudentHistoryEntity>();
+
+        foreach (var r in allHistory)
+        {
+            if (r.HistoryType != nameof(VisitStudentHistoryEntity))
+            {
+                continue;
+            }
+
+            var record = visitsHistory.First(h => h.Id == r.Id);
+            newVisits.Add(record);
+            visitsHistory.Remove(record);
+        }
+
+        foreach (var r in allHistory)
+        {
+            if (r.HistoryType != nameof(PointsStudentHistoryEntity))
+            {
+                continue;
+            }
+
+            var record = pointsHistory.First(h => h.Id == r.Id);
+            newPoints.Add(record);
+            pointsHistory.Remove(record);
+        }
+
+        foreach (var r in allHistory)
+        {
+            if (r.HistoryType != nameof(StandardsStudentHistoryEntity))
+            {
+                continue;
+            }
+
+            var record = standardsHistory.First(h => h.Id == r.Id);
+            newStandards.Add(record);
+            standardsHistory.Remove(record);
+        }
+
+        return (newVisits, newPoints, newStandards);
+    }
+
+    private class SuperHistoryEntity
+    {
+        public required int Id { get; init; }
+        public required DateOnly Date { get; init; }
+        public required string HistoryType { get; init; }
+        public required double Points { get; init; }
     }
 }
