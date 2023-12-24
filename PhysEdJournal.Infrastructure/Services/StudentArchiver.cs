@@ -34,6 +34,9 @@ internal sealed class StudentArchiver
             TotalPoints = student.TotalPoints,
             Visits = student.Visits,
             SemesterName = student.CurrentSemesterName,
+            VisitStudentHistory = student.VisitStudentHistory,
+            PointsStudentHistory = student.PointsStudentHistory,
+            StandardsStudentHistory = student.StandardsStudentHistory,
         };
 
         _applicationContext.ArchivedStudents.Add(archivedStudent);
