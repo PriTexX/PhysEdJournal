@@ -77,9 +77,9 @@ public sealed class ArchiveStudentCommand
 
         if (studentFromDb.HasDebtFromPreviousSemester)
         {
-            TrySavePointsFromCurrentSemester(
+            MarkHistoryToSave(
                 totalPoints,
-                oldVisitValue: 0, // TODO: узнать откуда брать
+                studentFromDb.ArchivedVisitValue,
                 studentFromDb.PointsStudentHistory,
                 studentFromDb.StandardsStudentHistory,
                 studentFromDb.VisitsStudentHistory
@@ -120,11 +120,7 @@ public sealed class ArchiveStudentCommand
         return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
     }
 
-    private (
-        ICollection<VisitStudentHistoryEntity>,
-        ICollection<PointsStudentHistoryEntity>,
-        ICollection<StandardsStudentHistoryEntity>
-    ) TrySavePointsFromCurrentSemester(
+    private void MarkHistoryToSave(
         double totalPoints,
         double oldVisitValue,
         ICollection<PointsStudentHistoryEntity>? pointsHistory,
@@ -132,62 +128,63 @@ public sealed class ArchiveStudentCommand
         ICollection<VisitStudentHistoryEntity>? visitsHistory
     )
     {
-        if (pointsHistory is null && standardsHistory is null && visitsHistory is null)
-        {
-            return (
-                new List<VisitStudentHistoryEntity>(),
-                new List<PointsStudentHistoryEntity>(),
-                new List<StandardsStudentHistoryEntity>()
-            );
-        }
-
         if (totalPoints <= REQUIRED_POINT_AMOUNT)
         {
-            return (
-                new List<VisitStudentHistoryEntity>(),
-                new List<PointsStudentHistoryEntity>(),
-                new List<StandardsStudentHistoryEntity>()
-            );
+            return;
+        }
+
+        if (pointsHistory is null && standardsHistory is null && visitsHistory is null)
+        {
+            throw new Exception("Has total points with no history");
         }
 
         var allHistory = new List<SuperHistoryEntity>();
 
-        foreach (var r in pointsHistory)
+        if (pointsHistory is not null)
         {
-            allHistory.Add(
-                new SuperHistoryEntity
-                {
-                    Id = r.Id,
-                    Date = r.Date,
-                    HistoryType = nameof(r),
-                    Points = r.Points,
-                }
+            allHistory = pointsHistory
+                .Select(
+                    r =>
+                        new SuperHistoryEntity
+                        {
+                            Id = r.Id,
+                            Date = r.Date,
+                            HistoryType = nameof(r),
+                            Points = r.Points,
+                        }
+                )
+                .ToList();
+        }
+
+        if (visitsHistory is not null)
+        {
+            allHistory.AddRange(
+                visitsHistory.Select(
+                    r =>
+                        new SuperHistoryEntity
+                        {
+                            Id = r.Id,
+                            Date = r.Date,
+                            HistoryType = nameof(r),
+                            Points = oldVisitValue,
+                        }
+                )
             );
         }
 
-        foreach (var r in visitsHistory)
+        if (standardsHistory is not null)
         {
-            allHistory.Add(
-                new SuperHistoryEntity
-                {
-                    Id = r.Id,
-                    Date = r.Date,
-                    HistoryType = nameof(r),
-                    Points = oldVisitValue,
-                }
-            );
-        }
-
-        foreach (var r in standardsHistory)
-        {
-            allHistory.Add(
-                new SuperHistoryEntity
-                {
-                    Id = r.Id,
-                    Date = r.Date,
-                    HistoryType = nameof(r),
-                    Points = r.Points,
-                }
+            allHistory.AddRange(
+                standardsHistory.Select(
+                    r =>
+                        new SuperHistoryEntity
+                        {
+                            Id = r.Id,
+                            Date = r.Date,
+                            HistoryType = nameof(r),
+                            Points = r.Points,
+                        }
+                )
             );
         }
 
@@ -200,10 +197,6 @@ public sealed class ArchiveStudentCommand
             sum += record.Points;
         } while (sum < REQUIRED_POINT_AMOUNT);
 
-        var newVisits = new List<VisitStudentHistoryEntity>();
-        var newPoints = new List<PointsStudentHistoryEntity>();
-        var newStandards = new List<StandardsStudentHistoryEntity>();
-
         foreach (var r in allHistory)
         {
             if (r.HistoryType != nameof(VisitStudentHistoryEntity))
@@ -211,9 +204,14 @@ public sealed class ArchiveStudentCommand
                 continue;
             }
 
-            var record = visitsHistory.First(h => h.Id == r.Id);
-            newVisits.Add(record);
-            visitsHistory.Remove(record);
+            var record = visitsHistory?.FirstOrDefault(h => h.Id == r.Id);
+
+            if (record is null)
+            {
+                continue;
+            }
+
+            record.ShouldBeArchived = false;
         }
 
         foreach (var r in allHistory)
@@ -223,9 +221,14 @@ public sealed class ArchiveStudentCommand
                 continue;
             }
 
-            var record = pointsHistory.First(h => h.Id == r.Id);
-            newPoints.Add(record);
-            pointsHistory.Remove(record);
+            var record = pointsHistory?.First(h => h.Id == r.Id);
+
+            if (record is null)
+            {
+                continue;
+            }
+
+            record.ShouldBeArchived = false;
         }
 
         foreach (var r in allHistory)
@@ -235,12 +238,15 @@ public sealed class ArchiveStudentCommand
                 continue;
             }
 
-            var record = standardsHistory.First(h => h.Id == r.Id);
-            newStandards.Add(record);
-            standardsHistory.Remove(record);
-        }
+            var record = standardsHistory?.First(h => h.Id == r.Id);
 
-        return (newVisits, newPoints, newStandards);
+            if (record is null)
+            {
+                continue;
+            }
+
+            record.ShouldBeArchived = false;
+        }
     }
 
     private class SuperHistoryEntity
