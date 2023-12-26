@@ -47,4 +47,7 @@ public sealed class PointsStudentHistoryEntity
 
     [ForeignKey("StudentGuid")]
     public StudentEntity? Student { get; set; }
+
+    [NotMapped]
+    public bool ShouldBeArchived { get; set; } = true;
 }

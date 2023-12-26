@@ -48,4 +48,7 @@ public sealed class StandardsStudentHistoryEntity
     public StudentEntity? Student { get; set; }
 
     public string? Comment { get; set; }
+
+    [NotMapped]
+    public bool ShouldBeArchived { get; set; } = true;
 }
