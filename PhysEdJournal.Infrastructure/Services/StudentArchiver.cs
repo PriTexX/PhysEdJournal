@@ -26,6 +26,12 @@ internal sealed class StudentArchiver
                 p => p.SetProperty(s => s.CurrentSemesterName, student.ActiveSemesterName)
             );
 
+        var visitsToArchive = student.VisitStudentHistory?.Where(e => e.ShouldBeArchived).ToList();
+        var pointsToArchive = student.PointsStudentHistory?.Where(e => e.ShouldBeArchived).ToList();
+        var standardsToArchive = student.StandardsStudentHistory
+            ?.Where(e => e.ShouldBeArchived)
+            .ToList();
+
         var archivedStudent = new ArchivedStudentEntity
         {
             StudentGuid = student.StudentGuid,
@@ -34,9 +40,9 @@ internal sealed class StudentArchiver
             TotalPoints = student.TotalPoints,
             Visits = student.Visits,
             SemesterName = student.CurrentSemesterName,
-            VisitStudentHistory = student.VisitStudentHistory,
-            PointsStudentHistory = student.PointsStudentHistory,
-            StandardsStudentHistory = student.StandardsStudentHistory,
+            VisitStudentHistory = visitsToArchive,
+            PointsStudentHistory = pointsToArchive,
+            StandardsStudentHistory = standardsToArchive,
         };
 
         _applicationContext.ArchivedStudents.Add(archivedStudent);
@@ -44,16 +50,41 @@ internal sealed class StudentArchiver
 
         await ArchiveCurrentSemesterHistoryAsync(student.StudentGuid, student.CurrentSemesterName);
 
+        var visitsToSave = student.VisitStudentHistory?.Where(e => !e.ShouldBeArchived).ToList();
+        var pointsToSave = student.PointsStudentHistory?.Where(e => !e.ShouldBeArchived).ToList();
+        var standardsToSave = student.StandardsStudentHistory
+            ?.Where(e => !e.ShouldBeArchived)
+            .ToList();
+
+        var visits = visitsToSave?.Count ?? 0;
+        var additionalPoints = pointsToArchive?.Sum(r => r.Points) ?? 0;
+        var pointsForStandards = standardsToArchive?.Sum(r => r.Points) ?? 0;
+
         await _applicationContext.Students
             .Where(s => s.StudentGuid == student.StudentGuid)
             .ExecuteUpdateAsync(
                 p =>
-                    p.SetProperty(s => s.AdditionalPoints, 0)
-                        .SetProperty(s => s.Visits, 0)
-                        .SetProperty(s => s.PointsForStandards, 0)
+                    p.SetProperty(s => s.AdditionalPoints, additionalPoints)
+                        .SetProperty(s => s.Visits, visits)
+                        .SetProperty(s => s.PointsForStandards, pointsForStandards)
                         .SetProperty(s => s.HasDebtFromPreviousSemester, false)
                         .SetProperty(s => s.ArchivedVisitValue, 0)
             );
+
+        if (visitsToSave is not null)
+        {
+            await _applicationContext.VisitsStudentsHistory.AddRangeAsync(visitsToSave);
+        }
+
+        if (pointsToSave is not null)
+        {
+            await _applicationContext.PointsStudentsHistory.AddRangeAsync(pointsToSave);
+        }
+
+        if (standardsToSave is not null)
+        {
+            await _applicationContext.StandardsStudentsHistory.AddRangeAsync(standardsToSave);
+        }
 
         await transaction.CommitAsync();
 
