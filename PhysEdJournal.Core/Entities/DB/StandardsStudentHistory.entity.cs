@@ -19,17 +19,6 @@ public sealed class StandardsStudentHistoryEntity
     [Required]
     public DateOnly Date { get; set; }
 
-    [StringLength(32)]
-    [Required(AllowEmptyStrings = false)]
-    [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
-    public required string SemesterName { get; set; }
-
-    [ForeignKey("SemesterName")]
-    public SemesterEntity? Semester { get; set; }
-
-    [DefaultValue(false)]
-    public bool IsArchived { get; set; }
-
     [Required]
     public StandardType StandardType { get; set; }
 
