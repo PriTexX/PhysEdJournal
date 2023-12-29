@@ -35,9 +35,12 @@ public sealed class ArchivedStudentEntity
     [DefaultValue(0)]
     public int Visits { get; set; }
 
+    [Column(TypeName = "jsonb")]
     public ICollection<VisitStudentHistoryEntity>? VisitStudentHistory { get; set; }
 
+    [Column(TypeName = "jsonb")]
     public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
 
+    [Column(TypeName = "jsonb")]
     public ICollection<StandardsStudentHistoryEntity>? StandardsStudentHistory { get; set; }
 }
