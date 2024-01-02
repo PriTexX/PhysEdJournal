@@ -48,8 +48,6 @@ internal sealed class StudentArchiver
         _applicationContext.ArchivedStudents.Add(archivedStudent);
         await _applicationContext.SaveChangesAsync();
 
-        await ArchiveCurrentSemesterHistoryAsync(student.StudentGuid, student.CurrentSemesterName);
-
         var visitsToSave = student.VisitStudentHistory?.Where(e => !e.ShouldBeArchived).ToList();
         var pointsToSave = student.PointsStudentHistory?.Where(e => !e.ShouldBeArchived).ToList();
         var standardsToSave = student.StandardsStudentHistory
@@ -89,27 +87,5 @@ internal sealed class StudentArchiver
         await transaction.CommitAsync();
 
         return archivedStudent;
-    }
-
-    private async Task ArchiveCurrentSemesterHistoryAsync(
-        string studentGuid,
-        string oldSemesterName
-    )
-    {
-        await _applicationContext.VisitsStudentsHistory
-            .Where(h => h.StudentGuid == studentGuid && h.IsArchived == true)
-            .ExecuteDeleteAsync();
-
-        await _applicationContext.PointsStudentsHistory
-            .Where(h => h.StudentGuid == studentGuid && h.SemesterName == oldSemesterName)
-            .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsArchived, true));
-
-        await _applicationContext.VisitsStudentsHistory
-            .Where(h => h.StudentGuid == studentGuid)
-            .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsArchived, true));
-
-        await _applicationContext.StandardsStudentsHistory
-            .Where(h => h.StudentGuid == studentGuid && h.SemesterName == oldSemesterName)
-            .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsArchived, true));
     }
 }

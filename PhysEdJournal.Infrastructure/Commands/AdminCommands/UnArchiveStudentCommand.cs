@@ -44,11 +44,7 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
         await using var transaction = await _applicationContext.Database.BeginTransactionAsync();
 
         var pointsStudentHistory = await _applicationContext.PointsStudentsHistory
-            .Where(
-                h =>
-                    h.StudentGuid == commandPayload.StudentGuid
-                    && h.SemesterName == commandPayload.SemesterName
-            )
+            .Where(h => h.StudentGuid == commandPayload.StudentGuid)
             .ToListAsync();
 
         student.AdditionalPoints = pointsStudentHistory.Aggregate(
@@ -57,11 +53,7 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
         );
 
         var standardsStudentHistory = await _applicationContext.StandardsStudentsHistory
-            .Where(
-                h =>
-                    h.StudentGuid == commandPayload.StudentGuid
-                    && h.SemesterName == commandPayload.SemesterName
-            )
+            .Where(h => h.StudentGuid == commandPayload.StudentGuid)
             .ToListAsync();
 
         student.PointsForStandards = standardsStudentHistory.Aggregate(
@@ -75,34 +67,6 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
 
         _applicationContext.Students.Update(student);
         await _applicationContext.SaveChangesAsync();
-
-        await _applicationContext.VisitsStudentsHistory
-            .Where(h => h.StudentGuid == commandPayload.StudentGuid && h.IsArchived == true)
-            .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsArchived, false));
-
-        await _applicationContext.PointsStudentsHistory
-            .Where(
-                h =>
-                    h.StudentGuid == commandPayload.StudentGuid
-                    && h.SemesterName == commandPayload.SemesterName
-            )
-            .ExecuteUpdateAsync(
-                p =>
-                    p.SetProperty(s => s.SemesterName, student.CurrentSemesterName)
-                        .SetProperty(s => s.IsArchived, false)
-            );
-
-        await _applicationContext.StandardsStudentsHistory
-            .Where(
-                h =>
-                    h.StudentGuid == commandPayload.StudentGuid
-                    && h.SemesterName == commandPayload.SemesterName
-            )
-            .ExecuteUpdateAsync(
-                p =>
-                    p.SetProperty(s => s.SemesterName, student.CurrentSemesterName)
-                        .SetProperty(s => s.IsArchived, false)
-            );
 
         await transaction.CommitAsync();
         return Unit.Default;

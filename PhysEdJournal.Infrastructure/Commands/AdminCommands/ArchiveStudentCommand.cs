@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Language;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
@@ -36,29 +37,20 @@ public sealed class ArchiveStudentCommand
         var studentFromDb = await _applicationContext.Students
             .AsNoTracking()
             .Where(s => s.StudentGuid == commandPayload.StudentGuid)
-            .Select(
-                s =>
-                    new
-                    {
-                        s.Group!.VisitValue,
-                        s.Visits,
-                        s.AdditionalPoints,
-                        s.PointsForStandards,
-                        s.FullName,
-                        s.GroupNumber,
-                        s.HasDebtFromPreviousSemester,
-                        s.ArchivedVisitValue,
-                        s.CurrentSemesterName,
-                        s.PointsStudentHistory,
-                        s.StandardsStudentHistory,
-                        s.VisitsStudentHistory,
-                    }
-            )
+            .Include(s => s.PointsStudentHistory)
+            .Include(s => s.StandardsStudentHistory)
+            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.Group)
             .FirstOrDefaultAsync();
 
         if (studentFromDb is null)
         {
             return new StudentNotFoundException(commandPayload.StudentGuid);
+        }
+
+        if (studentFromDb.Group is null)
+        {
+            return new GroupNotFoundException(studentFromDb.GroupNumber);
         }
 
         var activeSemesterName = (await _applicationContext.GetActiveSemester()).Name;
@@ -70,7 +62,7 @@ public sealed class ArchiveStudentCommand
 
         var totalPoints = CalculateTotalPoints(
             studentFromDb.Visits,
-            studentFromDb.VisitValue,
+            studentFromDb.Group.VisitValue,
             studentFromDb.AdditionalPoints,
             studentFromDb.PointsForStandards
         );
@@ -114,7 +106,7 @@ public sealed class ArchiveStudentCommand
             .ExecuteUpdateAsync(
                 p =>
                     p.SetProperty(s => s.HasDebtFromPreviousSemester, true)
-                        .SetProperty(s => s.ArchivedVisitValue, studentFromDb.VisitValue)
+                        .SetProperty(s => s.ArchivedVisitValue, studentFromDb.Group.VisitValue)
             );
 
         return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
