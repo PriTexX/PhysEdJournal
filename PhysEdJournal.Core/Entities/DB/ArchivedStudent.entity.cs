@@ -36,11 +36,14 @@ public sealed class ArchivedStudentEntity
     public int Visits { get; set; }
 
     [Column(TypeName = "jsonb")]
-    public ICollection<VisitStudentHistoryEntity>? VisitStudentHistory { get; set; }
+    public ICollection<VisitStudentHistoryEntity> VisitStudentHistory { get; set; } =
+        new List<VisitStudentHistoryEntity>();
 
     [Column(TypeName = "jsonb")]
-    public ICollection<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
+    public ICollection<PointsStudentHistoryEntity> PointsStudentHistory { get; set; } =
+        new List<PointsStudentHistoryEntity>();
 
     [Column(TypeName = "jsonb")]
-    public ICollection<StandardsStudentHistoryEntity>? StandardsStudentHistory { get; set; }
+    public ICollection<StandardsStudentHistoryEntity> StandardsStudentHistory { get; set; } =
+        new List<StandardsStudentHistoryEntity>();
 }
