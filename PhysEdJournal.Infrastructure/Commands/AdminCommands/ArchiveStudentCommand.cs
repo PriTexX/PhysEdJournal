@@ -1,12 +1,8 @@
-﻿using HotChocolate.Data.Filters.Expressions;
-using HotChocolate.Language;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Models;
 using PResult;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
@@ -48,12 +44,11 @@ public sealed class ArchiveStudentCommand
 
         ArgumentNullException.ThrowIfNull(studentFromDb.Group);
 
-        var activeSemesterName = (await _applicationContext.GetActiveSemester()).Name;
+        studentFromDb.StandardsStudentHistory ??= new List<StandardsStudentHistoryEntity>();
+        studentFromDb.VisitsStudentHistory ??= new List<VisitStudentHistoryEntity>();
+        studentFromDb.PointsStudentHistory ??= new List<PointsStudentHistoryEntity>();
 
-        if (studentFromDb.CurrentSemesterName == activeSemesterName)
-        {
-            return new CannotMigrateToNewSemesterException(activeSemesterName);
-        }
+        var activeSemesterName = (await _applicationContext.GetActiveSemester()).Name;
 
         var totalPoints = CalculateTotalPoints(
             studentFromDb.Visits,
@@ -62,241 +57,163 @@ public sealed class ArchiveStudentCommand
             studentFromDb.PointsForStandards
         );
 
-        var visitsToArchive = studentFromDb.VisitsStudentHistory;
-        var pointsToArchive = studentFromDb.PointsStudentHistory;
-        var standardsToArchive = studentFromDb.StandardsStudentHistory;
-
-        if (studentFromDb.HasDebtFromPreviousSemester && totalPoints > REQUIRED_POINT_AMOUNT)
+        if (!commandPayload.IsForceMode && totalPoints < REQUIRED_POINT_AMOUNT)
         {
-            var histories = FindHistoriesToArchive(
+            studentFromDb.ArchivedVisitValue = studentFromDb.Group.VisitValue;
+            studentFromDb.HasDebtFromPreviousSemester = true;
+
+            _applicationContext.Students.Update(studentFromDb);
+            await _applicationContext.SaveChangesAsync();
+
+            return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
+        }
+
+        var histories = FindHistoriesToArchive(
+                totalPoints,
                 studentFromDb.ArchivedVisitValue,
                 studentFromDb.PointsStudentHistory,
                 studentFromDb.StandardsStudentHistory,
                 studentFromDb.VisitsStudentHistory
-            );
+            )
+            .ToList();
 
-            visitsToArchive = studentFromDb.VisitsStudentHistory.Filter(
-                h => histories.Include(h.Id)
-            );
-            pointsToArchive = studentFromDb.PointsStudentHistory.Filter(
-                h => histories.Include(h.Id)
-            );
-            standardsToArchive = studentFromDb.StandardsStudentHistory.Filter(
-                h => histories.Include(h.Id)
-            );
+        var visitsToArchive = studentFromDb.VisitsStudentHistory
+            .Where(h => histories.Any(s => s.Id == h.Id && s.Type == HistoryType.VisitsHistory))
+            .ToList();
+        var pointsToArchive = studentFromDb.PointsStudentHistory
+            .Where(h => histories.Any(s => s.Id == h.Id && s.Type == HistoryType.PointsHistory))
+            .ToList();
+        var standardsToArchive = studentFromDb.StandardsStudentHistory
+            .Where(h => histories.Any(s => s.Id == h.Id && s.Type == HistoryType.StandardsHistory))
+            .ToList();
 
-            foreach (var r in histories)
-            {
-                switch (r.Type)
-                {
-                    case HistoryType.PointsHistory:
-                    {
-                        var record = studentFromDb.PointsStudentHistory?.FirstOrDefault(
-                            h => h.Id == r.Id
-                        );
+        RemoveRange(studentFromDb.VisitsStudentHistory, visitsToArchive);
 
-                        if (record is null)
-                        {
-                            return new Exception(
-                                $"History of type {r.Type} or record with id = {r.Id} is missing"
-                            );
-                        }
+        RemoveRange(studentFromDb.PointsStudentHistory, pointsToArchive);
 
-                        pointsToArchive.Add(record);
-                        studentFromDb.PointsStudentHistory?.Remove(record);
-                        _applicationContext.PointsStudentsHistory.Remove(record);
+        RemoveRange(studentFromDb.StandardsStudentHistory, standardsToArchive);
 
-                        continue;
-                    }
-
-                    case HistoryType.VisitsHistory:
-                    {
-                        var record = studentFromDb.VisitsStudentHistory?.FirstOrDefault(
-                            h => h.Id == r.Id
-                        );
-
-                        if (record is null)
-                        {
-                            return new Exception(
-                                $"History of type {r.Type} or record with id = {r.Id} is missing"
-                            );
-                        }
-
-                        visitsToArchive.Add(record);
-                        studentFromDb.VisitsStudentHistory?.Remove(record);
-                        _applicationContext.VisitsStudentsHistory.Remove(record);
-
-                        continue;
-                    }
-
-                    case HistoryType.StandardsHistory:
-                    {
-                        var record = studentFromDb.StandardsStudentHistory?.FirstOrDefault(
-                            h => h.Id == r.Id
-                        );
-
-                        if (record is null)
-                        {
-                            return new Exception(
-                                $"History of type {r.Type} or record with id = {r.Id} is missing"
-                            );
-                        }
-
-                        standardsToArchive.Add(record);
-                        studentFromDb.StandardsStudentHistory?.Remove(record);
-                        _applicationContext.StandardsStudentsHistory.Remove(record);
-
-                        continue;
-                    }
-
-                    default:
-                        return new Exception($"History type {r.Type} undefined");
-                }
-            }
-        }
-
-        // If student has enough points or he is force-archived
-        if (commandPayload.IsForceMode || totalPoints >= REQUIRED_POINT_AMOUNT)
+        var archiveStudentPayload = new ArchiveStudentPayload
         {
-            var archiveStudentPayload = new InternalArchiveStudentPayload
-            {
-                Visits = studentFromDb.Visits,
-                FullName = studentFromDb.FullName,
-                GroupNumber = studentFromDb.GroupNumber,
-                StudentGuid = commandPayload.StudentGuid,
-                TotalPoints = totalPoints,
-                ActiveSemesterName = activeSemesterName,
-                CurrentSemesterName = studentFromDb.CurrentSemesterName,
-                HasDebt = false,
-                VisitStudentHistory = visitsToArchive,
-                PointsStudentHistory = pointsToArchive,
-                StandardsStudentHistory = standardsToArchive,
-            };
+            Visits = studentFromDb.Visits,
+            FullName = studentFromDb.FullName,
+            GroupNumber = studentFromDb.GroupNumber,
+            StudentGuid = commandPayload.StudentGuid,
+            TotalPoints = totalPoints,
+            ActiveSemesterName = activeSemesterName,
+            CurrentSemesterName = studentFromDb.CurrentSemesterName,
+            HasDebt = false,
+            VisitStudentHistory = visitsToArchive,
+            PointsStudentHistory = pointsToArchive,
+            StandardsStudentHistory = standardsToArchive,
+        };
 
-            var archivedStudent = await ArchiveStudentAsync(archiveStudentPayload);
+        var archivedStudent = await ArchiveStudentAsync(archiveStudentPayload);
 
-            if (!studentFromDb.HasDebtFromPreviousSemester)
-            {
-                await DeleteAllHistoryNoSaveAsync(studentFromDb.StudentGuid);
-
-                studentFromDb.StandardsStudentHistory?.Clear();
-                studentFromDb.VisitsStudentHistory?.Clear();
-                studentFromDb.PointsStudentHistory?.Clear();
-            }
-
-            studentFromDb.Visits = studentFromDb.VisitsStudentHistory?.Count ?? 0;
-            studentFromDb.AdditionalPoints = studentFromDb.PointsStudentHistory?.Count ?? 0;
-            studentFromDb.PointsForStandards = studentFromDb.StandardsStudentHistory?.Count ?? 0;
-            studentFromDb.HasDebtFromPreviousSemester = false;
-            studentFromDb.AdditionalPoints = 0;
-
-            _applicationContext.Students.Update(studentFromDb);
-            await _applicationContext.SaveChangesAsync();
-            return archivedStudent;
-        }
-
-        studentFromDb.ArchivedVisitValue = studentFromDb.Group.VisitValue;
-        studentFromDb.HasDebtFromPreviousSemester = true;
+        studentFromDb.Visits = studentFromDb.VisitsStudentHistory?.Count ?? 0;
+        studentFromDb.AdditionalPoints =
+            studentFromDb.PointsStudentHistory?.Sum(h => h.Points) ?? 0;
+        studentFromDb.PointsForStandards =
+            studentFromDb.StandardsStudentHistory?.Sum(h => h.Points) ?? 0;
+        studentFromDb.HasDebtFromPreviousSemester = false;
+        studentFromDb.AdditionalPoints = 0;
 
         _applicationContext.Students.Update(studentFromDb);
         await _applicationContext.SaveChangesAsync();
-
-        return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
+        return archivedStudent;
     }
 
-    private async Task DeleteAllHistoryNoSaveAsync(string studentGuid)
+    private void RemoveRange<T>(ICollection<T> source, IEnumerable<T> itemsToDelete)
     {
-        var pointsHistory = await _applicationContext.PointsStudentsHistory
-            .Where(r => r.StudentGuid == studentGuid)
-            .ToListAsync();
-        var standardsHistory = await _applicationContext.StandardsStudentsHistory
-            .Where(r => r.StudentGuid == studentGuid)
-            .ToListAsync();
-        var visitsHistory = await _applicationContext.VisitsStudentsHistory
-            .Where(r => r.StudentGuid == studentGuid)
-            .ToListAsync();
-
-        _applicationContext.PointsStudentsHistory.RemoveRange(pointsHistory);
-
-        _applicationContext.StandardsStudentsHistory.RemoveRange(standardsHistory);
-
-        _applicationContext.VisitsStudentsHistory.RemoveRange(visitsHistory);
+        foreach (var record in itemsToDelete)
+        {
+            source.Remove(record);
+        }
     }
 
     private IEnumerable<SuperHistoryEntity> FindHistoriesToArchive(
+        double totalPoints,
         double oldVisitValue,
-        ICollection<PointsStudentHistoryEntity>? pointsHistory,
-        ICollection<StandardsStudentHistoryEntity>? standardsHistory,
-        ICollection<VisitStudentHistoryEntity>? visitsHistory
+        IEnumerable<PointsStudentHistoryEntity> pointsHistory,
+        IEnumerable<StandardsStudentHistoryEntity> standardsHistory,
+        IEnumerable<VisitStudentHistoryEntity> visitsHistory
     )
     {
-        if (pointsHistory is null && standardsHistory is null && visitsHistory is null)
-        {
-            throw new Exception("Has total points with no history");
-        }
+        var allHistory = pointsHistory
+            .Select(
+                r =>
+                    new SuperHistoryEntity
+                    {
+                        Id = r.Id,
+                        Date = r.Date,
+                        Type = HistoryType.PointsHistory,
+                        Points = r.Points,
+                    }
+            )
+            .ToList();
 
-        var allHistory = new List<SuperHistoryEntity>();
+        allHistory.AddRange(
+            visitsHistory.Select(
+                r =>
+                    new SuperHistoryEntity
+                    {
+                        Id = r.Id,
+                        Date = r.Date,
+                        Type = HistoryType.VisitsHistory,
+                        Points = oldVisitValue,
+                    }
+            )
+        );
 
-        if (pointsHistory is not null)
+        allHistory.AddRange(
+            standardsHistory.Select(
+                r =>
+                    new SuperHistoryEntity
+                    {
+                        Id = r.Id,
+                        Date = r.Date,
+                        Type = HistoryType.StandardsHistory,
+                        Points = r.Points,
+                    }
+            )
+        );
+
+        if (totalPoints > REQUIRED_POINT_AMOUNT)
         {
-            allHistory = pointsHistory
-                .Select(
-                    r =>
-                        new SuperHistoryEntity
-                        {
-                            Id = r.Id,
-                            Date = r.Date,
-                            Type = HistoryType.PointsHistory,
-                            Points = r.Points,
-                        }
-                )
+            var sum = 0.0;
+            var historyToArchive = allHistory
+                .OrderByDescending(r => r.Date)
+                .TakeWhile(record =>
+                {
+                    sum += record.Points;
+                    return sum < REQUIRED_POINT_AMOUNT;
+                })
                 .ToList();
+
+            return historyToArchive;
         }
 
-        if (visitsHistory is not null)
+        return allHistory;
+    }
+
+    private async Task<ArchivedStudentEntity> ArchiveStudentAsync(ArchiveStudentPayload student)
+    {
+        var archivedStudent = new ArchivedStudentEntity
         {
-            allHistory.AddRange(
-                visitsHistory.Select(
-                    r =>
-                        new SuperHistoryEntity
-                        {
-                            Id = r.Id,
-                            Date = r.Date,
-                            Type = HistoryType.VisitsHistory,
-                            Points = oldVisitValue,
-                        }
-                )
-            );
-        }
+            StudentGuid = student.StudentGuid,
+            FullName = student.FullName,
+            GroupNumber = student.GroupNumber,
+            TotalPoints = student.TotalPoints,
+            Visits = student.Visits,
+            SemesterName = student.CurrentSemesterName,
+            VisitStudentHistory = student.VisitStudentHistory,
+            PointsStudentHistory = student.PointsStudentHistory,
+            StandardsStudentHistory = student.StandardsStudentHistory,
+        };
 
-        if (standardsHistory is not null)
-        {
-            allHistory.AddRange(
-                standardsHistory.Select(
-                    r =>
-                        new SuperHistoryEntity
-                        {
-                            Id = r.Id,
-                            Date = r.Date,
-                            Type = HistoryType.StandardsHistory,
-                            Points = r.Points,
-                        }
-                )
-            );
-        }
+        await _applicationContext.ArchivedStudents.AddAsync(archivedStudent);
 
-        allHistory = allHistory.OrderByDescending(r => r.Date).ToList();
-        var historyToArchive = new List<SuperHistoryEntity>();
-
-        double sum = 0;
-        do
-        {
-            var record = allHistory.Pop();
-            historyToArchive.Add(record);
-            sum += record.Points;
-        } while (sum < REQUIRED_POINT_AMOUNT);
-
-        return historyToArchive;
+        return archivedStudent;
     }
 
     private struct SuperHistoryEntity
@@ -314,38 +231,22 @@ public sealed class ArchiveStudentCommand
         StandardsHistory,
     }
 
-    private async Task<ArchivedStudentEntity> ArchiveStudentAsync(
-        InternalArchiveStudentPayload student
-    )
+    private sealed class ArchiveStudentPayload
     {
-        var archivedStudent = new ArchivedStudentEntity
-        {
-            StudentGuid = student.StudentGuid,
-            FullName = student.FullName,
-            GroupNumber = student.GroupNumber,
-            TotalPoints = student.TotalPoints,
-            Visits = student.Visits,
-            SemesterName = student.CurrentSemesterName,
-        };
+        public required string StudentGuid { get; init; }
+        public required int Visits { get; init; }
+        public required string FullName { get; init; }
+        public required string GroupNumber { get; init; }
+        public required string CurrentSemesterName { get; init; }
+        public required string ActiveSemesterName { get; init; }
+        public required double TotalPoints { get; init; }
 
-        if (student.VisitStudentHistory is not null)
-        {
-            archivedStudent.VisitStudentHistory = student.VisitStudentHistory;
-        }
+        public required bool HasDebt { get; init; }
 
-        if (student.PointsStudentHistory is not null)
-        {
-            archivedStudent.PointsStudentHistory = student.PointsStudentHistory;
-        }
+        public required ICollection<VisitStudentHistoryEntity> VisitStudentHistory { get; init; }
 
-        if (student.StandardsStudentHistory is not null)
-        {
-            archivedStudent.StandardsStudentHistory = student.StandardsStudentHistory;
-        }
+        public required ICollection<PointsStudentHistoryEntity> PointsStudentHistory { get; init; }
 
-        _applicationContext.ArchivedStudents.Add(archivedStudent);
-        await _applicationContext.SaveChangesAsync();
-
-        return archivedStudent;
+        public required ICollection<StandardsStudentHistoryEntity> StandardsStudentHistory { get; init; }
     }
 }
