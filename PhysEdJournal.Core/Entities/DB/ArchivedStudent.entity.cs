@@ -30,20 +30,17 @@ public sealed class ArchivedStudentEntity
     public GroupEntity? Group { get; set; }
 
     [Required]
-    public double TotalPoints { get; set; }
+    public required double TotalPoints { get; set; }
 
     [DefaultValue(0)]
-    public int Visits { get; set; }
+    public required int Visits { get; set; }
 
     [Column(TypeName = "jsonb")]
-    public ICollection<VisitStudentHistoryEntity> VisitStudentHistory { get; set; } =
-        new List<VisitStudentHistoryEntity>();
+    public required List<VisitStudentHistoryEntity> VisitsHistory { get; set; }
 
     [Column(TypeName = "jsonb")]
-    public ICollection<PointsStudentHistoryEntity> PointsStudentHistory { get; set; } =
-        new List<PointsStudentHistoryEntity>();
+    public required List<PointsStudentHistoryEntity> PointsHistory { get; set; }
 
     [Column(TypeName = "jsonb")]
-    public ICollection<StandardsStudentHistoryEntity> StandardsStudentHistory { get; set; } =
-        new List<StandardsStudentHistoryEntity>();
+    public required List<StandardsStudentHistoryEntity> StandardsHistory { get; set; }
 }

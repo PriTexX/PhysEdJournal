@@ -49,7 +49,6 @@ public sealed class ArchiveStudentJob : IJob
                 var archivePayload = new ArchiveStudentCommandPayload
                 {
                     StudentGuid = stud.StudentGuid,
-                    IsForceMode = false,
                 };
 
                 try

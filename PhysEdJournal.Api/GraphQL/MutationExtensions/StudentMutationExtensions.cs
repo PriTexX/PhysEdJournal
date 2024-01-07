@@ -215,14 +215,12 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
-    [Error(typeof(CannotMigrateToNewSemesterException))]
     [Error(typeof(ConcurrencyError))]
-    public async Task<ArchivedStudentEntity> ArchiveStudent(
+    public async Task<Success> ArchiveStudent(
         [Service] ArchiveStudentCommand archiveStudentCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal,
-        string studentGuid,
-        bool isForceMode = false
+        string studentGuid
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
@@ -232,15 +230,11 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
-        var archiveStudentPayload = new ArchiveStudentCommandPayload
-        {
-            StudentGuid = studentGuid,
-            IsForceMode = isForceMode,
-        };
+        var archiveStudentPayload = new ArchiveStudentCommandPayload { StudentGuid = studentGuid, };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
 
-        return res.Match(archivedStudent => archivedStudent, exception => throw exception);
+        return res.Match(_ => true, exception => throw exception);
     }
 
     public async Task<Success> UnArchiveStudent(
