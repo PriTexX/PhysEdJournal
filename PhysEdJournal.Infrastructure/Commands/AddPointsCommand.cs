@@ -60,8 +60,6 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             return new StudentNotFoundException(commandInput.StudentGuid);
         }
 
-        var activeSemesterName = student.CurrentSemesterName;
-
         if (commandInput.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext.PointsStudentsHistory

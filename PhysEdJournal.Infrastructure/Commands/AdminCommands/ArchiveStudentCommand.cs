@@ -40,7 +40,6 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
     public async Task<Result<Unit>> ExecuteAsync(ArchiveStudentCommandPayload commandPayload)
     {
         var student = await _applicationContext.Students
-            .AsNoTracking()
             .Where(s => s.StudentGuid == commandPayload.StudentGuid)
             .Include(s => s.PointsStudentHistory)
             .Include(s => s.StandardsStudentHistory)
@@ -73,6 +72,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                 student.ArchivedVisitValue = student.Group.VisitValue;
                 student.HasDebtFromPreviousSemester = true;
 
+                _applicationContext.Update(student);
                 await _applicationContext.SaveChangesAsync();
             }
 
@@ -80,6 +80,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         }
 
         var (visitsToArchive, standardsToArchive, pointsToArchive) = GetHistoriesToArchive(
+            student.HasDebtFromPreviousSemester,
             visitValue,
             student.PointsStudentHistory,
             student.StandardsStudentHistory,
@@ -93,11 +94,47 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                 SemesterName = student.CurrentSemesterName,
                 FullName = student.FullName,
                 GroupNumber = student.GroupNumber,
-                TotalPoints = totalPoints,
                 Visits = visitsToArchive.Count,
-                VisitsHistory = visitsToArchive,
-                PointsHistory = pointsToArchive,
-                StandardsHistory = standardsToArchive,
+                VisitsHistory = visitsToArchive
+                    .Select(
+                        h =>
+                            new ArchivedHistory
+                            {
+                                Date = h.Date,
+                                StudentGuid = h.StudentGuid,
+                                TeacherGuid = h.TeacherGuid,
+                                Points = visitValue,
+                            }
+                    )
+                    .ToList(),
+                PointsHistory = pointsToArchive
+                    .Select(
+                        h =>
+                            new ArchivedPointsHistory
+                            {
+                                Date = h.Date,
+                                StudentGuid = h.StudentGuid,
+                                TeacherGuid = h.TeacherGuid,
+                                Points = h.Points,
+                                WorkType = h.WorkType,
+                                Comment = h.Comment,
+                            }
+                    )
+                    .ToList(),
+                StandardsHistory = standardsToArchive
+                    .Select(
+                        h =>
+                            new ArchivedStandardsHistory
+                            {
+                                Date = h.Date,
+                                StudentGuid = h.StudentGuid,
+                                TeacherGuid = h.TeacherGuid,
+                                Points = h.Points,
+                                StandardType = h.StandardType,
+                                Comment = h.Comment,
+                            }
+                    )
+                    .ToList(),
             }
         );
 
@@ -113,6 +150,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         student.CurrentSemesterName = activeSemester.Name;
         student.HasDebtFromPreviousSemester = false;
 
+        _applicationContext.Update(student);
         await _applicationContext.SaveChangesAsync();
 
         return Unit.Default;
@@ -136,18 +174,28 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         List<StandardsStudentHistoryEntity>,
         List<PointsStudentHistoryEntity>
     ) GetHistoriesToArchive(
+        bool hasDebt,
         double visitValue,
-        ICollection<PointsStudentHistoryEntity>? additionalPointsHistory,
+        ICollection<PointsStudentHistoryEntity>? pointsHistory,
         ICollection<StandardsStudentHistoryEntity>? standardsHistory,
         ICollection<VisitStudentHistoryEntity>? visitsHistory
     )
     {
+        if (!hasDebt)
+        {
+            var visits = visitsHistory?.ToList() ?? new List<VisitStudentHistoryEntity>();
+            var standards = standardsHistory?.ToList() ?? new List<StandardsStudentHistoryEntity>();
+            var points = pointsHistory?.ToList() ?? new List<PointsStudentHistoryEntity>();
+
+            return (visits, standards, points);
+        }
+
         var allHistory = new List<HistoryEntity>();
 
-        if (additionalPointsHistory is not null)
+        if (pointsHistory is not null)
         {
             allHistory.AddRange(
-                additionalPointsHistory.Select(
+                pointsHistory.Select(
                     h =>
                         new HistoryEntity
                         {
@@ -197,8 +245,9 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             .OrderBy(r => r.Date)
             .TakeWhile(record =>
             {
+                var needsToBeArchived = sum < REQUIRED_POINT_AMOUNT;
                 sum += record.Points;
-                return sum < REQUIRED_POINT_AMOUNT;
+                return needsToBeArchived;
             })
             .ToList();
 
@@ -209,7 +258,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                 )
                 .ToList() ?? new List<VisitStudentHistoryEntity>();
         var pointsToArchive =
-            additionalPointsHistory
+            pointsHistory
                 ?.Where(
                     h =>
                         historiesToArchive.Any(

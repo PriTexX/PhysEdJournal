@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PhysEdJournal.Core.Entities.DB;
@@ -13,9 +14,11 @@ using PhysEdJournal.Infrastructure.Database;
 namespace PhysEdJournal.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240107102956_archive_student")]
+    partial class archive_student
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,18 +47,21 @@ namespace PhysEdJournal.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<List<ArchivedPointsHistory>>("PointsHistory")
+                    b.Property<List<PointsStudentHistoryEntity>>("PointsHistory")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<List<ArchivedStandardsHistory>>("StandardsHistory")
+                    b.Property<List<StandardsStudentHistoryEntity>>("StandardsHistory")
                         .IsRequired()
                         .HasColumnType("jsonb");
+
+                    b.Property<double>("TotalPoints")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Visits")
                         .HasColumnType("integer");
 
-                    b.Property<List<ArchivedHistory>>("VisitsHistory")
+                    b.Property<List<VisitStudentHistoryEntity>>("VisitsHistory")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
@@ -116,6 +122,9 @@ namespace PhysEdJournal.Infrastructure.Migrations
                     b.Property<int>("Points")
                         .HasColumnType("integer");
 
+                    b.Property<string>("SemesterEntityName")
+                        .HasColumnType("character varying(32)");
+
                     b.Property<string>("StudentGuid")
                         .IsRequired()
                         .HasMaxLength(36)
@@ -130,6 +139,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SemesterEntityName");
 
                     b.HasIndex("StudentGuid");
 
@@ -334,6 +345,10 @@ namespace PhysEdJournal.Infrastructure.Migrations
 
             modelBuilder.Entity("PhysEdJournal.Core.Entities.DB.PointsStudentHistoryEntity", b =>
                 {
+                    b.HasOne("PhysEdJournal.Core.Entities.DB.SemesterEntity", null)
+                        .WithMany("StudentPointsHistory")
+                        .HasForeignKey("SemesterEntityName");
+
                     b.HasOne("PhysEdJournal.Core.Entities.DB.StudentEntity", "Student")
                         .WithMany("PointsStudentHistory")
                         .HasForeignKey("StudentGuid")
@@ -416,6 +431,8 @@ namespace PhysEdJournal.Infrastructure.Migrations
             modelBuilder.Entity("PhysEdJournal.Core.Entities.DB.SemesterEntity", b =>
                 {
                     b.Navigation("ArchivedStudents");
+
+                    b.Navigation("StudentPointsHistory");
                 });
 
             modelBuilder.Entity("PhysEdJournal.Core.Entities.DB.StudentEntity", b =>
