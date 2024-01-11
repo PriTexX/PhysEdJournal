@@ -21,20 +21,18 @@ internal sealed partial class StartNewSemesterCommandValidator : ICommandValidat
         return ValidationResult.Success;
     }
 
-    [GeneratedRegex("\\d{4}-\\d{4}/\\w{5}")]
+    [GeneratedRegex(@"\d{4}-\d{4}/\w{5}")]
     private static partial Regex MyRegex();
 }
 
 public sealed class StartNewSemesterCommand : ICommand<string, Unit>
 {
     private readonly ApplicationContext _applicationContext;
-    private readonly IMemoryCache _memoryCache;
     private readonly StartNewSemesterCommandValidator _validator;
 
-    public StartNewSemesterCommand(ApplicationContext applicationContext, IMemoryCache memoryCache)
+    public StartNewSemesterCommand(ApplicationContext applicationContext)
     {
         _applicationContext = applicationContext;
-        _memoryCache = memoryCache;
         _validator = new StartNewSemesterCommandValidator();
     }
 
@@ -50,8 +48,14 @@ public sealed class StartNewSemesterCommand : ICommand<string, Unit>
         var currentSemester = await _applicationContext.Semesters
             .Where(s => s.IsCurrent == true)
             .SingleOrDefaultAsync();
+
         if (currentSemester is not null)
         {
+            if (currentSemester.Name == semesterName)
+            {
+                return Unit.Default;
+            }
+
             currentSemester.IsCurrent = false;
             _applicationContext.Update(currentSemester);
         }
@@ -60,10 +64,6 @@ public sealed class StartNewSemesterCommand : ICommand<string, Unit>
 
         _applicationContext.Add(semester);
         await _applicationContext.SaveChangesAsync();
-
-        using var entry = _memoryCache.CreateEntry("activeSemester");
-        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-        entry.Value = semester;
 
         return Unit.Default;
     }

@@ -11,6 +11,7 @@ namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 public sealed class ArchiveStudentCommandPayload
 {
     public required string StudentGuid { get; init; }
+    public required string SemesterName { get; init; }
 }
 
 file struct HistoryEntity
@@ -142,12 +143,10 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         RemoveRange(student.PointsStudentHistory, pointsToArchive);
         RemoveRange(student.StandardsStudentHistory, standardsToArchive);
 
-        var activeSemester = await _applicationContext.GetActiveSemester();
-
         student.Visits = student.VisitsStudentHistory?.Count ?? 0;
         student.AdditionalPoints = student.PointsStudentHistory?.Sum(h => h.Points) ?? 0;
         student.PointsForStandards = student.StandardsStudentHistory?.Sum(h => h.Points) ?? 0;
-        student.CurrentSemesterName = activeSemester.Name;
+        student.CurrentSemesterName = commandPayload.SemesterName;
         student.HasDebtFromPreviousSemester = false;
 
         _applicationContext.Update(student);
