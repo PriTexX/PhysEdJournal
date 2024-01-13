@@ -60,7 +60,7 @@ internal sealed class AddStandardPointsCommandValidator
             student.PointsForStandards
         );
 
-        if (totalPoints < 20)
+        if (totalPoints < 30)
         {
             return new NotEnoughPointsForStandardException();
         }

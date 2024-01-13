@@ -80,7 +80,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
         }
 
-        var (visitsToArchive, standardsToArchive, pointsToArchive) = GetHistoriesToArchive(
+        var visitsToArchive = GetHistoriesToArchive(
             student.HasDebtFromPreviousSemester,
             visitValue,
             student.PointsStudentHistory,
@@ -108,40 +108,42 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                             }
                     )
                     .ToList(),
-                PointsHistory = pointsToArchive
-                    .Select(
-                        h =>
-                            new ArchivedPointsHistory
-                            {
-                                Date = h.Date,
-                                StudentGuid = h.StudentGuid,
-                                TeacherGuid = h.TeacherGuid,
-                                Points = h.Points,
-                                WorkType = h.WorkType,
-                                Comment = h.Comment,
-                            }
-                    )
-                    .ToList(),
-                StandardsHistory = standardsToArchive
-                    .Select(
-                        h =>
-                            new ArchivedStandardsHistory
-                            {
-                                Date = h.Date,
-                                StudentGuid = h.StudentGuid,
-                                TeacherGuid = h.TeacherGuid,
-                                Points = h.Points,
-                                StandardType = h.StandardType,
-                                Comment = h.Comment,
-                            }
-                    )
-                    .ToList(),
+                PointsHistory =
+                    student.PointsStudentHistory
+                        ?.Select(
+                            h =>
+                                new ArchivedPointsHistory
+                                {
+                                    Date = h.Date,
+                                    StudentGuid = h.StudentGuid,
+                                    TeacherGuid = h.TeacherGuid,
+                                    Points = h.Points,
+                                    WorkType = h.WorkType,
+                                    Comment = h.Comment,
+                                }
+                        )
+                        .ToList() ?? new List<ArchivedPointsHistory>(),
+                StandardsHistory =
+                    student.StandardsStudentHistory
+                        ?.Select(
+                            h =>
+                                new ArchivedStandardsHistory
+                                {
+                                    Date = h.Date,
+                                    StudentGuid = h.StudentGuid,
+                                    TeacherGuid = h.TeacherGuid,
+                                    Points = h.Points,
+                                    StandardType = h.StandardType,
+                                    Comment = h.Comment,
+                                }
+                        )
+                        .ToList() ?? new List<ArchivedStandardsHistory>(),
             }
         );
 
-        RemoveRange(student.VisitsStudentHistory, visitsToArchive);
-        RemoveRange(student.PointsStudentHistory, pointsToArchive);
-        RemoveRange(student.StandardsStudentHistory, standardsToArchive);
+        visitsToArchive.ForEach(v => student.VisitsStudentHistory?.Remove(v));
+        student.PointsStudentHistory?.Clear();
+        student.StandardsStudentHistory?.Clear();
 
         student.Visits = student.VisitsStudentHistory?.Count ?? 0;
         student.AdditionalPoints = student.PointsStudentHistory?.Sum(h => h.Points) ?? 0;
@@ -156,24 +158,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         return Unit.Default;
     }
 
-    private static void RemoveRange<T>(ICollection<T>? source, IEnumerable<T> itemsToDelete)
-    {
-        if (source is null)
-        {
-            return;
-        }
-
-        foreach (var record in itemsToDelete)
-        {
-            source.Remove(record);
-        }
-    }
-
-    private static (
-        List<VisitStudentHistoryEntity>,
-        List<StandardsStudentHistoryEntity>,
-        List<PointsStudentHistoryEntity>
-    ) GetHistoriesToArchive(
+    private static List<VisitStudentHistoryEntity> GetHistoriesToArchive(
         bool hasDebt,
         double visitValue,
         ICollection<PointsStudentHistoryEntity>? pointsHistory,
@@ -184,96 +169,21 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         if (!hasDebt)
         {
             var visits = visitsHistory?.ToList() ?? new List<VisitStudentHistoryEntity>();
-            var standards = standardsHistory?.ToList() ?? new List<StandardsStudentHistoryEntity>();
-            var points = pointsHistory?.ToList() ?? new List<PointsStudentHistoryEntity>();
-
-            return (visits, standards, points);
+            return visits;
         }
 
-        var allHistory = new List<HistoryEntity>();
+        var sum = standardsHistory?.Sum(h => h.Points) + pointsHistory?.Sum(h => h.Points) ?? 0.0;
 
-        if (pointsHistory is not null)
-        {
-            allHistory.AddRange(
-                pointsHistory.Select(
-                    h =>
-                        new HistoryEntity
-                        {
-                            Id = h.Id,
-                            Date = h.Date,
-                            Type = HistoryType.AdditionalPoints,
-                            Points = h.Points,
-                        }
-                )
-            );
-        }
-
-        if (visitsHistory is not null)
-        {
-            allHistory.AddRange(
-                visitsHistory.Select(
-                    r =>
-                        new HistoryEntity
-                        {
-                            Id = r.Id,
-                            Date = r.Date,
-                            Type = HistoryType.Visits,
-                            Points = visitValue,
-                        }
-                )
-            );
-        }
-
-        if (standardsHistory is not null)
-        {
-            allHistory.AddRange(
-                standardsHistory.Select(
-                    r =>
-                        new HistoryEntity
-                        {
-                            Id = r.Id,
-                            Date = r.Date,
-                            Type = HistoryType.Standards,
-                            Points = r.Points,
-                        }
-                )
-            );
-        }
-
-        var sum = 0.0;
-        var historiesToArchive = allHistory
-            .OrderBy(r => r.Date)
+        var visitsToArchive = visitsHistory
+            ?.OrderBy(r => r.Date)
             .TakeWhile(record =>
             {
                 var needsToBeArchived = sum < REQUIRED_POINT_AMOUNT;
-                sum += record.Points;
+                sum += visitValue;
                 return needsToBeArchived;
             })
             .ToList();
 
-        var visitsToArchive =
-            visitsHistory
-                ?.Where(
-                    h => historiesToArchive.Any(s => s.Id == h.Id && s.Type == HistoryType.Visits)
-                )
-                .ToList() ?? new List<VisitStudentHistoryEntity>();
-        var pointsToArchive =
-            pointsHistory
-                ?.Where(
-                    h =>
-                        historiesToArchive.Any(
-                            s => s.Id == h.Id && s.Type == HistoryType.AdditionalPoints
-                        )
-                )
-                .ToList() ?? new List<PointsStudentHistoryEntity>();
-        var standardsToArchive =
-            standardsHistory
-                ?.Where(
-                    h =>
-                        historiesToArchive.Any(s => s.Id == h.Id && s.Type == HistoryType.Standards)
-                )
-                .ToList() ?? new List<StandardsStudentHistoryEntity>();
-
-        return (visitsToArchive, standardsToArchive, pointsToArchive);
+        return visitsToArchive ?? new List<VisitStudentHistoryEntity>();
     }
 }

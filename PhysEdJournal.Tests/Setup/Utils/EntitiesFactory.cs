@@ -20,7 +20,7 @@ public static class EntitiesFactory
             HasDebtFromPreviousSemester = hasDebtFromPreviousSemester,
             ArchivedVisitValue = 10.5,
             AdditionalPoints = 2,
-            Visits = 10,
+            Visits = 15,
             Course = 2,
             HealthGroup = HealthGroupType.Basic,
             Department = "IT",
