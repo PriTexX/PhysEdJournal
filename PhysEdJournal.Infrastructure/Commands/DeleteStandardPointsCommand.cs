@@ -48,11 +48,6 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
             s => s.StudentGuid == history.StudentGuid
         );
 
-        if (history.IsArchived)
-        {
-            return new ArchivedPointsDeletionException();
-        }
-
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
                 > DAYS_TO_DELETE_POINTS

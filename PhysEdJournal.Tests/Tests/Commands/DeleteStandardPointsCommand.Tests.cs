@@ -44,8 +44,7 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Jumps,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -104,8 +103,7 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Jumps,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(date),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -162,8 +160,7 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Jumps,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(date),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -241,61 +238,6 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
     }
 
     [Fact]
-    public async Task DeleteStandardPointsAsync_ArchivedPointsDeletionException_ShouldThrow()
-    {
-        //Arrange
-        await using var context = CreateContext();
-        await ClearDatabase(context);
-
-        var command = new DeleteStandardPointsCommand(context);
-        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
-        var group = EntitiesFactory.CreateGroup("211-729");
-        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
-        student.PointsForStandards = 10;
-        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var historyEntity = EntitiesFactory.CreateStandardsHistoryEntity(
-            student.StudentGuid,
-            StandardType.Jumps,
-            teacher.TeacherGuid,
-            DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
-        );
-        historyEntity.IsArchived = true;
-
-        await context.Semesters.AddAsync(semester);
-        await context.Groups.AddAsync(group);
-        await context.Students.AddAsync(student);
-        await context.Teachers.AddAsync(teacher);
-        await context.StandardsStudentsHistory.AddAsync(historyEntity);
-        await context.SaveChangesAsync();
-
-        var historyObj = context.StandardsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
-        );
-        var payload = new DeleteStandardPointsCommandPayload
-        {
-            TeacherGuid = historyEntity.TeacherGuid,
-            HistoryId = historyObj!.Id,
-            IsAdmin = false
-        };
-
-        //Act
-        var result = await command.ExecuteAsync(payload);
-
-        //Assert
-        Assert.False(result.IsSuccess);
-        result.Match(
-            _ => true,
-            exception =>
-            {
-                Assert.IsType<ArchivedPointsDeletionException>(exception);
-                return true;
-            }
-        );
-    }
-
-    [Fact]
     public async Task DeleteStandardPointsAsync_TeacherGuidMismatchException_ShouldThrow()
     {
         //Arrange
@@ -313,8 +255,7 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Jumps,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);
@@ -369,8 +310,7 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
             StandardType.Jumps,
             teacher.TeacherGuid,
             DateOnlyGenerator.GetWorkingDate(),
-            10,
-            semester.Name
+            10
         );
 
         await context.Semesters.AddAsync(semester);

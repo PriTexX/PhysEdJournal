@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PhysEdJournal.Core.Entities.Types;
 
@@ -18,14 +17,6 @@ public sealed class PointsStudentHistoryEntity
     [Required]
     public int Points { get; set; }
 
-    [StringLength(32)]
-    [Required(AllowEmptyStrings = false)]
-    [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
-    public required string SemesterName { get; set; }
-
-    [ForeignKey("SemesterName")]
-    public SemesterEntity? Semester { get; set; }
-
     [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public required string TeacherGuid { get; set; }
@@ -35,9 +26,6 @@ public sealed class PointsStudentHistoryEntity
 
     [Required]
     public WorkType WorkType { get; set; }
-
-    [DefaultValue(false)]
-    public bool IsArchived { get; set; }
 
     public string? Comment { get; set; }
 

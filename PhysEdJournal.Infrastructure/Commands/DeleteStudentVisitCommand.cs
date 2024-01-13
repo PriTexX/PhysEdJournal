@@ -52,11 +52,6 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
             s => s.StudentGuid == history.StudentGuid
         );
 
-        if (history.IsArchived)
-        {
-            return new ArchivedVisitDeletionException();
-        }
-
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
                 > DAYS_TO_DELETE_VISIT

@@ -60,8 +60,6 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             return new StudentNotFoundException(commandInput.StudentGuid);
         }
 
-        var activeSemesterName = student.CurrentSemesterName;
-
         if (commandInput.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext.PointsStudentsHistory
@@ -70,7 +68,6 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
                     p =>
                         p.StudentGuid == commandInput.StudentGuid
                         && p.WorkType == WorkType.ExternalFitness
-                        && p.SemesterName == activeSemesterName
                 )
                 .FirstOrDefaultAsync();
 
@@ -89,12 +86,7 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         {
             var anotherGTO = await _applicationContext.PointsStudentsHistory
                 .AsNoTracking()
-                .Where(
-                    p =>
-                        p.StudentGuid == commandInput.StudentGuid
-                        && p.WorkType == WorkType.GTO
-                        && p.SemesterName == activeSemesterName
-                )
+                .Where(p => p.StudentGuid == commandInput.StudentGuid && p.WorkType == WorkType.GTO)
                 .FirstOrDefaultAsync();
 
             if (anotherGTO is not null)
@@ -157,7 +149,6 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
             Date = commandPayload.Date,
             Points = commandPayload.Points,
             WorkType = commandPayload.WorkType,
-            SemesterName = student.CurrentSemesterName,
             TeacherGuid = commandPayload.TeacherGuid,
         };
 

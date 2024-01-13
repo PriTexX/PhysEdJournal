@@ -224,58 +224,6 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
     }
 
     [Fact]
-    public async Task DeleteVisitAsync_ArchivedVisitDeletionException_ShouldThrow()
-    {
-        // Arrange
-        await using var context = CreateContext();
-        await ClearDatabase(context);
-
-        var command = new DeleteStudentVisitCommand(context);
-        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
-        var group = EntitiesFactory.CreateGroup("211-729");
-        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
-        student.Visits = 1;
-        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
-        var historyEntity = EntitiesFactory.CreateVisitStudentHistoryEntity(
-            DateOnlyGenerator.GetWorkingDate(),
-            teacher.TeacherGuid,
-            student.StudentGuid
-        );
-        historyEntity.IsArchived = true;
-
-        await context.Semesters.AddAsync(semester);
-        await context.Groups.AddAsync(group);
-        await context.Students.AddAsync(student);
-        await context.Teachers.AddAsync(teacher);
-        await context.VisitsStudentsHistory.AddAsync(historyEntity);
-        await context.SaveChangesAsync();
-
-        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
-        );
-        var payload = new DeleteStudentVisitCommandPayload
-        {
-            TeacherGuid = teacher.TeacherGuid,
-            HistoryId = historyObj.Id,
-            IsAdmin = false
-        };
-
-        // Act
-        var result = await command.ExecuteAsync(payload);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        result.Match(
-            _ => true,
-            exception =>
-            {
-                Assert.IsType<ArchivedVisitDeletionException>(exception);
-                return true;
-            }
-        );
-    }
-
-    [Fact]
     public async Task DeleteVisitPointsAsync_TeacherGuidMismatchException_ShouldThrow()
     {
         // Arrange
