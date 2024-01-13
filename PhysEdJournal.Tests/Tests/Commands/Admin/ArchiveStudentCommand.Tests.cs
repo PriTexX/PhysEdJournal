@@ -188,8 +188,8 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         Assert.NotNull(activeStudent);
         Assert.Equal(activeStudent.StudentGuid, archivedStudentFromDb.StudentGuid);
 
-        Assert.Equal(1, student.PointsStudentHistory?.Count);
-        Assert.Equal(1, student.StandardsStudentHistory?.Count);
+        Assert.Equal(0, student.PointsStudentHistory?.Count);
+        Assert.Equal(0, student.StandardsStudentHistory?.Count);
         Assert.Equal(1, student.VisitsStudentHistory?.Count);
     }
 
