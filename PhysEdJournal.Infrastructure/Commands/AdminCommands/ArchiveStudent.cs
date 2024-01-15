@@ -172,7 +172,16 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             return visits;
         }
 
-        var sum = standardsHistory?.Sum(h => h.Points) + pointsHistory?.Sum(h => h.Points) ?? 0.0;
+        var standardsPointsSum = standardsHistory?.Sum(h => h.Points) ?? 0.0;
+
+        var additionalPointsSum = pointsHistory?.Sum(h => h.Points) ?? 0.0;
+
+        if (standardsPointsSum > MAX_POINTS_FOR_STANDARDS)
+        {
+            standardsPointsSum = MAX_POINTS_FOR_STANDARDS;
+        }
+
+        var sum = standardsPointsSum + additionalPointsSum;
 
         var visitsToArchive = visitsHistory
             ?.OrderBy(r => r.Date)
