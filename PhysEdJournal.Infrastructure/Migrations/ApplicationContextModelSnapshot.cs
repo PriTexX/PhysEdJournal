@@ -225,6 +225,9 @@ namespace PhysEdJournal.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<bool>("HadDebtInSemester")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("HasDebtFromPreviousSemester")
                         .HasColumnType("boolean");
 
@@ -236,9 +239,6 @@ namespace PhysEdJournal.Infrastructure.Migrations
 
                     b.Property<int>("PointsForStandards")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("UsedToHaveDebtInCurrentSemester")
-                        .HasColumnType("boolean");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()

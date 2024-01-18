@@ -14,10 +14,8 @@ using PhysEdJournal.Infrastructure.Database;
 namespace PhysEdJournal.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240118085536_used-to-have-debt-field")]
-#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-    partial class Usedtohavedebtfield
-#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+    [Migration("20240118101903_had-debt-field")]
+    partial class Haddebtfield
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -230,6 +228,9 @@ namespace PhysEdJournal.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<bool>("HadDebtInSemester")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("HasDebtFromPreviousSemester")
                         .HasColumnType("boolean");
 
@@ -241,9 +242,6 @@ namespace PhysEdJournal.Infrastructure.Migrations
 
                     b.Property<int>("PointsForStandards")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("UsedToHaveDebtInCurrentSemester")
-                        .HasColumnType("boolean");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()

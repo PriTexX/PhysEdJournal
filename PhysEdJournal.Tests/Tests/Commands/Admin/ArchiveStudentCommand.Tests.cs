@@ -219,7 +219,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             true,
             51
         );
-        student.UsedToHaveDebtInCurrentSemester = usedToHaveDebt;
+        student.HadDebtInSemester = usedToHaveDebt;
 
         var payload = new ArchiveStudentCommandPayload
         {
@@ -247,7 +247,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             .Include(s => s.StandardsStudentHistory)
             .FirstOrDefaultAsync();
 
-        Assert.Equal(expected, student.UsedToHaveDebtInCurrentSemester);
+        Assert.Equal(expected, student.HadDebtInSemester);
     }
 
     [Fact]

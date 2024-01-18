@@ -5,13 +5,13 @@
 namespace PhysEdJournal.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Usedtohavedebtfield : Migration
+    public partial class Haddebtfield : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
-                name: "UsedToHaveDebtInCurrentSemester",
+                name: "HadDebtInSemester",
                 table: "Students",
                 type: "boolean",
                 nullable: false,
@@ -22,7 +22,7 @@ namespace PhysEdJournal.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(name: "UsedToHaveDebtInCurrentSemester", table: "Students");
+            migrationBuilder.DropColumn(name: "HadDebtInSemester", table: "Students");
         }
     }
 }
