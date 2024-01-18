@@ -194,7 +194,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
     }
 
     [Theory]
-    [InlineData(true, false, true)]
+    [InlineData(true, true, true)]
     [InlineData(false, false, false)]
     [InlineData(false, true, false)]
     public async Task ArchiveStudentAsync_MarksOldDebt_ShouldWorkProperly(
