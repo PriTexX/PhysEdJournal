@@ -72,6 +72,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             {
                 student.ArchivedVisitValue = student.Group.VisitValue;
                 student.HasDebtFromPreviousSemester = true;
+                student.HadDebtInSemester = true;
 
                 _applicationContext.Update(student);
                 await _applicationContext.SaveChangesAsync();
@@ -140,6 +141,11 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                         .ToList() ?? new List<ArchivedStandardsHistory>(),
             }
         );
+
+        if (!student.HasDebtFromPreviousSemester)
+        {
+            student.HadDebtInSemester = false;
+        }
 
         visitsToArchive.ForEach(v => student.VisitsStudentHistory?.Remove(v));
         student.PointsStudentHistory?.Clear();
