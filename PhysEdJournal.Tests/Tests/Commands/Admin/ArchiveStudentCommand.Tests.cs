@@ -193,6 +193,63 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         Assert.Equal(1, student.VisitsStudentHistory?.Count);
     }
 
+    [Theory]
+    [InlineData(true, false, true)]
+    [InlineData(false, false, false)]
+    [InlineData(false, true, false)]
+    public async Task ArchiveStudentAsync_MarksOldDebt_ShouldWorkProperly(
+        bool hasDebt,
+        bool usedToHaveDebt,
+        bool expected
+    )
+    {
+        //Arrange
+        await using var context = CreateContext();
+        await ClearDatabase(context);
+
+        var command = new ArchiveStudentCommand(context);
+        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
+        var lastSemester = EntitiesFactory.CreateSemester("2022-2023/spring", false);
+        var currentSemester = EntitiesFactory.CreateSemester("2021-2023/autumn", true);
+        var group = EntitiesFactory.CreateGroup("211-729", 2, teacher.TeacherGuid);
+        var student = EntitiesFactory.CreateStudent(
+            group.GroupName,
+            lastSemester.Name,
+            hasDebt,
+            true,
+            51
+        );
+        student.UsedToHaveDebtInCurrentSemester = usedToHaveDebt;
+
+        var payload = new ArchiveStudentCommandPayload
+        {
+            StudentGuid = student.StudentGuid,
+            SemesterName = currentSemester.Name,
+        };
+
+        await context.Semesters.AddAsync(lastSemester);
+        await context.Semesters.AddAsync(currentSemester);
+        await context.Groups.AddAsync(group);
+        await context.Students.AddAsync(student);
+        await context.Teachers.AddAsync(teacher);
+        await context.SaveChangesAsync();
+
+        //Act
+        var result = await command.ExecuteAsync(payload);
+
+        //Assert
+        Assert.True(result.IsSuccess);
+        await using var assertContext = CreateContext();
+        var activeStudent = await assertContext.Students
+            .Where(s => s.StudentGuid == student.StudentGuid)
+            .Include(s => s.PointsStudentHistory)
+            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.StandardsStudentHistory)
+            .FirstOrDefaultAsync();
+
+        Assert.Equal(expected, student.UsedToHaveDebtInCurrentSemester);
+    }
+
     [Fact]
     public async Task ArchiveStudentAsync_NoTransfersPointsWhenHasNoDebt_ShouldWorkProperly()
     {
