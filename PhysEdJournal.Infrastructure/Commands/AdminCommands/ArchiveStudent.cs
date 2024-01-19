@@ -142,18 +142,18 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             }
         );
 
+        visitsToArchive.ForEach(v => student.VisitsStudentHistory?.Remove(v));
+        student.PointsStudentHistory?.Clear();
+        student.StandardsStudentHistory?.Clear();
+
         if (!student.HasDebtFromPreviousSemester)
         {
             student.HadDebtInSemester = false;
         }
 
-        visitsToArchive.ForEach(v => student.VisitsStudentHistory?.Remove(v));
-        student.PointsStudentHistory?.Clear();
-        student.StandardsStudentHistory?.Clear();
-
         student.Visits = student.VisitsStudentHistory?.Count ?? 0;
-        student.AdditionalPoints = student.PointsStudentHistory?.Sum(h => h.Points) ?? 0;
-        student.PointsForStandards = student.StandardsStudentHistory?.Sum(h => h.Points) ?? 0;
+        student.AdditionalPoints = 0;
+        student.PointsForStandards = 0;
         student.CurrentSemesterName = commandPayload.SemesterName;
         student.ArchivedVisitValue = 0;
         student.HasDebtFromPreviousSemester = false;
@@ -191,9 +191,9 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
 
         var visitsToArchive = visitsHistory
             ?.OrderBy(r => r.Date)
-            .TakeWhile(record =>
+            .TakeWhile(_ =>
             {
-                var needsToBeArchived = sum < REQUIRED_POINT_AMOUNT;
+                var needsToBeArchived = Math.Ceiling(sum) < REQUIRED_POINT_AMOUNT;
                 sum += visitValue;
                 return needsToBeArchived;
             })
