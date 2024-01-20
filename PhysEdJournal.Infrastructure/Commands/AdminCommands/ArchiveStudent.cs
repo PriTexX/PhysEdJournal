@@ -14,21 +14,6 @@ public sealed class ArchiveStudentCommandPayload
     public required string SemesterName { get; init; }
 }
 
-file struct HistoryEntity
-{
-    public required int Id { get; init; }
-    public required DateOnly Date { get; init; }
-    public required HistoryType Type { get; init; }
-    public required double Points { get; init; }
-}
-
-file enum HistoryType
-{
-    AdditionalPoints,
-    Visits,
-    Standards,
-}
-
 public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayload, Unit>
 {
     private readonly ApplicationContext _applicationContext;
@@ -81,14 +66,6 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
         }
 
-        var visitsToArchive = GetHistoriesToArchive(
-            student.HasDebtFromPreviousSemester,
-            visitValue,
-            student.PointsStudentHistory,
-            student.StandardsStudentHistory,
-            student.VisitsStudentHistory
-        );
-
         _applicationContext.ArchivedStudents.Add(
             new ArchivedStudentEntity
             {
@@ -96,19 +73,20 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                 SemesterName = student.CurrentSemesterName,
                 FullName = student.FullName,
                 GroupNumber = student.GroupNumber,
-                Visits = visitsToArchive.Count,
-                VisitsHistory = visitsToArchive
-                    .Select(
-                        h =>
-                            new ArchivedHistory
-                            {
-                                Date = h.Date,
-                                StudentGuid = h.StudentGuid,
-                                TeacherGuid = h.TeacherGuid,
-                                Points = visitValue,
-                            }
-                    )
-                    .ToList(),
+                Visits = student.VisitsStudentHistory?.Count ?? 0,
+                VisitsHistory =
+                    student.VisitsStudentHistory
+                        ?.Select(
+                            h =>
+                                new ArchivedHistory
+                                {
+                                    Date = h.Date,
+                                    StudentGuid = h.StudentGuid,
+                                    TeacherGuid = h.TeacherGuid,
+                                    Points = visitValue,
+                                }
+                        )
+                        .ToList() ?? new List<ArchivedHistory>(),
                 PointsHistory =
                     student.PointsStudentHistory
                         ?.Select(
@@ -142,7 +120,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             }
         );
 
-        visitsToArchive.ForEach(v => student.VisitsStudentHistory?.Remove(v));
+        student.VisitsStudentHistory?.Clear();
         student.PointsStudentHistory?.Clear();
         student.StandardsStudentHistory?.Clear();
 
@@ -151,7 +129,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             student.HadDebtInSemester = false;
         }
 
-        student.Visits = student.VisitsStudentHistory?.Count ?? 0;
+        student.Visits = 0;
         student.AdditionalPoints = 0;
         student.PointsForStandards = 0;
         student.CurrentSemesterName = commandPayload.SemesterName;
@@ -162,43 +140,5 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         await _applicationContext.SaveChangesAsync();
 
         return Unit.Default;
-    }
-
-    private static List<VisitStudentHistoryEntity> GetHistoriesToArchive(
-        bool hasDebt,
-        double visitValue,
-        ICollection<PointsStudentHistoryEntity>? pointsHistory,
-        ICollection<StandardsStudentHistoryEntity>? standardsHistory,
-        ICollection<VisitStudentHistoryEntity>? visitsHistory
-    )
-    {
-        if (!hasDebt)
-        {
-            var visits = visitsHistory?.ToList() ?? new List<VisitStudentHistoryEntity>();
-            return visits;
-        }
-
-        var standardsPointsSum = standardsHistory?.Sum(h => h.Points) ?? 0.0;
-
-        var additionalPointsSum = pointsHistory?.Sum(h => h.Points) ?? 0.0;
-
-        if (standardsPointsSum > MAX_POINTS_FOR_STANDARDS)
-        {
-            standardsPointsSum = MAX_POINTS_FOR_STANDARDS;
-        }
-
-        var sum = standardsPointsSum + additionalPointsSum;
-
-        var visitsToArchive = visitsHistory
-            ?.OrderBy(r => r.Date)
-            .TakeWhile(_ =>
-            {
-                var needsToBeArchived = Math.Ceiling(sum) < REQUIRED_POINT_AMOUNT;
-                sum += visitValue;
-                return needsToBeArchived;
-            })
-            .ToList();
-
-        return visitsToArchive ?? new List<VisitStudentHistoryEntity>();
     }
 }
