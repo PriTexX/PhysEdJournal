@@ -18,14 +18,27 @@ public class AddPointsForStandardToStudentRequest
     {
         public Validator()
         {
-            RuleFor(request => request.StudentGuid).Length(GuidLength, GuidLength).NotEmpty();
+            RuleFor(request => request.StudentGuid)
+                .Length(GuidLength, GuidLength)
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.PointsAmount)
                 .NotEmpty()
                 .GreaterThan(0)
-                .LessThan(MAX_POINTS_FOR_ONE_STANDARD);
-            RuleFor(request => request.Date).NotEmpty();
-            RuleFor(request => request.StandardType).NotEmpty();
-            RuleFor(request => request.IsOverride).NotEmpty();
+                .WithMessage($"Колличество баллов должно быть больше 0")
+                .LessThan(MAX_POINTS_FOR_ONE_STANDARD)
+                .WithMessage(
+                    $"Колличество баллов не должно быть больше {MAX_POINTS_FOR_ONE_STANDARD}"
+                );
+            RuleFor(request => request.Date)
+                .NotEmpty()
+                .WithMessage("Дата должна быть действительной");
+            RuleFor(request => request.StandardType)
+                .NotEmpty()
+                .WithMessage("Это поле не должно быть пустым");
+            RuleFor(request => request.IsOverride)
+                .NotEmpty()
+                .WithMessage("Это поле не должно быть пустым");
         }
     }
 }

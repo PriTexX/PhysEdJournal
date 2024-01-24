@@ -12,8 +12,13 @@ public sealed class IncreaseStudentVisitsRequest
     {
         public Validator()
         {
-            RuleFor(request => request.StudentGuid).Length(GuidLength, GuidLength).NotEmpty();
-            RuleFor(request => request.Date).NotEmpty();
+            RuleFor(request => request.StudentGuid)
+                .Length(GuidLength, GuidLength)
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
+            RuleFor(request => request.Date)
+                .NotEmpty()
+                .WithMessage("Дата должна быть действительной");
         }
     }
 }

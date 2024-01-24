@@ -12,8 +12,16 @@ public sealed class AssignVisitValueRequest
     {
         public Validator()
         {
-            RuleFor(request => request.GroupName).Length(1, 30).NotEmpty();
-            RuleFor(request => request.NewVisitValue).NotEmpty();
+            RuleFor(request => request.GroupName)
+                .Length(1, 30)
+                .WithMessage(
+                    "Длина названия группы должна быть не меньше 1 и не больше 30 символов"
+                )
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
+            RuleFor(request => request.NewVisitValue)
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
         }
     }
 }

@@ -12,8 +12,16 @@ public sealed class UnArchiveStudentRequest
     {
         public Validator()
         {
-            RuleFor(request => request.StudentGuid).Length(GuidLength, GuidLength).NotEmpty();
-            RuleFor(request => request.SemesterName).Matches(@"\d{4}-\d{4}/\w{5}").NotEmpty(); // 2022-2023/весна
+            RuleFor(request => request.StudentGuid)
+                .Length(GuidLength, GuidLength)
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
+            RuleFor(request => request.SemesterName)
+                .Matches(@"\d{4}-\d{4}/\w{5}")
+                .NotEmpty() // 2022-2023/весна
+                .WithMessage(
+                    "Имя семестра должно соответствовать паттерну - yearStart-yearEnd/monthName"
+                );
         }
     }
 }

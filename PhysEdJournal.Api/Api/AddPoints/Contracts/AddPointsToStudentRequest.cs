@@ -17,13 +17,24 @@ public class AddPointsToStudentRequest
     {
         public Validator()
         {
-            RuleFor(request => request.StudentGuid).Length(GuidLength, GuidLength).NotEmpty();
+            RuleFor(request => request.StudentGuid)
+                .Length(GuidLength, GuidLength)
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.PointsAmount)
                 .NotEmpty()
                 .GreaterThan(0)
-                .LessThan(MaxPointsAmount);
-            RuleFor(request => request.Date).NotEmpty();
-            RuleFor(request => request.WorkType).NotEmpty();
+                .WithMessage($"Кол-во дополнительных баллов должно быть больше 0")
+                .LessThan(MaxPointsAmount)
+                .WithMessage(
+                    $"Кол-во дополнительных баллов не должно быть больше {MaxPointsAmount}"
+                );
+            RuleFor(request => request.Date)
+                .NotEmpty()
+                .WithMessage("Дата должна быть действительной");
+            RuleFor(request => request.WorkType)
+                .NotEmpty()
+                .WithMessage("Поле не должно быть пустым");
         }
     }
 }
