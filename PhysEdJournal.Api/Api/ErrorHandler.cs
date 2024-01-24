@@ -134,17 +134,6 @@ public static class ErrorHandler
                             "Teacher can manage the data that he has entered. He can't change other people's records.",
                     }
             },
-            {
-                nameof(ArchivedPointsDeletionException),
-                _ =>
-                    new ProblemDetailsResponse
-                    {
-                        Status = StatusCodes.Status400BadRequest,
-                        Type = "archive-points-deletion",
-                        Title = "Attempt to delete archived points",
-                        Detail = "You cannot delete points that are in the archive",
-                    }
-            },
         };
 
     private static readonly ProblemDetailsResponse DefaultProblemDetailsResponse =

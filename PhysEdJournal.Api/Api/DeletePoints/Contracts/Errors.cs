@@ -21,17 +21,6 @@ public static class DeletePointsErrors
                     }
             },
             {
-                nameof(ArchivedVisitDeletionException),
-                _ =>
-                    new ProblemDetailsResponse
-                    {
-                        Status = StatusCodes.Status400BadRequest,
-                        Type = "archived-visit-deletion",
-                        Title = "Attempt to delete archived visit",
-                        Detail = "You cannot delete archived visits",
-                    }
-            },
-            {
                 nameof(VisitOutdatedException),
                 _ =>
                     new ProblemDetailsResponse

@@ -33,7 +33,7 @@ public static class ArchiveController
         var archiveStudentPayload = new ArchiveStudentCommandPayload
         {
             StudentGuid = request.StudentGuid,
-            IsForceMode = request.IsForceMode,
+            SemesterName = request.SemesterName,
         };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);

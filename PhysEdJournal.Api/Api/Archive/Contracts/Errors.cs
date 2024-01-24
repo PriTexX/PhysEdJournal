@@ -19,17 +19,6 @@ public static class ArchiveErrors
                     }
             },
             {
-                nameof(CannotMigrateToNewSemesterException),
-                _ =>
-                    new ProblemDetailsResponse
-                    {
-                        Status = StatusCodes.Status409Conflict,
-                        Type = "no-semester-migration",
-                        Title = "Cannot migrate to new semester",
-                        Detail = "Student already has an active semester",
-                    }
-            },
-            {
                 nameof(ArchivedStudentNotFound),
                 _ =>
                     new ProblemDetailsResponse
