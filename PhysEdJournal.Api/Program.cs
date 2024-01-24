@@ -12,6 +12,7 @@ using PhysEdJournal.Api.Api.Competition;
 using PhysEdJournal.Api.Api.DeletePoints;
 using PhysEdJournal.Api.Api.Group;
 using PhysEdJournal.Api.Api.Group.Contracts;
+using PhysEdJournal.Api.Api.Semester;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
 using PhysEdJournal.Api.Endpoints.StaffEndpoint;
 using PhysEdJournal.Api.FilterExtensions;
@@ -180,6 +181,7 @@ AddPointsController.MapAddPointsEndpoints(root);
 GroupController.MapGroupEndpoints(root);
 DeletePointsController.MapDeletePointsEndpoints(root);
 CompetitionController.MapCompetitionEndpoints(root);
+SemesterController.MapSemesterEndpoints(root);
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>
