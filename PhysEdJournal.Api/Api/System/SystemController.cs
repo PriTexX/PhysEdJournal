@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Controllers;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
