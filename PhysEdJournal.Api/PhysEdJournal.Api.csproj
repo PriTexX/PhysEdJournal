@@ -39,6 +39,5 @@
     <ItemGroup>
       <Folder Include="Api\Student\Contracts\" />
       <Folder Include="Api\System\Contracts\" />
-      <Folder Include="Api\Teacher\Contracts\" />
     </ItemGroup>
 </Project>
