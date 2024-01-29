@@ -57,8 +57,10 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
             return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
         }
 
-        student.PointsForStandards -= history.Points;
         _applicationContext.StandardsStudentsHistory.Remove(history);
+        student.PointsForStandards = await _applicationContext.StandardsStudentsHistory
+            .Where(h => h.Id != history.Id)
+            .SumAsync(h => h.Points);
         _applicationContext.Students.Update(student);
 
         try
