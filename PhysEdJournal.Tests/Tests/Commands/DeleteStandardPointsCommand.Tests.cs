@@ -12,26 +12,17 @@ namespace PhysEdJournal.Tests.Tests.Commands;
 public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
 {
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
-    [InlineData(5)]
-    [InlineData(6)]
-    [InlineData(7)]
-    [InlineData(8)]
-    [InlineData(9)]
-    [InlineData(10)]
-    [InlineData(100)]
+    [InlineData(1, 0)]
+    [InlineData(10, 0)]
+    [InlineData(100, 0)]
     public async Task DeleteStandardPointsAsync_DeletesPointsForStandardsFromStudent_ShouldWorkProperly(
-        int standardPoints
+        int standardPoints,
+        int expectedStandardPoints
     )
     {
         //Arrange
         await using var context = CreateContext();
         await ClearDatabase(context);
-
-        var expectedStandardPoints = standardPoints - 10;
 
         var command = new DeleteStandardPointsCommand(context);
         var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
@@ -76,6 +67,70 @@ public sealed class DeleteStandardPointsCommandTests : DatabaseTestsHelper
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedStandardPoints, studentFromDb.PointsForStandards);
+        var historyEntityFromDb = studentFromDb.StandardsStudentHistory.FirstOrDefault(
+            h => h.Points == historyEntity.Points
+        );
+        Assert.Null(historyEntityFromDb);
+    }
+
+    [Fact]
+    public async Task DeleteStandardPointsAsync_DeletesProperRecord_ShouldWorkProperly()
+    {
+        //Arrange
+        await using var context = CreateContext();
+        await ClearDatabase(context);
+
+        var command = new DeleteStandardPointsCommand(context);
+        var semester = EntitiesFactory.CreateSemester("2022-2023/spring", true);
+        var group = EntitiesFactory.CreateGroup("211-729");
+        var student = EntitiesFactory.CreateStudent(group.GroupName, semester.Name, false, true);
+        student.PointsForStandards = 30;
+        var teacher = EntitiesFactory.CreateTeacher(permissions: TeacherPermissions.SuperUser);
+        var historyEntity = EntitiesFactory.CreateStandardsHistoryEntity(
+            student.StudentGuid,
+            StandardType.Jumps,
+            teacher.TeacherGuid,
+            DateOnlyGenerator.GetWorkingDate(),
+            10
+        );
+        var historyEntity1 = EntitiesFactory.CreateStandardsHistoryEntity(
+            student.StudentGuid,
+            StandardType.Jumps,
+            teacher.TeacherGuid,
+            DateOnlyGenerator.GetWorkingDate(),
+            20
+        );
+
+        await context.Semesters.AddAsync(semester);
+        await context.Groups.AddAsync(group);
+        await context.Students.AddAsync(student);
+        await context.Teachers.AddAsync(teacher);
+        await context.StandardsStudentsHistory.AddAsync(historyEntity);
+        await context.StandardsStudentsHistory.AddAsync(historyEntity1);
+        await context.SaveChangesAsync();
+
+        var historyObj = context.StandardsStudentsHistory.FirstOrDefault(
+            h => h.Points == historyEntity.Points
+        );
+        var payload = new DeleteStandardPointsCommandPayload
+        {
+            TeacherGuid = historyEntity.TeacherGuid,
+            HistoryId = historyObj!.Id,
+            IsAdmin = false
+        };
+
+        //Act
+        var result = await command.ExecuteAsync(payload);
+
+        //Assert
+        Assert.True(result.IsSuccess);
+        await using var assertContext = CreateContext();
+        var studentFromDb = await assertContext.Students
+            .Include(s => s.StandardsStudentHistory)
+            .Where(s => s.StudentGuid == student.StudentGuid)
+            .FirstOrDefaultAsync();
+        Assert.NotNull(studentFromDb);
+        Assert.Equal(historyEntity1.Points, studentFromDb.PointsForStandards);
         var historyEntityFromDb = studentFromDb.StandardsStudentHistory.FirstOrDefault(
             h => h.Points == historyEntity.Points
         );
