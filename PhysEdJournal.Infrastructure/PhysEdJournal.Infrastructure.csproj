@@ -22,6 +22,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="NanoXLSX" Version="2.3.1" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
       <PackageReference Include="PResult" Version="0.8.0" />
       <PackageReference Include="Quartz" Version="3.7.0" />
@@ -38,5 +39,4 @@
     <ItemGroup>
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
     </ItemGroup>
-
 </Project>
