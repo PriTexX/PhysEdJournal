@@ -33,7 +33,6 @@
     <ItemGroup>
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
       <ProjectReference Include="..\PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj" />
-
     </ItemGroup>
 
 
