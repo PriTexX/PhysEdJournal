@@ -3,7 +3,7 @@ using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
 
-namespace PhysEdJournal.Infrastructure.Commands.ServiceCommands;
+namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 public sealed class UpdateGroupsVisitValuePayload
 {
@@ -47,13 +47,13 @@ public sealed class UpdateGroupsVisitValueCommand : ICommand<UpdateGroupsVisitVa
     {
         var groupEntities = new List<GroupDataFromExcel>();
 
-        var workbook = new Workbook(path);
-        var worksheet = workbook.GetWorksheet(1);
+        var workbook = Workbook.Load(path);
+        var worksheet = workbook.GetWorksheet(0);
 
-        for (var row = 2; row <= worksheet.RowHeights[0]; row++)
+        for (var row = 1; row < worksheet.GetColumn(0).Count; row++)
         {
-            var groupNumber = worksheet.GetCell(1, row).Value.ToString();
-            var points = Convert.ToInt32(worksheet.GetCell(2, row).Value.ToString()?.Trim());
+            var groupNumber = worksheet.GetCell(0, row).Value.ToString();
+            var points = Convert.ToDouble(worksheet.GetCell(1, row).Value.ToString()?.Trim());
 
             if (groupNumber is null)
             {
@@ -76,6 +76,6 @@ public sealed class UpdateGroupsVisitValueCommand : ICommand<UpdateGroupsVisitVa
     {
         public required string GroupNumber { get; init; }
 
-        public required int VisitValue { get; init; }
+        public required double VisitValue { get; init; }
     }
 }

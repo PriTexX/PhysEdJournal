@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Infrastructure.Commands.ServiceCommands;
+using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
 namespace PhysEdJournal.Api.ExcelControllers;
 
