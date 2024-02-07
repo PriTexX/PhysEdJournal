@@ -24,10 +24,8 @@ public class AddPointsForStandardToStudentRequest
             RuleFor(request => request.PointsAmount)
                 .GreaterThan(0)
                 .WithMessage($"Колличество баллов должно быть больше 0")
-                .LessThan(MAX_POINTS_FOR_ONE_STANDARD)
-                .WithMessage(
-                    $"Колличество баллов не должно быть больше {MAX_POINTS_FOR_ONE_STANDARD}"
-                );
+                .LessThan(MaxPointsForOneStandard)
+                .WithMessage($"Колличество баллов не должно быть больше {MaxPointsForOneStandard}");
             RuleFor(request => request.Date)
                 .NotEmpty()
                 .WithMessage("Дата должна быть действительной");

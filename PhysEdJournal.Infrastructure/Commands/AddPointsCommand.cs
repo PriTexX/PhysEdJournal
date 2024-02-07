@@ -103,7 +103,7 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > PointsConstants.POINTS_LIFE_DAYS
+                > PointsConstants.PointsLifeDays
             && !commandInput.IsAdmin
         )
         {

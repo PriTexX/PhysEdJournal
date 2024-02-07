@@ -67,7 +67,7 @@ internal sealed class AddStandardPointsCommandValidator
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > POINTS_LIFE_DAYS
+                > PointsLifeDays
             && !commandInput.IsAdmin
         )
         {
@@ -79,9 +79,9 @@ internal sealed class AddStandardPointsCommandValidator
             return new NonWorkingDayException(commandInput.Date.DayOfWeek);
         }
 
-        if (commandInput.Points > MAX_POINTS_FOR_ONE_STANDARD)
+        if (commandInput.Points > MaxPointsForOneStandard)
         {
-            return new PointsOverflowException(commandInput.Points, MAX_POINTS_FOR_ONE_STANDARD);
+            return new PointsOverflowException(commandInput.Points, MaxPointsForOneStandard);
         }
 
         if (commandInput.Points <= 0)
@@ -201,9 +201,9 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
     private int AdjustStudentPointsAmount(int studentTotalPointsForStandards, int pointsToImplement)
     {
         int adjustedStudentPointsAmount;
-        if (studentTotalPointsForStandards + pointsToImplement > MAX_POINTS_FOR_STANDARDS)
+        if (studentTotalPointsForStandards + pointsToImplement > MaxPointsForStandards)
         {
-            adjustedStudentPointsAmount = MAX_POINTS_FOR_STANDARDS;
+            adjustedStudentPointsAmount = MaxPointsForStandards;
         }
         else
         {
