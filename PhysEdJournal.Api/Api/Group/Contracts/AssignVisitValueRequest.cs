@@ -20,7 +20,9 @@ public sealed class AssignVisitValueRequest
                 .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.NewVisitValue)
                 .NotEmpty()
-                .WithMessage("Поле не должно быть пустым");
+                .WithMessage("Поле не должно быть пустым")
+                .LessThanOrEqualTo(4)
+                .WithMessage("Новое значение для аосещений не может быть больше 4");
         }
     }
 }
