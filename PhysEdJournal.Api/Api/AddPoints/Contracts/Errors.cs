@@ -16,8 +16,8 @@ public static class AddPointsErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "fitness-duplicate",
-                        Title = "Record for fitness already exists",
-                        Detail = "Only one record of points for external fitness per semester",
+                        Title = "Такая запись за фитнес уже существует",
+                        Detail = "Баллы за фитнес можно получить только один раз в семестр",
                     }
             },
             {
@@ -27,8 +27,8 @@ public static class AddPointsErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "points-out-of-limit",
-                        Title = "Points limit is exceeded",
-                        Detail = "You can't give this much points for such an activity",
+                        Title = "Лимит баллов превышен",
+                        Detail = "Вы не можете выставить столько баллов за эту активность",
                     }
             },
             {
@@ -38,8 +38,8 @@ public static class AddPointsErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "visit-expired",
-                        Title = "This visit is too old",
-                        Detail = "You can't set visit for a day that was so long ago.",
+                        Title = "Эта запись посещений слишком старая",
+                        Detail = "Вы не можете удалить посещение, которые было так давно",
                     }
             },
             {
@@ -49,8 +49,8 @@ public static class AddPointsErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "visit-exists",
-                        Title = "This visit already exists",
-                        Detail = "You cannot set more than one visit per day",
+                        Title = "Это посещение уже существует",
+                        Detail = "Нельзя поставить больше одного посещения в день",
                     }
             },
         };

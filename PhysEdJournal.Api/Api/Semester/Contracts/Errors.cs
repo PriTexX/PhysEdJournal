@@ -14,8 +14,9 @@ public static class SemesterErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "semester-name-wrong",
-                        Title = "Semester name validation failure",
-                        Detail = "Semester name must be like: 2022-2023/весна",
+                        Title = "Ошибка при валидации названия семестра",
+                        Detail =
+                            "Название семестра должно соответствовать паттерну: 2022-2023/весна",
                     }
             },
         };

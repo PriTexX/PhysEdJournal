@@ -14,8 +14,9 @@ public static class GroupErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "no-visit-value",
-                        Title = "Visit value was not provided",
-                        Detail = "Visit value cannot be negative.",
+                        Title = "Кол-во баллов за посещение не было передано",
+                        Detail =
+                            "Невозможно передать отрецательное значение для кол-ва баллов за посещение.",
                     }
             },
         };

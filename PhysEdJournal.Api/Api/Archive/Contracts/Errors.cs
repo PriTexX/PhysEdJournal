@@ -14,8 +14,8 @@ public static class ArchiveErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "not-enough-points",
-                        Title = "Not enough points to archive student",
-                        Detail = "Student must have more points to be archived",
+                        Title = "Не хватает баллов для архивации",
+                        Detail = "У студентов должно быть больше баллов для архивации",
                     }
             },
             {
@@ -25,8 +25,8 @@ public static class ArchiveErrors
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "archived-student-not-found",
-                        Title = "Archived student not found",
-                        Detail = "Archived student was not found in the database",
+                        Title = "Заархивированный студент не найден",
+                        Detail = "Заархивированный студент не был найден в базе данных",
                     }
             },
         };

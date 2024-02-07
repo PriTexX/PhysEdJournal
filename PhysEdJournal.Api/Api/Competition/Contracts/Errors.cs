@@ -14,8 +14,8 @@ public static class CompetitionErrors
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "competition-not-found",
-                        Title = "Competition not found",
-                        Detail = "Competition was not found in the database",
+                        Title = "Соревнование не найдено",
+                        Detail = "Соревнование не было найдено в базе",
                     }
             },
         };

@@ -14,8 +14,8 @@ public static class TeacherErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "teacher-already-exists",
-                        Title = "Teacher duplicate was found",
-                        Detail = "You cannot create the same teacher twice",
+                        Title = "Такой учитель уже есть в системе",
+                        Detail = "Невозможно создать одного и того же учителя дважды",
                     }
             },
             {
@@ -25,8 +25,8 @@ public static class TeacherErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "cannot-grand-superuser-permissions",
-                        Title = "Cannot grant superuser permissions to teacher",
-                        Detail = "Unable to grand permissions",
+                        Title = "Невозможно выдать права суперпользователя учителю",
+                        Detail = "Этот учитель не может быть наделен правами суперпользователя",
                     }
             },
         };

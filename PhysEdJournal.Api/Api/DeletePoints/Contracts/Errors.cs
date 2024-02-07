@@ -16,8 +16,8 @@ public static class DeletePointsErrors
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "visit-not-found",
-                        Title = "Visit not found in the system",
-                        Detail = "Visit record was not found in the database",
+                        Title = "Запись о посещении не существует",
+                        Detail = "Запись о посещении не была найдена в базе данных",
                     }
             },
             {
@@ -27,8 +27,8 @@ public static class DeletePointsErrors
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "visit-outdated",
-                        Title = "Attempt to delete outdated visit",
-                        Detail = "You cannot delete visits that were set too long ago",
+                        Title = "Попытка удалить посещение, которое было очень давно",
+                        Detail = "Нельзя удалить посещения, которые были так давно",
                     }
             },
             {
@@ -38,8 +38,8 @@ public static class DeletePointsErrors
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "points-history-not-found",
-                        Title = "Points student history not found",
-                        Detail = "Points student history record was not found in the database",
+                        Title = "История баллов не существует",
+                        Detail = "Не удалось найти историю баллов в базе данных",
                     }
             },
             {
@@ -49,8 +49,8 @@ public static class DeletePointsErrors
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "standards-history-not-found",
-                        Title = "Standards student history not found",
-                        Detail = "Standards student history record was not found in the database",
+                        Title = "Не удается найти историю нормативов",
+                        Detail = "Запись о сдаче нормативов не существует в базе данных",
                     }
             },
         };
