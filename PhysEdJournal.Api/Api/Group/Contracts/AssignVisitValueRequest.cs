@@ -17,7 +17,6 @@ public sealed class AssignVisitValueRequest
                 .WithMessage(
                     "Длина названия группы должна быть не меньше 1 и не больше 30 символов"
                 )
-                .NotEmpty()
                 .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.NewVisitValue)
                 .NotEmpty()

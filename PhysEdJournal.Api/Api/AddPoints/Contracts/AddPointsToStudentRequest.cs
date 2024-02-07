@@ -19,10 +19,8 @@ public class AddPointsToStudentRequest
         {
             RuleFor(request => request.StudentGuid)
                 .Length(GuidLength, GuidLength)
-                .NotEmpty()
                 .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.PointsAmount)
-                .NotEmpty()
                 .GreaterThan(0)
                 .WithMessage($"Кол-во дополнительных баллов должно быть больше 0")
                 .LessThan(MaxPointsAmount)

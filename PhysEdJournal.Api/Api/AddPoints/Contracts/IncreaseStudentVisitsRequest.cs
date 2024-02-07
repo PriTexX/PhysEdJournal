@@ -14,7 +14,6 @@ public sealed class IncreaseStudentVisitsRequest
         {
             RuleFor(request => request.StudentGuid)
                 .Length(GuidLength, GuidLength)
-                .NotEmpty()
                 .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.Date)
                 .NotEmpty()

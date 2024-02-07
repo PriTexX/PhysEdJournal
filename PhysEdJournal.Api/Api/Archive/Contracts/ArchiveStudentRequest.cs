@@ -13,7 +13,6 @@ public sealed class ArchiveStudentRequest
         public Validator()
         {
             RuleFor(request => request.StudentGuid)
-                .NotEmpty()
                 .Length(GuidLength, GuidLength)
                 .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.SemesterName)

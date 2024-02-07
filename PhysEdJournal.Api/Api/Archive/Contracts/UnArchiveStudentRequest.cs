@@ -14,11 +14,10 @@ public sealed class UnArchiveStudentRequest
         {
             RuleFor(request => request.StudentGuid)
                 .Length(GuidLength, GuidLength)
-                .NotEmpty()
                 .WithMessage("Поле не должно быть пустым");
             RuleFor(request => request.SemesterName)
-                .Matches(@"\d{4}-\d{4}/\w{5}")
-                .NotEmpty() // 2022-2023/весна
+                .NotEmpty()
+                .Matches(@"\d{4}-\d{4}/\w{5}") // 2022-2023/весна
                 .WithMessage(
                     "Имя семестра должно соответствовать паттерну - yearStart-yearEnd/monthName"
                 );

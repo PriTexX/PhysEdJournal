@@ -13,7 +13,6 @@ public sealed class CreateTeacherRequest
         public Validator()
         {
             RuleFor(request => request.TeacherGuid)
-                .NotEmpty()
                 .Length(GuidLength, GuidLength)
                 .WithMessage("Поле должно содержать гуид стандартного формата");
             RuleFor(request => request.FullName)
