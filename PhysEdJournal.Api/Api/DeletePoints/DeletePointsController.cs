@@ -8,7 +8,7 @@ namespace PhysEdJournal.Api.Api.DeletePoints;
 
 public static class DeletePointsController
 {
-    public static void MapDeletePointsEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         ErrorHandler.AddErrors(DeletePointsErrors.Errors);
 

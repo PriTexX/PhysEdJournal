@@ -7,7 +7,7 @@ namespace PhysEdJournal.Api.Api.System;
 
 public static class SystemController
 {
-    public static void MapSystemEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         router.MapPost("/UpdateStudentsInfo", UpdateStudentsInfo);
     }

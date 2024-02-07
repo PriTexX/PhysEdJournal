@@ -7,7 +7,7 @@ namespace PhysEdJournal.Api.Api.Student;
 
 public static class StudentController
 {
-    public static void MapStudentEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         router.MapPost("/ActivateStudent", ActivateStudent);
         router.MapPost("/DeActivateStudent", DeActivateStudent);

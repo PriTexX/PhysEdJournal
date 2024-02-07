@@ -179,13 +179,13 @@ var app = builder.Build();
 var root = app.MapGroup("/api");
 root.AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory);
 
-AddPointsController.MapAddPointsEndpoints(root);
-GroupController.MapGroupEndpoints(root);
-DeletePointsController.MapDeletePointsEndpoints(root);
-CompetitionController.MapCompetitionEndpoints(root);
-SemesterController.MapSemesterEndpoints(root);
-SystemController.MapSystemEndpoints(root);
-StudentController.MapStudentEndpoints(root);
+AddPointsController.MapEndpoints(root);
+GroupController.MapEndpoints(root);
+DeletePointsController.MapEndpoints(root);
+CompetitionController.MapEndpoints(root);
+SemesterController.MapEndpoints(root);
+SystemController.MapEndpoints(root);
+StudentController.MapEndpoints(root);
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>

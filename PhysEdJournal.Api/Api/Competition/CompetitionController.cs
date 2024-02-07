@@ -8,7 +8,7 @@ namespace PhysEdJournal.Api.Api.Competition;
 
 public static class CompetitionController
 {
-    public static void MapCompetitionEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         ErrorHandler.AddErrors(CompetitionErrors.Errors);
 

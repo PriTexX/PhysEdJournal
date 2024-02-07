@@ -8,7 +8,7 @@ namespace PhysEdJournal.Api.Api.Semester;
 
 public static class SemesterController
 {
-    public static void MapSemesterEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         ErrorHandler.AddErrors(SemesterErrors.Errors);
 

@@ -8,7 +8,7 @@ namespace PhysEdJournal.Api.Api.Group;
 
 public static class GroupController
 {
-    public static void MapGroupEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         ErrorHandler.AddErrors(GroupErrors.Errors);
 

@@ -10,7 +10,7 @@ namespace PhysEdJournal.Api.Api.AddPoints;
 
 public static class AddPointsController
 {
-    public static void MapAddPointsEndpoints(IEndpointRouteBuilder router)
+    public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         ErrorHandler.AddErrors(GroupErrors.Errors);
 
