@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
 using PhysEdJournal.Api.Api.Group.Contracts;
-using PhysEdJournal.Api.Controllers;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;

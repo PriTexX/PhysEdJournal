@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Api.DeletePoints.Contracts;
-using PhysEdJournal.Api.Controllers;
 using PhysEdJournal.Infrastructure.Commands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 

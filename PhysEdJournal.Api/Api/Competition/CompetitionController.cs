@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Api.Competition.Contracts;
-using PhysEdJournal.Api.Controllers;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
