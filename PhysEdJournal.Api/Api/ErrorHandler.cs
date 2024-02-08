@@ -40,8 +40,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status403Forbidden,
                         Type = "not-enough-permissions",
-                        Title = "Not enough permissions",
-                        Detail = "User must have more permissions to perform this action",
+                        Title = "Не достаточно прав",
+                        Detail = "У пользователя должно быть больше прав для этого действия",
                     }
             },
             {
@@ -51,8 +51,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "no-teacher",
-                        Title = "Teacher not found",
-                        Detail = "Teacher was not found in the system",
+                        Title = "Учитель не найден",
+                        Detail = "Учитель не был обнаружен в базе данных",
                     }
             },
             {
@@ -62,8 +62,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status404NotFound,
                         Type = "no-student",
-                        Title = "Student not found",
-                        Detail = "Student was not found in the system",
+                        Title = "Студент не найден",
+                        Detail = "Студент не был найден в системе",
                     }
             },
             {
@@ -73,9 +73,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "action-from-future",
-                        Title = "Action was committed in the future",
-                        Detail =
-                            "The system does not operate with information that comes from the future",
+                        Title = "Действие было совершено в будущем",
+                        Detail = "Система не может обрабатывать действия, которые еще не произошли",
                     }
             },
             {
@@ -85,8 +84,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "date-expired",
-                        Title = "Action was performed after the deadline",
-                        Detail = "Action should be performed before its deadline",
+                        Title = "Действие было совершено слишком поздно",
+                        Detail = "Действие должно быть исполнено перед дедлайном",
                     }
             },
             {
@@ -96,8 +95,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "negative-points",
-                        Title = "Points amount is less than or equal to zero",
-                        Detail = "Cannot grant negative or zero amount of points",
+                        Title = "Кол-во баллов меньше или равно нулю",
+                        Detail = "Нельзя выставить отрицательное кол-во баллов",
                     }
             },
             {
@@ -107,8 +106,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "non-working-day",
-                        Title = "Attempt to perform action on the non working day",
-                        Detail = "Non Working days: Sunday, Monday",
+                        Title = "Попытка выполнить действие в нерабочий день",
+                        Detail = "Нерабочие дни: Воскресенье, Понедельник",
                     }
             },
             {
@@ -118,8 +117,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status409Conflict,
                         Type = "concurrency",
-                        Title = "Attempt to perform one action twice",
-                        Detail = "Only one of each type of action at a time",
+                        Title = "Попытка выполнить действие дважды",
+                        Detail = "Нельзя выполнять одно и то же действие дважды",
                     }
             },
             {
@@ -129,9 +128,8 @@ public static class ErrorHandler
                     {
                         Status = StatusCodes.Status400BadRequest,
                         Type = "wrong-teacher",
-                        Title = "This action should be done by another teacher",
-                        Detail =
-                            "Teacher can manage the data that he has entered. He can't change other people's records.",
+                        Title = "Действие должно быть выполнено другим учителем",
+                        Detail = "Учитель должен изменять только свои данные.",
                     }
             },
         };
@@ -141,7 +139,7 @@ public static class ErrorHandler
         {
             Status = 500,
             Type = "unknown-error",
-            Title = "Unknown error",
-            Detail = "Unknown error happened during request",
+            Title = "Неизвестная ошибка",
+            Detail = "Неизвестная ошибка произошла во время запроса",
         };
 }
