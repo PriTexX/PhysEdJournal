@@ -1,3 +1,4 @@
+using PhysEdJournal.Api.Api._Response;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 
 namespace PhysEdJournal.Api.Api.Semester.Contracts;

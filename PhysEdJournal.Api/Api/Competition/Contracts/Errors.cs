@@ -1,3 +1,4 @@
+using PhysEdJournal.Api.Api._Response;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
 namespace PhysEdJournal.Api.Api.Competition.Contracts;

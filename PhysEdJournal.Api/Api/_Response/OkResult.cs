@@ -1,4 +1,4 @@
-namespace PhysEdJournal.Api.Api;
+namespace PhysEdJournal.Api.Api._Response;
 
 public sealed class OkResult : RestResult
 {

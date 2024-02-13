@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PhysEdJournal.Api.Api._Response;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
 using PhysEdJournal.Api.Api.Group.Contracts;
 using PhysEdJournal.Core.Entities.Types;
@@ -11,7 +12,7 @@ public static class AddPointsController
 {
     public static void MapEndpoints(IEndpointRouteBuilder router)
     {
-        ErrorHandler.AddErrors(GroupErrors.Errors);
+        ErrorHandler.AddErrors(AddPointsErrors.Errors);
 
         router.MapPost("/AddPointsToStudent", AddPointsToStudent);
         router.MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent);
