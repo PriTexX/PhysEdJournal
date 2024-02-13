@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace PhysEdJournal.Api.Api;
 
 [JsonConverter(typeof(CustomProblemDetailsJsonConverter))]
-public sealed class ProblemDetailsResponse
+public sealed class ProblemDetailsResponse : RestResult
 {
     [JsonPropertyName("type")]
     public required string Type { get; init; }
@@ -44,6 +44,7 @@ public sealed class ProblemDetailsResult : IActionResult
 
 public sealed class CustomProblemDetailsJsonConverter : JsonConverter<ProblemDetailsResponse>
 {
+    private static readonly JsonEncodedText Success = JsonEncodedText.Encode("success");
     private static readonly JsonEncodedText Type = JsonEncodedText.Encode("type");
     private static readonly JsonEncodedText Title = JsonEncodedText.Encode("title");
     private static readonly JsonEncodedText Status = JsonEncodedText.Encode("status");
@@ -75,6 +76,8 @@ public sealed class CustomProblemDetailsJsonConverter : JsonConverter<ProblemDet
         JsonSerializerOptions options
     )
     {
+        writer.WriteBoolean(Success, value.Success);
+
         writer.WriteString(Type, value.Type);
 
         writer.WriteString(Title, value.Title);

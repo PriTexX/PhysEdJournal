@@ -70,7 +70,7 @@ public static class AddPointsController
 
         var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Result.Ok, Result.NotOk);
     }
 
     public static async Task<IResult> AddPointsForStandardToStudent(
@@ -107,7 +107,7 @@ public static class AddPointsController
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Result.Ok, Result.NotOk);
     }
 
     public static async Task<IResult> IncreaseStudentVisits(
@@ -141,6 +141,6 @@ public static class AddPointsController
 
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Result.Ok, Result.NotOk);
     }
 }

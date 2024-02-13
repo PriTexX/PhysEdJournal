@@ -1,11 +1,9 @@
-using PhysEdJournal.Api.Api;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
-using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
-namespace PhysEdJournal.Api.Controllers;
+namespace PhysEdJournal.Api.Api;
 
 public static class ErrorHandler
 {
