@@ -3,4 +3,9 @@ namespace PhysEdJournal.Api.Api;
 public sealed class OkResult : RestResult
 {
     public object? Data { get; init; }
+
+    public OkResult()
+    {
+        Success = true;
+    }
 }
