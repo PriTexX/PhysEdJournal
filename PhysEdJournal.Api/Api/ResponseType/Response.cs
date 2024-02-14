@@ -1,10 +1,10 @@
-namespace PhysEdJournal.Api.Api._Response;
+namespace PhysEdJournal.Api.Api.ResponseType;
 
-public static class Result
+public static class Response
 {
     public static IResult Ok(object? data = null)
     {
-        var okResult = new OkResult { Data = data };
+        var okResult = new OkResponse { Data = data };
 
         return Results.Ok(okResult);
     }

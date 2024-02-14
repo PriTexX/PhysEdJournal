@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api._Response;
 using PhysEdJournal.Api.Api.AddPoints.Contracts;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
@@ -70,7 +69,7 @@ public static class AddPointsController
 
         var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
 
-        return res.Match(Result.Ok, Result.NotOk);
+        return res.Match(ResponseType.Response.Ok, ResponseType.Response.NotOk);
     }
 
     public static async Task<IResult> AddPointsForStandardToStudent(
@@ -107,7 +106,7 @@ public static class AddPointsController
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
 
-        return res.Match(Result.Ok, Result.NotOk);
+        return res.Match(ResponseType.Response.Ok, ResponseType.Response.NotOk);
     }
 
     public static async Task<IResult> IncreaseStudentVisits(
@@ -141,6 +140,6 @@ public static class AddPointsController
 
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
 
-        return res.Match(Result.Ok, Result.NotOk);
+        return res.Match(ResponseType.Response.Ok, ResponseType.Response.NotOk);
     }
 }

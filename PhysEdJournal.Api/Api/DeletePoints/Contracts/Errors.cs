@@ -1,4 +1,4 @@
-using PhysEdJournal.Api.Api._Response;
+using PhysEdJournal.Api.Api.ResponseType;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;

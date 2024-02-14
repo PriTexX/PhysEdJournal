@@ -2,10 +2,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PhysEdJournal.Api.Api._Response;
+namespace PhysEdJournal.Api.Api.ResponseType;
 
 [JsonConverter(typeof(CustomProblemDetailsJsonConverter))]
-public sealed class ProblemDetailsResponse : RestResult
+public sealed class ProblemDetailsResponse : RestResponse
 {
     [JsonPropertyName("type")]
     public required string Type { get; init; }

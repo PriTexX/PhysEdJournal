@@ -1,4 +1,4 @@
-using PhysEdJournal.Api.Api._Response;
+using PhysEdJournal.Api.Api.ResponseType;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
 namespace PhysEdJournal.Api.Api.Teacher.Contracts;
