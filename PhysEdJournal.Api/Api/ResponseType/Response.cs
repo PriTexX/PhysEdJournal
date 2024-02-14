@@ -2,14 +2,12 @@ namespace PhysEdJournal.Api.Api.ResponseType;
 
 public static class Response
 {
-    public static IResult Ok(object? data = null)
+    public static IResult Ok<T>(T? data)
     {
-        var okResult = new OkResponse { Data = data };
-
-        return Results.Ok(okResult);
+        return Results.Ok(new { success = "success", data });
     }
 
-    public static IResult NotOk(Exception ex)
+    public static IResult Error(Exception ex)
     {
         return ErrorHandler.HandleErrorResult(ex);
     }
