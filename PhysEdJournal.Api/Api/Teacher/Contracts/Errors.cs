@@ -25,7 +25,7 @@ public static class TeacherErrors
                     new ProblemDetailsResponse
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Type = "cannot-grand-superuser-permissions",
+                        Type = "cannot-give-superuser-permissions",
                         Title = "Невозможно выдать права суперпользователя учителю",
                         Detail = "Этот учитель не может быть наделен правами суперпользователя",
                     }
