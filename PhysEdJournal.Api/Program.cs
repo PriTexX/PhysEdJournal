@@ -108,16 +108,6 @@ builder.Services.AddScoped<PermissionValidator>();
 builder.Services.AddScoped<MeInfoService>();
 
 /*
-    Validators
- */
-
-builder.Services.AddSingleton<AssignVisitValueRequest.Validator>();
-builder.Services.AddSingleton<AssignCuratorToGroupRequest.Validator>();
-builder.Services.AddSingleton<AddPointsToStudentRequest.Validator>();
-builder.Services.AddSingleton<AddPointsForStandardToStudentRequest.Validator>();
-builder.Services.AddSingleton<IncreaseStudentVisitsRequest.Validator>();
-
-/*
     Utils
  */
 
@@ -177,7 +167,6 @@ var app = builder.Build();
  */
 
 var root = app.MapGroup("/api");
-root.AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory);
 
 AddPointsController.MapEndpoints(root);
 GroupController.MapEndpoints(root);

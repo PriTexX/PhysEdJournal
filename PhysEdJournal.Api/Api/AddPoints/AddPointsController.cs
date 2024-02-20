@@ -13,12 +13,18 @@ public static class AddPointsController
     {
         ErrorHandler.AddErrors(AddPointsErrors.Errors);
 
-        router.MapPost("/AddPointsToStudent", AddPointsToStudent);
-        router.MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent);
-        router.MapPost("/IncreaseStudentVisits", IncreaseStudentVisits);
+        router
+            .MapPost("/AddPointsToStudent", AddPointsToStudent)
+            .AddEndpointFilter<ValidationFilter<AddPointsToStudentRequest>>();
+        router
+            .MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent)
+            .AddEndpointFilter<ValidationFilter<AddPointsForStandardToStudentRequest>>();
+        router
+            .MapPost("/IncreaseStudentVisits", IncreaseStudentVisits)
+            .AddEndpointFilter<ValidationFilter<IncreaseStudentVisitsRequest>>();
     }
 
-    public static async Task<IResult> AddPointsToStudent(
+    private static async Task<IResult> AddPointsToStudent(
         [FromBody] AddPointsToStudentRequest request,
         [FromServices] AddPointsCommand addPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
@@ -73,7 +79,7 @@ public static class AddPointsController
         return res.Match(Response.Ok, Response.Error);
     }
 
-    public static async Task<IResult> AddPointsForStandardToStudent(
+    private static async Task<IResult> AddPointsForStandardToStudent(
         [FromBody] AddPointsForStandardToStudentRequest request,
         [FromServices] AddStandardPointsCommand addStandardPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
@@ -110,7 +116,7 @@ public static class AddPointsController
         return res.Match(Response.Ok, Response.Error);
     }
 
-    public static async Task<IResult> IncreaseStudentVisits(
+    private static async Task<IResult> IncreaseStudentVisits(
         [FromBody] IncreaseStudentVisitsRequest request,
         [FromServices] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
         [FromServices] PermissionValidator permissionValidator,
