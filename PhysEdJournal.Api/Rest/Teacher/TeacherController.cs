@@ -40,7 +40,7 @@ public static class TeacherController
 
         var result = await createTeacherCommand.ExecuteAsync(createTeacherPayload);
 
-        return result.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return result.Match(Response.Ok, Response.Error);
     }
 
     public static async Task<IResult> GivePermissionsToTeacherAsync(
@@ -77,6 +77,6 @@ public static class TeacherController
 
         var result = await givePermissionsCommand.ExecuteAsync(givePermissionsPayload);
 
-        return result.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return result.Match(Response.Ok, Response.Error);
     }
 }

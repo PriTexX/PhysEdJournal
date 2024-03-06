@@ -42,7 +42,7 @@ public static class DeletePointsController
             }
         );
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 
     public static async Task<IResult> DeletePoints(
@@ -70,7 +70,7 @@ public static class DeletePointsController
             }
         );
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 
     public static async Task<IResult> DeleteStandardPoints(
@@ -98,6 +98,6 @@ public static class DeletePointsController
             }
         );
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 }

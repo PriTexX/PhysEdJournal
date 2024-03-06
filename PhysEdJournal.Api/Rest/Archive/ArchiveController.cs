@@ -3,6 +3,7 @@ using PhysEdJournal.Api.Rest.Archive.Contracts;
 using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
+using Response = PhysEdJournal.Api.Rest.Common.Response;
 
 namespace PhysEdJournal.Api.Rest.Archive;
 
@@ -38,7 +39,7 @@ public static class ArchiveController
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 
     public static async Task<IResult> UnArchiveStudent(
@@ -64,6 +65,6 @@ public static class ArchiveController
 
         var res = await unArchiveStudentCommand.ExecuteAsync(unArchiveStudentPayload);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 }

@@ -29,7 +29,7 @@ public static class StudentController
 
         var res = await activateStudentCommand.ExecuteAsync(studentGuid);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 
     public static async Task<IResult> DeActivateStudent(
@@ -48,6 +48,6 @@ public static class StudentController
 
         var res = await deActivateStudentCommand.ExecuteAsync(studentGuid);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 }

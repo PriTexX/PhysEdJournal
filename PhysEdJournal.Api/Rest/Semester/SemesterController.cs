@@ -31,6 +31,6 @@ public static class SemesterController
 
         var res = await startNewSemesterCommand.ExecuteAsync(semesterName);
 
-        return res.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return res.Match(Response.Ok, Response.Error);
     }
 }

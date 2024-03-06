@@ -3,6 +3,7 @@ using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Api.Rest.Competition.Contracts;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
+using Response = PhysEdJournal.Api.Rest.Common.Response;
 
 namespace PhysEdJournal.Api.Rest.Competition;
 
@@ -32,7 +33,7 @@ public static class CompetitionController
 
         var result = await createCompetitionCommand.ExecuteAsync(competitionName);
 
-        return result.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return result.Match(Response.Ok, Response.Error);
     }
 
     public static async Task<IResult> DeleteCompetition(
@@ -51,6 +52,6 @@ public static class CompetitionController
 
         var result = await deleteCompetitionCommand.ExecuteAsync(competitionName);
 
-        return result.Match(_ => Results.Ok(), ErrorHandler.HandleErrorResult);
+        return result.Match(Response.Ok, Response.Error);
     }
 }
