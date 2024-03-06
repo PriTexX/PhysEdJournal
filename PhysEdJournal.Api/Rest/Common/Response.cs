@@ -9,6 +9,11 @@ public static class Response
 
     public static IResult Error(Exception ex)
     {
-        return ErrorHandler.HandleErrorResult(ex);
+        return ToResult(ErrorHandler.HandleErrorResult(ex));
+    }
+
+    private static IResult ToResult(ProblemDetailsResponse response)
+    {
+        return Results.Json(response, statusCode: response.Status);
     }
 }

@@ -7,12 +7,12 @@ namespace PhysEdJournal.Api.Rest.Common;
 
 public static class ErrorHandler
 {
-    public static IResult HandleErrorResult(Exception error)
+    public static ProblemDetailsResponse HandleErrorResult(Exception error)
     {
         var errorName = error.GetType().Name;
         return Errors.TryGetValue(errorName, out var errorProblemDetailsBuilder)
-            ? ToResult(errorProblemDetailsBuilder(error))
-            : ToResult(DefaultProblemDetailsResponse);
+            ? errorProblemDetailsBuilder(error)
+            : DefaultProblemDetailsResponse;
     }
 
     public static void AddErrors(Dictionary<string, Func<Exception, ProblemDetailsResponse>> errors)
@@ -21,11 +21,6 @@ public static class ErrorHandler
         {
             Errors[kvp.Key] = kvp.Value;
         }
-    }
-
-    private static IResult ToResult(ProblemDetailsResponse response)
-    {
-        return Results.Json(response, statusCode: response.Status);
     }
 
     public static readonly Dictionary<string, Func<Exception, ProblemDetailsResponse>> Errors =
