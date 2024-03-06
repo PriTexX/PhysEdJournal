@@ -2,7 +2,7 @@ using FluentValidation;
 using PhysEdJournal.Core.Entities.Types;
 using static PhysEdJournal.Core.Constants.ModelsConstants;
 
-namespace PhysEdJournal.Api.Api.Teacher.Contracts;
+namespace PhysEdJournal.Api.Rest.Teacher.Contracts;
 
 public class GivePermissionsToTeacherRequest
 {

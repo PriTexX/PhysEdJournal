@@ -1,7 +1,7 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
-namespace PhysEdJournal.Api.Api.Teacher.Contracts;
+namespace PhysEdJournal.Api.Rest.Teacher.Contracts;
 
 public static class TeacherErrors
 {

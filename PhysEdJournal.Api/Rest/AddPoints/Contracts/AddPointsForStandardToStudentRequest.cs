@@ -3,7 +3,7 @@ using PhysEdJournal.Core.Entities.Types;
 using static PhysEdJournal.Core.Constants.ModelsConstants;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
-namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
+namespace PhysEdJournal.Api.Rest.AddPoints.Contracts;
 
 public class AddPointsForStandardToStudentRequest
 {

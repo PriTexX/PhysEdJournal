@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PhysEdJournal.Api.Api.ResponseType;
+namespace PhysEdJournal.Api.Rest.Common;
 
 [JsonConverter(typeof(CustomProblemDetailsJsonConverter))]
 public sealed class ProblemDetailsResponse

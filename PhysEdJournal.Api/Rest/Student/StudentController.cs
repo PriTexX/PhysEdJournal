@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.Student;
+namespace PhysEdJournal.Api.Rest.Student;
 
 public static class StudentController
 {

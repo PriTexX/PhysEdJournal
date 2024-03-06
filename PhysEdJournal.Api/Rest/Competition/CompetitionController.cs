@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.Competition.Contracts;
+using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Competition.Contracts;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.Competition;
+namespace PhysEdJournal.Api.Rest.Competition;
 
 public static class CompetitionController
 {

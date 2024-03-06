@@ -1,9 +1,9 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 
-namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
+namespace PhysEdJournal.Api.Rest.AddPoints.Contracts;
 
 public static class AddPointsErrors
 {

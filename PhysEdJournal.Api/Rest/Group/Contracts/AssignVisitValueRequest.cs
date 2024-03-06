@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace PhysEdJournal.Api.Api.Group.Contracts;
+namespace PhysEdJournal.Api.Rest.Group.Contracts;
 
 public sealed class AssignVisitValueRequest
 {

@@ -1,7 +1,7 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
-namespace PhysEdJournal.Api.Api.Competition.Contracts;
+namespace PhysEdJournal.Api.Rest.Competition.Contracts;
 
 public static class CompetitionErrors
 {

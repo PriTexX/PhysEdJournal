@@ -1,7 +1,7 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 
-namespace PhysEdJournal.Api.Api.Semester.Contracts;
+namespace PhysEdJournal.Api.Rest.Semester.Contracts;
 
 public static class SemesterErrors
 {

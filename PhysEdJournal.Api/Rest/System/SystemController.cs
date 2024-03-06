@@ -3,7 +3,7 @@ using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.System;
+namespace PhysEdJournal.Api.Rest.System;
 
 public static class SystemController
 {

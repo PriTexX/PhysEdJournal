@@ -1,7 +1,7 @@
 using System.Net;
 using FluentValidation;
 
-namespace PhysEdJournal.Api.Api;
+namespace PhysEdJournal.Api.Rest.Common;
 
 public class ValidationFilter<T> : IEndpointFilter
 {

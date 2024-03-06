@@ -1,4 +1,6 @@
-namespace PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Api;
+
+namespace PhysEdJournal.Api.Rest.Common;
 
 public static class Response
 {

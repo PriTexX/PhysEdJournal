@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.AddPoints.Contracts;
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.AddPoints.Contracts;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.AddPoints;
+namespace PhysEdJournal.Api.Rest.AddPoints;
 
 public static class AddPointsController
 {

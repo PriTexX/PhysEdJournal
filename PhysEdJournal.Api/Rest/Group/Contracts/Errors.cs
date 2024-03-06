@@ -1,7 +1,7 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 
-namespace PhysEdJournal.Api.Api.Group.Contracts;
+namespace PhysEdJournal.Api.Rest.Group.Contracts;
 
 public static class GroupErrors
 {

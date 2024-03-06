@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.Teacher.Contracts;
+using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Teacher.Contracts;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.Teacher;
+namespace PhysEdJournal.Api.Rest.Teacher;
 
 public static class TeacherController
 {

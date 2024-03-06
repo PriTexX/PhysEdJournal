@@ -1,7 +1,7 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 
-namespace PhysEdJournal.Api.Api.Archive.Contracts;
+namespace PhysEdJournal.Api.Rest.Archive.Contracts;
 
 public static class ArchiveErrors
 {

@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.Archive.Contracts;
+using PhysEdJournal.Api.Rest.Archive.Contracts;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.Archive;
+namespace PhysEdJournal.Api.Rest.Archive;
 
 public static class ArchiveController
 {

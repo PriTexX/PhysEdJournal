@@ -1,9 +1,9 @@
-using PhysEdJournal.Api.Api.ResponseType;
+using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 
-namespace PhysEdJournal.Api.Api.DeletePoints.Contracts;
+namespace PhysEdJournal.Api.Rest.DeletePoints.Contracts;
 
 public static class DeletePointsErrors
 {

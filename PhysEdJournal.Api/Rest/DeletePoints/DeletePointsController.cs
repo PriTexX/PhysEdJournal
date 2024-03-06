@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.DeletePoints.Contracts;
+using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.DeletePoints.Contracts;
 using PhysEdJournal.Infrastructure.Commands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.DeletePoints;
+namespace PhysEdJournal.Api.Rest.DeletePoints;
 
 public static class DeletePointsController
 {

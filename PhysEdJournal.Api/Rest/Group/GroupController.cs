@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.Group.Contracts;
+using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Group.Contracts;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.Group;
+namespace PhysEdJournal.Api.Rest.Group;
 
 public static class GroupController
 {

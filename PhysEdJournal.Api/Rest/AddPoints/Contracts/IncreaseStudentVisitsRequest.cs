@@ -1,7 +1,7 @@
 using FluentValidation;
 using static PhysEdJournal.Core.Constants.ModelsConstants;
 
-namespace PhysEdJournal.Api.Api.AddPoints.Contracts;
+namespace PhysEdJournal.Api.Rest.AddPoints.Contracts;
 
 public sealed class IncreaseStudentVisitsRequest
 {

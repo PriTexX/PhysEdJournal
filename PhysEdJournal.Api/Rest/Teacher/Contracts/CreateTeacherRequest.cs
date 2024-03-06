@@ -1,7 +1,7 @@
 using FluentValidation;
 using static PhysEdJournal.Core.Constants.ModelsConstants;
 
-namespace PhysEdJournal.Api.Api.Teacher.Contracts;
+namespace PhysEdJournal.Api.Rest.Teacher.Contracts;
 
 public sealed class CreateTeacherRequest
 {

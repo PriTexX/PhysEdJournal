@@ -1,7 +1,7 @@
 using FluentValidation;
 using static PhysEdJournal.Core.Constants.ModelsConstants;
 
-namespace PhysEdJournal.Api.Api.Archive.Contracts;
+namespace PhysEdJournal.Api.Rest.Archive.Contracts;
 
 public sealed class ArchiveStudentRequest
 {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using static PhysEdJournal.Core.Constants.ModelsConstants;
 
-namespace PhysEdJournal.Api.Api.Group.Contracts;
+namespace PhysEdJournal.Api.Rest.Group.Contracts;
 
 public sealed class AssignCuratorToGroupRequest
 {

@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Api.Api.Semester.Contracts;
+using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Semester.Contracts;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
 
-namespace PhysEdJournal.Api.Api.Semester;
+namespace PhysEdJournal.Api.Rest.Semester;
 
 public static class SemesterController
 {
