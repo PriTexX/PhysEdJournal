@@ -19,7 +19,7 @@ public sealed class CreateTeacherRequest
                 .NotEmpty()
                 .WithMessage("Поле не должно быть пустым")
                 .MaximumLength(120)
-                .WithMessage("Длина ФИО должна быть меньше");
+                .WithMessage("Длина ФИО должна быть не больше 120 символов");
         }
     }
 }

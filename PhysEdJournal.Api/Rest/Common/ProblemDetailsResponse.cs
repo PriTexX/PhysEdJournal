@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PhysEdJournal.Api.Rest.Common;
 
-[JsonConverter(typeof(CustomProblemDetailsJsonConverter))]
+[JsonConverter(typeof(CustomProblemDetailsJsonConverter))] // TODO: убрать ненужное говно
 public sealed class ProblemDetailsResponse
 {
     [JsonPropertyName("success")]

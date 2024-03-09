@@ -14,7 +14,7 @@ public sealed class UnArchiveStudentRequest
         {
             RuleFor(request => request.StudentGuid)
                 .Length(GuidLength, GuidLength)
-                .WithMessage("Поле не должно быть пустым");
+                .WithMessage("В поле должен передаваться гуид стандартного формата");
             RuleFor(request => request.SemesterName)
                 .NotEmpty()
                 .Matches(@"\d{4}-\d{4}/\w{5}") // 2022-2023/весна

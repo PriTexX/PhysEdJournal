@@ -14,7 +14,7 @@ public sealed class IncreaseStudentVisitsRequest
         {
             RuleFor(request => request.StudentGuid)
                 .Length(GuidLength, GuidLength)
-                .WithMessage("Поле не должно быть пустым");
+                .WithMessage("В поле должен передаваться гуид стандартного формата");
             RuleFor(request => request.Date)
                 .NotEmpty()
                 .WithMessage("Дата должна быть действительной");

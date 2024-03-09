@@ -17,11 +17,10 @@ public sealed class AssignCuratorToGroupRequest
                 .Length(1, 30)
                 .WithMessage(
                     "Длина названия группы должна быть не меньше 1 и не больше 30 символов"
-                )
-                .WithMessage("Поле не должно быть пустым");
+                );
             RuleFor(request => request.TeacherGuid)
                 .Length(GuidLength, GuidLength)
-                .WithMessage("Поле не должно быть пустым");
+                .WithMessage("В поле должен передаваться гуид стандартного формата");
         }
     }
 }

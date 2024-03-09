@@ -20,10 +20,10 @@ public class AddPointsForStandardToStudentRequest
         {
             RuleFor(request => request.StudentGuid)
                 .Length(GuidLength, GuidLength)
-                .WithMessage("Поле не должно быть пустым");
+                .WithMessage("В поле должен передаваться гуид стандартного формата");
             RuleFor(request => request.PointsAmount)
                 .GreaterThan(0)
-                .WithMessage($"Колличество баллов должно быть больше 0")
+                .WithMessage("Колличество баллов должно быть больше 0")
                 .LessThan(MaxPointsForOneStandard)
                 .WithMessage($"Колличество баллов не должно быть больше {MaxPointsForOneStandard}");
             RuleFor(request => request.Date)
