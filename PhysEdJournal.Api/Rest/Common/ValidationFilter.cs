@@ -25,7 +25,7 @@ public class ValidationFilter<TReq, TValidator> : IEndpointFilter
         {
             return Results.ValidationProblem(
                 validationResult.ToDictionary(),
-                statusCode: (int)HttpStatusCode.UnprocessableEntity
+                statusCode: (int)HttpStatusCode.BadRequest
             );
         }
 
