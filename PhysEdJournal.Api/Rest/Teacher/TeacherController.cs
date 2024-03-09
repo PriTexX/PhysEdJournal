@@ -13,8 +13,19 @@ public static class TeacherController
     {
         ErrorHandler.AddErrors(TeacherErrors.Errors);
 
-        router.MapPost("/CreateTeacher", CreateTeacherAsync);
-        router.MapPost("/GivePermissionsToTeacher", GivePermissionsToTeacherAsync);
+        router
+            .MapPost("/CreateTeacher", CreateTeacherAsync)
+            .AddEndpointFilter<
+                ValidationFilter<CreateTeacherRequest, CreateTeacherRequest.Validator>
+            >();
+        router
+            .MapPost("/GivePermissionsToTeacher", GivePermissionsToTeacherAsync)
+            .AddEndpointFilter<
+                ValidationFilter<
+                    GivePermissionsToTeacherRequest,
+                    GivePermissionsToTeacherRequest.Validator
+                >
+            >();
     }
 
     public static async Task<IResult> CreateTeacherAsync(

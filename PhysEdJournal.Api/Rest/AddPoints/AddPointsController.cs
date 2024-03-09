@@ -15,13 +15,25 @@ public static class AddPointsController
 
         router
             .MapPost("/AddPointsToStudent", AddPointsToStudent)
-            .AddEndpointFilter<ValidationFilter<AddPointsToStudentRequest>>();
+            .AddEndpointFilter<
+                ValidationFilter<AddPointsToStudentRequest, AddPointsToStudentRequest.Validator>
+            >();
         router
             .MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent)
-            .AddEndpointFilter<ValidationFilter<AddPointsForStandardToStudentRequest>>();
+            .AddEndpointFilter<
+                ValidationFilter<
+                    AddPointsForStandardToStudentRequest,
+                    AddPointsForStandardToStudentRequest.Validator
+                >
+            >();
         router
             .MapPost("/IncreaseStudentVisits", IncreaseStudentVisits)
-            .AddEndpointFilter<ValidationFilter<IncreaseStudentVisitsRequest>>();
+            .AddEndpointFilter<
+                ValidationFilter<
+                    IncreaseStudentVisitsRequest,
+                    IncreaseStudentVisitsRequest.Validator
+                >
+            >();
     }
 
     private static async Task<IResult> AddPointsToStudent(

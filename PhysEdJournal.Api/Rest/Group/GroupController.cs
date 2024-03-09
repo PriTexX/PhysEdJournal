@@ -12,8 +12,16 @@ public static class GroupController
     {
         ErrorHandler.AddErrors(GroupErrors.Errors);
 
-        router.MapPost("/AssignCurator", AssignCuratorToGroup);
-        router.MapPost("/AssignVisitValue", AssignVisitValue);
+        router
+            .MapPost("/AssignCurator", AssignCuratorToGroup)
+            .AddEndpointFilter<
+                ValidationFilter<AssignCuratorToGroupRequest, AssignCuratorToGroupRequest.Validator>
+            >();
+        router
+            .MapPost("/AssignVisitValue", AssignVisitValue)
+            .AddEndpointFilter<
+                ValidationFilter<AssignVisitValueRequest, AssignVisitValueRequest.Validator>
+            >();
     }
 
     public static async Task<IResult> AssignCuratorToGroup(

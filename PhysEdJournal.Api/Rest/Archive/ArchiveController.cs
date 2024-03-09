@@ -13,8 +13,16 @@ public static class ArchiveController
     {
         ErrorHandler.AddErrors(ArchiveErrors.Errors);
 
-        router.MapPost("/ArchiveStudent", ArchiveStudent);
-        router.MapPost("/UnArchiveStudent", UnArchiveStudent);
+        router
+            .MapPost("/ArchiveStudent", ArchiveStudent)
+            .AddEndpointFilter<
+                ValidationFilter<ArchiveStudentRequest, ArchiveStudentRequest.Validator>
+            >();
+        router
+            .MapPost("/UnArchiveStudent", UnArchiveStudent)
+            .AddEndpointFilter<
+                ValidationFilter<UnArchiveStudentRequest, UnArchiveStudentRequest.Validator>
+            >();
     }
 
     public static async Task<IResult> ArchiveStudent(
