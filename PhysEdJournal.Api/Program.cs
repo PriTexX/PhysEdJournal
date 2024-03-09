@@ -5,7 +5,6 @@ using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhysEdJournal.Api;
-using PhysEdJournal.Api.Rest.Competition;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
 using PhysEdJournal.Api.Endpoints.StaffEndpoint;
 using PhysEdJournal.Api.FilterExtensions;
@@ -15,11 +14,16 @@ using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Monitoring.Logging;
 using PhysEdJournal.Api.Rest.AddPoints;
+using PhysEdJournal.Api.Rest.AddPoints.Contracts;
+using PhysEdJournal.Api.Rest.Archive.Contracts;
+using PhysEdJournal.Api.Rest.Competition;
 using PhysEdJournal.Api.Rest.DeletePoints;
 using PhysEdJournal.Api.Rest.Group;
+using PhysEdJournal.Api.Rest.Group.Contracts;
 using PhysEdJournal.Api.Rest.Semester;
 using PhysEdJournal.Api.Rest.Student;
 using PhysEdJournal.Api.Rest.System;
+using PhysEdJournal.Api.Rest.Teacher.Contracts;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.DI;
@@ -103,6 +107,20 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddSingleton<IStaffInfoClient, StaffInfoHttpClient>();
 builder.Services.AddScoped<PermissionValidator>();
 builder.Services.AddScoped<MeInfoService>();
+
+/*
+    Validators
+ */
+
+builder.Services.AddSingleton<AddPointsToStudentRequest.Validator>();
+builder.Services.AddSingleton<AddPointsForStandardToStudentRequest.Validator>();
+builder.Services.AddSingleton<IncreaseStudentVisitsRequest.Validator>();
+builder.Services.AddSingleton<ArchiveStudentRequest.Validator>();
+builder.Services.AddSingleton<UnArchiveStudentRequest.Validator>();
+builder.Services.AddSingleton<AssignCuratorToGroupRequest.Validator>();
+builder.Services.AddSingleton<AssignVisitValueRequest.Validator>();
+builder.Services.AddSingleton<CreateTeacherRequest.Validator>();
+builder.Services.AddSingleton<GivePermissionsToTeacherRequest.Validator>();
 
 /*
     Utils
