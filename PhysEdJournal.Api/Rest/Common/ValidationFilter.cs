@@ -3,20 +3,22 @@ using FluentValidation;
 
 namespace PhysEdJournal.Api.Rest.Common;
 
-public class ValidationFilter<T> : IEndpointFilter
+public class ValidationFilter<TReq, TValidator> : IEndpointFilter
+    where TValidator : IValidator<TReq>
 {
     public async ValueTask<object?> InvokeAsync(
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next
     )
     {
-        var argToValidate = context.GetArgument<T>(0);
-        var validator = context.HttpContext.RequestServices.GetService<IValidator<T>>();
+        var validator = context.HttpContext.RequestServices.GetService<TValidator>();
 
         if (validator is null)
         {
-            return await next.Invoke(context);
+            throw new Exception("Validator is missing");
         }
+
+        var argToValidate = context.GetArgument<TReq>(0);
 
         var validationResult = await validator.ValidateAsync(argToValidate!);
         if (!validationResult.IsValid)
