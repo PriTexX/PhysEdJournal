@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Common.Pagination;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
@@ -12,7 +13,7 @@ public static class StudentController
     public static void MapEndpoints(IEndpointRouteBuilder router)
     {
         router.MapPost("/activate-student", ActivateStudent);
-        router.MapPost("/de-activate-student", DeActivateStudent);
+        router.MapPost("/deactivate-student", DeActivateStudent);
         router.MapGet("/get-student", GetStudent);
         router.MapGet("/get-students", GetStudents);
     }
@@ -65,8 +66,17 @@ public static class StudentController
         return Response.Ok(student);
     }
 
-    private static IResult GetStudents([FromBody] ApplicationContext context)
+    private static async Task<IResult> GetStudents(
+        [FromBody] PaginationParameters paginationParameters,
+        [FromServices] ApplicationContext context
+    )
     {
-        return Response.Ok(context.Students);
+        var data = await context.Students
+            .OrderBy(x => x.FullName)
+            .Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
+            .Take(paginationParameters.PageSize)
+            .ToListAsync();
+
+        return Response.Ok(data);
     }
 }

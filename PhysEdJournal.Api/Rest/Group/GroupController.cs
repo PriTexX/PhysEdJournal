@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Common.Extensions;
 using PhysEdJournal.Api.Rest.Group.Contracts;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
@@ -13,18 +14,14 @@ public static class GroupController
         ErrorHandler.AddErrors(GroupErrors.Errors);
 
         router
-            .MapPost("/AssignCurator", AssignCuratorToGroup)
-            .AddEndpointFilter<
-                ValidationFilter<AssignCuratorToGroupRequest, AssignCuratorToGroupRequest.Validator>
-            >();
+            .MapPost("/assign-curator", AssignCuratorToGroup)
+            .AddValidation<AssignCuratorToGroupRequest, AssignCuratorToGroupRequest.Validator>();
         router
             .MapPost("/AssignVisitValue", AssignVisitValue)
-            .AddEndpointFilter<
-                ValidationFilter<AssignVisitValueRequest, AssignVisitValueRequest.Validator>
-            >();
+            .AddValidation<AssignVisitValueRequest, AssignVisitValueRequest.Validator>();
     }
 
-    public static async Task<IResult> AssignCuratorToGroup(
+    private static async Task<IResult> AssignCuratorToGroup(
         [FromBody] AssignCuratorToGroupRequest request,
         [FromServices] AssignCuratorCommand assignCuratorCommand,
         [FromServices] PermissionValidator permissionValidator,

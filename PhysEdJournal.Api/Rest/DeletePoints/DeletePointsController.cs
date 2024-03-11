@@ -12,12 +12,12 @@ public static class DeletePointsController
     {
         ErrorHandler.AddErrors(DeletePointsErrors.Errors);
 
-        router.MapDelete("/DeleteStudentVisit", DeleteStudentVisit);
-        router.MapDelete("/DeletePoints", DeletePoints);
-        router.MapDelete("/DeleteStandardPoints", DeleteStandardPoints);
+        router.MapDelete("/delete-student-visit", DeleteStudentVisit);
+        router.MapDelete("/delete-points", DeletePoints);
+        router.MapDelete("/delete-standard-points", DeleteStandardPoints);
     }
 
-    public static async Task<IResult> DeleteStudentVisit(
+    private static async Task<IResult> DeleteStudentVisit(
         int historyId,
         [FromServices] DeleteStudentVisitCommand deleteStudentVisitCommand,
         [FromServices] PermissionValidator permissionValidator,

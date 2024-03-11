@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Common.Extensions;
 using PhysEdJournal.Api.Rest.Teacher.Contracts;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
@@ -14,21 +15,17 @@ public static class TeacherController
         ErrorHandler.AddErrors(TeacherErrors.Errors);
 
         router
-            .MapPost("/CreateTeacher", CreateTeacherAsync)
-            .AddEndpointFilter<
-                ValidationFilter<CreateTeacherRequest, CreateTeacherRequest.Validator>
-            >();
+            .MapPost("/create-teacher", CreateTeacherAsync)
+            .AddValidation<CreateTeacherRequest, CreateTeacherRequest.Validator>();
         router
-            .MapPost("/GivePermissionsToTeacher", GivePermissionsToTeacherAsync)
-            .AddEndpointFilter<
-                ValidationFilter<
-                    GivePermissionsToTeacherRequest,
-                    GivePermissionsToTeacherRequest.Validator
-                >
+            .MapPost("/give-permissions-to-teacher", GivePermissionsToTeacherAsync)
+            .AddValidation<
+                GivePermissionsToTeacherRequest,
+                GivePermissionsToTeacherRequest.Validator
             >();
     }
 
-    public static async Task<IResult> CreateTeacherAsync(
+    private static async Task<IResult> CreateTeacherAsync(
         [FromBody] CreateTeacherRequest request,
         [FromServices] CreateTeacherCommand createTeacherCommand,
         [FromServices] PermissionValidator permissionValidator,
@@ -54,7 +51,7 @@ public static class TeacherController
         return result.Match(Response.Ok, Response.Error);
     }
 
-    public static async Task<IResult> GivePermissionsToTeacherAsync(
+    private static async Task<IResult> GivePermissionsToTeacherAsync(
         [FromBody] GivePermissionsToTeacherRequest request,
         [FromServices] GivePermissionsCommand givePermissionsCommand,
         [FromServices] PermissionValidator permissionValidator,

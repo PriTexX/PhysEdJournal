@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Rest.AddPoints.Contracts;
 using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Common.Extensions;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
@@ -14,26 +15,17 @@ public static class AddPointsController
         ErrorHandler.AddErrors(AddPointsErrors.Errors);
 
         router
-            .MapPost("/AddPointsToStudent", AddPointsToStudent)
-            .AddEndpointFilter<
-                ValidationFilter<AddPointsToStudentRequest, AddPointsToStudentRequest.Validator>
+            .MapPost("/add-points-to-student", AddPointsToStudent)
+            .AddValidation<AddPointsToStudentRequest, AddPointsToStudentRequest.Validator>();
+        router
+            .MapPost("/add-points-for-standard-to-student", AddPointsForStandardToStudent)
+            .AddValidation<
+                AddPointsForStandardToStudentRequest,
+                AddPointsForStandardToStudentRequest.Validator
             >();
         router
-            .MapPost("/AddPointsForStandardToStudent", AddPointsForStandardToStudent)
-            .AddEndpointFilter<
-                ValidationFilter<
-                    AddPointsForStandardToStudentRequest,
-                    AddPointsForStandardToStudentRequest.Validator
-                >
-            >();
-        router
-            .MapPost("/IncreaseStudentVisits", IncreaseStudentVisits)
-            .AddEndpointFilter<
-                ValidationFilter<
-                    IncreaseStudentVisitsRequest,
-                    IncreaseStudentVisitsRequest.Validator
-                >
-            >();
+            .MapPost("/increase-student-visits", IncreaseStudentVisits)
+            .AddValidation<IncreaseStudentVisitsRequest, IncreaseStudentVisitsRequest.Validator>();
     }
 
     private static async Task<IResult> AddPointsToStudent(

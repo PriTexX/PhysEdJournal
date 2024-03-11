@@ -9,10 +9,10 @@ public static class SystemController
 {
     public static void MapEndpoints(IEndpointRouteBuilder router)
     {
-        router.MapPost("/UpdateStudentsInfo", UpdateStudentsInfo);
+        router.MapPost("/update-students-info", UpdateStudentsInfo);
     }
 
-    public static async Task<IResult> UpdateStudentsInfo(
+    private static async Task<IResult> UpdateStudentsInfo(
         [FromServices] ILogger<UpdateStudentsInfoCommand> logger,
         [FromServices] UpdateStudentsInfoCommand updateStudentsInfoCommand,
         [FromServices] PermissionValidator permissionValidator,

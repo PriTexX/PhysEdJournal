@@ -13,11 +13,11 @@ public static class CompetitionController
     {
         ErrorHandler.AddErrors(CompetitionErrors.Errors);
 
-        router.MapPost("/CreateCompetition", CreateCompetition);
-        router.MapDelete("/DeleteCompetition", DeleteCompetition);
+        router.MapPost("/create-competition", CreateCompetition);
+        router.MapDelete("/delete-competition", DeleteCompetition);
     }
 
-    public static async Task<IResult> CreateCompetition(
+    private static async Task<IResult> CreateCompetition(
         string competitionName,
         [FromServices] CreateCompetitionCommand createCompetitionCommand,
         [FromServices] PermissionValidator permissionValidator,
@@ -36,7 +36,7 @@ public static class CompetitionController
         return result.Match(Response.Ok, Response.Error);
     }
 
-    public static async Task<IResult> DeleteCompetition(
+    private static async Task<IResult> DeleteCompetition(
         string competitionName,
         [FromServices] DeleteCompetitionCommand deleteCompetitionCommand,
         [FromServices] PermissionValidator permissionValidator,

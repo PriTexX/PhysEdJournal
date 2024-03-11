@@ -12,10 +12,10 @@ public static class SemesterController
     {
         ErrorHandler.AddErrors(SemesterErrors.Errors);
 
-        router.MapPost("/StartNewSemester", StartNewSemester);
+        router.MapPost("/start-new-semester", StartNewSemester);
     }
 
-    public static async Task<IResult> StartNewSemester(
+    private static async Task<IResult> StartNewSemester(
         string semesterName,
         [FromServices] StartNewSemesterCommand startNewSemesterCommand,
         [FromServices] PermissionValidator permissionValidator,
