@@ -15,6 +15,7 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Monitoring.Logging;
 using PhysEdJournal.Api.Rest.AddPoints;
 using PhysEdJournal.Api.Rest.AddPoints.Contracts;
+using PhysEdJournal.Api.Rest.Archive;
 using PhysEdJournal.Api.Rest.Archive.Contracts;
 using PhysEdJournal.Api.Rest.Competition;
 using PhysEdJournal.Api.Rest.DeletePoints;
@@ -23,6 +24,7 @@ using PhysEdJournal.Api.Rest.Group.Contracts;
 using PhysEdJournal.Api.Rest.Semester;
 using PhysEdJournal.Api.Rest.Student;
 using PhysEdJournal.Api.Rest.System;
+using PhysEdJournal.Api.Rest.Teacher;
 using PhysEdJournal.Api.Rest.Teacher.Contracts;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
@@ -190,6 +192,8 @@ CompetitionController.MapEndpoints(root);
 SemesterController.MapEndpoints(root);
 SystemController.MapEndpoints(root);
 StudentController.MapEndpoints(root);
+TeacherController.MapEndpoints(root);
+ArchiveController.MapEndpoints(root);
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>
