@@ -105,7 +105,7 @@ public sealed class ArchiveStudentJob : IJob
 
         return CalculateTotalPoints(
                 student.Visits,
-                student.Group.VisitValue,
+                student.ArchivedVisitValue,
                 student.AdditionalPoints,
                 student.PointsForStandards
             ) >= REQUIRED_POINT_AMOUNT;

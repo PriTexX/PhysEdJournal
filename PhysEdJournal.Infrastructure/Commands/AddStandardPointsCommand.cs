@@ -53,9 +53,15 @@ internal sealed class AddStandardPointsCommandValidator
             return new StudentNotFoundException(commandInput.StudentGuid);
         }
 
+        ArgumentNullException.ThrowIfNull(student.Group);
+
+        var visitValue = student.HasDebtFromPreviousSemester
+            ? student.ArchivedVisitValue
+            : student.Group.VisitValue;
+
         var totalPoints = CalculateTotalPoints(
             student.Visits,
-            student.Group!.VisitValue,
+            visitValue,
             student.AdditionalPoints,
             student.PointsForStandards
         );
