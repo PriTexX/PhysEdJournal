@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Api.Rest.Common;
+using PhysEdJournal.Api.Rest.Common.Filtering;
 using PhysEdJournal.Api.Rest.Common.Pagination;
+using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
 using static PhysEdJournal.Core.Constants.PermissionConstants;
@@ -68,11 +70,24 @@ public static class StudentController
 
     private static async Task<IResult> GetStudents(
         [FromBody] PaginationParameters paginationParameters,
+        [FromBody] FilterParameters? filterParameters,
         [FromServices] ApplicationContext context
     )
     {
-        var data = await context.Students
-            .OrderBy(x => x.FullName)
+        var query = context.Students.OrderBy(x => x.FullName);
+        if (filterParameters is not null)
+        {
+            query =
+                query.Where(
+                    x =>
+                        EF.Functions.Like(
+                            EF.Property<string>(x, filterParameters.FieldName).ToLower(),
+                            "%" + filterParameters.SearchTerm + "%"
+                        )
+                ) as IOrderedQueryable<StudentEntity>;
+        }
+
+        var data = await query
             .Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
             .Take(paginationParameters.PageSize)
             .ToListAsync();
