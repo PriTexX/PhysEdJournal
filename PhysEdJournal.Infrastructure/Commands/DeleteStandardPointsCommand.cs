@@ -50,11 +50,11 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > DAYS_TO_DELETE_POINTS
+                > DaysToDeletePoints
             && !commandPayload.IsAdmin
         )
         {
-            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
+            return new PointsOutdatedException(DaysToDeletePoints);
         }
 
         var totalPointsForStandards = await _applicationContext.StandardsStudentsHistory

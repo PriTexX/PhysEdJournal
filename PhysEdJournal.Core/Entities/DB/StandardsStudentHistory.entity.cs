@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PhysEdJournal.Core.Entities.Types;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
@@ -22,14 +23,14 @@ public sealed class StandardsStudentHistoryEntity
     [Required]
     public StandardType StandardType { get; set; }
 
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     [Required(AllowEmptyStrings = false)]
     public required string TeacherGuid { get; set; }
 
     [ForeignKey("TeacherGuid")]
     public TeacherEntity? Teacher { get; set; }
 
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     [Required(AllowEmptyStrings = false)]
     public required string StudentGuid { get; set; }
 

@@ -49,11 +49,11 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > DAYS_TO_DELETE_POINTS
+                > DaysToDeletePoints
             && !commandPayload.IsAdmin
         )
         {
-            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
+            return new PointsOutdatedException(DaysToDeletePoints);
         }
 
         student.AdditionalPoints -= history.Points;

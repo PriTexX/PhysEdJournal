@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using PhysEdJournal.Core.Entities.Types;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
 public sealed class TeacherEntity
 {
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     [Key]
     public required string TeacherGuid { get; set; }
 

@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="11.8.1" />
         <PackageReference Include="HotChocolate.AspNetCore" Version="12.16.0" />
         <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.16.0" />
         <PackageReference Include="HotChocolate.Data" Version="12.16.0" />
@@ -32,11 +33,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
-      <ProjectReference Include="..\PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj" />
-
+        <ProjectReference Include="..\PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj" />
     </ItemGroup>
 
-
-
-
+    <ItemGroup>
+      <Folder Include="Rest\Student\Contracts\" />
+      <Folder Include="Rest\System\Contracts\" />
+    </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static PhysEdJournal.Core.Constants.ModelsConstants;
 
 namespace PhysEdJournal.Core.Entities.DB;
 
@@ -13,7 +14,7 @@ public sealed class GroupEntity
     [DefaultValue(2.0)]
     public double VisitValue { get; set; } = 2.0;
 
-    [StringLength(36)]
+    [StringLength(GuidLength)]
     public string? CuratorGuid { get; set; }
 
     [ForeignKey("CuratorGuid")]

@@ -51,7 +51,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             student.PointsForStandards
         );
 
-        if (totalPoints < REQUIRED_POINT_AMOUNT)
+        if (totalPoints < RequiredPointsAmount)
         {
             if (!student.HasDebtFromPreviousSemester)
             {
