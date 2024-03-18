@@ -39,4 +39,5 @@
       <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
     </ItemGroup>
 
+
 </Project>

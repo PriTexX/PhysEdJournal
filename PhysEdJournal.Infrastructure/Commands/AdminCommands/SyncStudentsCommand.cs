@@ -12,9 +12,70 @@ using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
+file sealed class Student
+{
+    public required string Guid { get; set; }
+    public required string FullName { get; set; }
+    public required string Group { get; set; }
+    public required int Course { get; set; }
+    public required string Department { get; set; }
+}
+
+file sealed class Students
+{
+    public required List<Student> Items { get; set; }
+}
+
+file sealed class PagedGraphQLStudent
+{
+    public required Students Students { get; set; }
+}
+
+file class UserInfoClient : IDisposable
+{
+    private readonly GraphQLHttpClient _client;
+
+    public UserInfoClient(string userInfoServerUrl)
+    {
+        _client = new GraphQLHttpClient(userInfoServerUrl, new NewtonsoftJsonSerializer());
+    }
+
+    public async Task<List<Student>> GetStudentsAsync(int limit, int offset)
+    {
+        var query =
+            @"query($pageSize: Int!, $skipSize: Int!) {
+            students(take: $pageSize, skip: $skipSize, where: {group: {neq: """"}}) {
+                items {
+                    guid
+                    fullName
+                    group
+                    course
+                    department
+                }
+            }
+         }";
+
+        var request = new GraphQLRequest { Query = query, Variables = new { limit, offset }, };
+
+        var response = await _client.SendQueryAsync<PagedGraphQLStudent>(request);
+
+        if (response.Errors != null && response.Errors.Any())
+        {
+            var errors = response.Errors.Select(e => new Exception(e.Message)).ToList();
+            throw new AggregateException(errors);
+        }
+
+        return response.Data.Students.Items;
+    }
+
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
+}
+
 public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 {
-    private static readonly List<Student> _allLatestStudents = new();
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly string _userInfoServerUrl;
     private readonly int _pageSize;
@@ -31,154 +92,98 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
     public async Task<Result<Unit>> ExecuteAsync(EmptyPayload commandPayload)
     {
-        await using var scope = _serviceScopeFactory.CreateAsyncScope(); // Использую ServiceLocator т.к. команда запускается в бэкграунде и переданный ей ApplicationContext закрывается до завершения работы команды
+        // Using ServiceLocator here as this command is launched
+        // in the background because if we pass ApplicationContext
+        // directly through constructor params it will be closed
+        // and disposed before command finishes
+        await using var scope = _serviceScopeFactory.CreateAsyncScope();
         await using var applicationContext =
             scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+        using var client = new UserInfoClient(_userInfoServerUrl);
+
         var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
 
-        await FetchStudents(_userInfoServerUrl, _pageSize);
+        // We expect to have more than 2000 students
+        // so why not to initialize it with this capacity?
+        var existingStudentsGuids = new List<string>(2000);
 
-        var guids = _allLatestStudents.Select(s => s.Guid).ToList();
+        var dbGroups = await applicationContext.Groups
+            .Select(g => g.GroupName)
+            .ToDictionaryAsync(g => g);
 
-        var studentsToDeactivate = await applicationContext.Students
-            .Where(s => !guids.Contains(s.StudentGuid))
-            .ToListAsync();
-
-        foreach (var stud in studentsToDeactivate)
-        {
-            stud.IsActive = false;
-        }
-
-        var batchSize = 500;
-        await HandleLatestStudents(applicationContext, currentSemesterName, batchSize);
-
-        applicationContext.UpdateRange(studentsToDeactivate);
-        await applicationContext.SaveChangesAsync();
-
-        return Unit.Default;
-    }
-
-    private async Task HandleLatestStudents(
-        ApplicationContext applicationContext,
-        string semesterName,
-        int batchSize
-    )
-    {
         var offset = 0;
-        var hasMoreStudents = true;
-
-        while (hasMoreStudents)
-        {
-            var studentsBatch = await applicationContext.Students
-                .Where(s => s.IsActive == true)
-                .Skip(offset)
-                .Take(batchSize)
-                .ToListAsync();
-
-            var guids = studentsBatch.Select(s => s.StudentGuid).ToList();
-
-            if (!studentsBatch.Any())
-            {
-                hasMoreStudents = false;
-            }
-
-            foreach (var stud in _allLatestStudents)
-            {
-                if (!guids.Contains(stud.Guid))
-                {
-                    await applicationContext.AddAsync(
-                        CreateStudentEntityFromStudentModel(stud, semesterName)
-                    );
-                }
-
-                var dbStudent = studentsBatch.First(s => s.StudentGuid == stud.Guid);
-
-                if (dbStudent.GroupNumber != stud.Group)
-                {
-                    dbStudent.GroupNumber = stud.Group;
-                }
-
-                if (dbStudent.FullName != stud.FullName)
-                {
-                    dbStudent.FullName = stud.FullName;
-                }
-
-                if (dbStudent.Course != stud.Course)
-                {
-                    dbStudent.Course = stud.Course;
-                }
-
-                if (dbStudent.Department != stud.Department)
-                {
-                    dbStudent.Department = stud.Department;
-                }
-            }
-
-            offset += batchSize;
-        }
-    }
-
-    private async Task FetchStudents(string url, int pageSize)
-    {
-        var query =
-            @"query($pageSize: Int!, $skipSize: Int!) {
-            students(take: $pageSize, skip: $skipSize, where: {group: {neq: """"}}) {
-                pageInfo{hasNextPage}
-                items {
-                    guid
-                    fullName
-                    group
-                    course
-                    department
-                }
-            }
-         }";
-
-        var client = new GraphQLHttpClient(url, new NewtonsoftJsonSerializer());
-        var skipSize = 0;
 
         while (true)
         {
-            var request = new GraphQLRequest
-            {
-                Query = query,
-                Variables = new { pageSize, skipSize },
-            };
-            var response = await client.SendQueryAsync<PagedGraphQLStudent>(request);
+            var actualStudents = await client.GetStudentsAsync(_pageSize, offset);
 
-            if (response.Errors != null && response.Errors.Any())
-            {
-                var errors = response.Errors.Select(e => new Exception(e.Message)).ToList();
-                throw new AggregateException(errors);
-            }
-
-            foreach (var student in response.Data.Students.Items)
-            {
-                _allLatestStudents?.Add(student);
-            }
-
-            if (!response.Data.Students.PageInfo.HasNextPage)
+            if (actualStudents.Count == 0)
             {
                 break;
             }
 
-            skipSize += pageSize;
+            offset += _pageSize;
+
+            var studentsGuids = actualStudents.Select(s => s.Guid).ToList();
+
+            existingStudentsGuids.AddRange(studentsGuids);
+
+            var dbStudents = await applicationContext.Students
+                .Where(s => studentsGuids.Contains(s.StudentGuid))
+                .ToDictionaryAsync(s => s.StudentGuid);
+
+            foreach (var student in actualStudents.Where(s => IsGroupValid(s.Group)))
+            {
+                if (!dbGroups.ContainsKey(student.Group))
+                {
+                    applicationContext.Groups.Add(
+                        new GroupEntity { GroupName = student.Group, VisitValue = 2.0, }
+                    );
+                }
+
+                if (!dbStudents.ContainsKey(student.Guid))
+                {
+                    applicationContext.Students.Add(
+                        new StudentEntity
+                        {
+                            FullName = student.FullName,
+                            GroupNumber = student.Group,
+                            StudentGuid = student.Guid,
+                            CurrentSemesterName = currentSemesterName,
+                            Department = student.Department,
+                            Course = student.Course,
+                        }
+                    );
+                }
+                else
+                {
+                    var dbStudent = dbStudents[student.Guid];
+
+                    dbStudent.FullName = student.FullName;
+                    dbStudent.GroupNumber = student.Group;
+                    dbStudent.StudentGuid = student.Guid;
+                    dbStudent.Department = student.Department;
+                    dbStudent.Course = student.Course;
+
+                    applicationContext.Students.Update(dbStudent);
+                }
+            }
+
+            await applicationContext.SaveChangesAsync();
         }
+
+        await applicationContext.Students
+            .Where(s => !existingStudentsGuids.Contains(s.StudentGuid))
+            .ExecuteDeleteAsync();
+
+        return Unit.Default;
     }
 
-    private static StudentEntity CreateStudentEntityFromStudentModel(
-        Student student,
-        string currentSemesterName
-    )
+    // Cringe name for method that checks
+    // that group has PE lessons
+    private bool IsGroupValid(string group)
     {
-        return new StudentEntity
-        {
-            StudentGuid = student.Guid,
-            FullName = student.FullName,
-            GroupNumber = student.Group,
-            Course = student.Course,
-            Department = student.Department,
-            CurrentSemesterName = currentSemesterName,
-        };
+        // Only 2X1 and 2X9 groups have PE lessons
+        return group[2] == '1' || group[2] == '9';
     }
 }

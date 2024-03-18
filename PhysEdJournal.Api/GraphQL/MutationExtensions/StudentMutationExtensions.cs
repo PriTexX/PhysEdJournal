@@ -320,8 +320,8 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     public async Task<Success> UpdateStudentsInfo(
-        [Service] UpdateStudentsInfoCommand updateStudentsInfoCommand,
-        [Service] ILogger<UpdateStudentsInfoCommand> logger,
+        [Service] SyncStudentsCommand syncStudentCommand,
+        [Service] ILogger<SyncStudentsCommand> logger,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
@@ -344,14 +344,14 @@ public class StudentMutationExtensions
                 logger.LogInformation(
                     "Teacher: {teacherGuid} started {commandName}",
                     callerGuid,
-                    nameof(UpdateStudentsInfoCommand)
+                    nameof(SyncStudentsCommand)
                 );
 
-                await updateStudentsInfoCommand.ExecuteAsync(EmptyPayload.Empty);
+                await syncStudentCommand.ExecuteAsync(EmptyPayload.Empty);
 
                 logger.LogInformation(
                     "{commandName} has successfully finished",
-                    nameof(UpdateStudentsInfoCommand)
+                    nameof(SyncStudentsCommand)
                 );
             }
             catch (Exception e)
@@ -359,7 +359,7 @@ public class StudentMutationExtensions
                 logger.LogError(
                     e,
                     "Unhandled exception happened in {commandName}",
-                    nameof(UpdateStudentsInfoCommand)
+                    nameof(SyncStudentsCommand)
                 );
             }
         });
