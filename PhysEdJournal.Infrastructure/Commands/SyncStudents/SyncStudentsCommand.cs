@@ -1,8 +1,6 @@
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -15,15 +13,18 @@ namespace PhysEdJournal.Infrastructure.Commands;
 public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ILogger<SyncStudentsCommand> _logger;
     private readonly string _userInfoServerUrl;
     private readonly int _pageSize;
 
     public SyncStudentsCommand(
         IOptions<ApplicationOptions> options,
-        IServiceScopeFactory serviceScopeFactory
+        IServiceScopeFactory serviceScopeFactory,
+        ILogger<SyncStudentsCommand> logger
     )
     {
         _serviceScopeFactory = serviceScopeFactory;
+        _logger = logger;
         _userInfoServerUrl = options.Value.UserInfoServerURL;
         _pageSize = options.Value.PageSizeToQueryUserInfoServer;
     }
@@ -39,11 +40,13 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
             scope.ServiceProvider.GetRequiredService<ApplicationContext>();
         using var client = new UserInfoClient(_userInfoServerUrl);
 
+        _logger.LogInformation($"Starting {nameof(SyncStudentsCommand)}");
+
         var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
 
-        // We expect to have more than 2000 students
+        // We expect to have more than 4000 students
         // so why not to initialize it with this capacity?
-        var existingStudentsGuids = new List<string>(2000);
+        var existingStudentsGuids = new List<string>(4000);
 
         var dbGroups = await applicationContext.Groups
             .Select(g => g.GroupName)
@@ -62,9 +65,12 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
             offset += _pageSize;
 
-            var studentsGuids = actualStudents.Select(s => s.Guid).ToList();
+            _logger.LogInformation(
+                "Received {chunkNum} chunk of students from `userinfo`",
+                offset / _pageSize
+            );
 
-            existingStudentsGuids.AddRange(studentsGuids);
+            var studentsGuids = actualStudents.Select(s => s.Guid).ToList();
 
             var dbStudents = await applicationContext.Students
                 .Where(s => studentsGuids.Contains(s.StudentGuid))
@@ -72,8 +78,12 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
             foreach (var student in actualStudents.Where(StudentHasPELessons))
             {
+                existingStudentsGuids.Add(student.Guid);
+
                 if (!dbGroups.ContainsKey(student.Group))
                 {
+                    _logger.LogInformation("Adding new group: {groupName}", student.Group);
+
                     dbGroups.Add(student.Group, true);
                     applicationContext.Groups.Add(
                         new GroupEntity { GroupName = student.Group, VisitValue = 2.0, }
@@ -92,6 +102,8 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
                 }
                 else
                 {
+                    _logger.LogInformation("Adding new student: {studentGuid}", student.Guid);
+
                     applicationContext.Students.Add(
                         new StudentEntity
                         {
@@ -113,6 +125,8 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
         await applicationContext.Students
             .Where(s => !existingStudentsGuids.Contains(s.StudentGuid))
             .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsActive, false));
+
+        _logger.LogInformation($"Finished {nameof(SyncStudentsCommand)}");
 
         return Unit.Default;
     }

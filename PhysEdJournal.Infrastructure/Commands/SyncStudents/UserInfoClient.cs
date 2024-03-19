@@ -47,7 +47,11 @@ internal sealed class UserInfoClient : IDisposable
             }
          }";
 
-        var request = new GraphQLRequest { Query = query, Variables = new { limit, offset }, };
+        var request = new GraphQLRequest
+        {
+            Query = query,
+            Variables = new { pageSize = limit, skipSize = offset },
+        };
 
         var response = await _client.SendQueryAsync<PagedGraphQLStudent>(request);
 
