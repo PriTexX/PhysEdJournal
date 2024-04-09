@@ -43,8 +43,8 @@ internal sealed class AddStandardPointsCommandValidator
             return new ActionFromFutureException(commandInput.Date);
         }
 
-        var student = await _applicationContext.Students
-            .Include(s => s.Group)
+        var student = await _applicationContext
+            .Students.Include(s => s.Group)
             .Where(s => s.StudentGuid == commandInput.StudentGuid)
             .FirstOrDefaultAsync();
 
@@ -95,12 +95,11 @@ internal sealed class AddStandardPointsCommandValidator
             return new NegativePointAmount();
         }
 
-        var duplicateHistoryEntity = await _applicationContext.StandardsStudentsHistory
-            .AsNoTracking()
-            .Where(
-                s =>
-                    s.StudentGuid == commandInput.StudentGuid
-                    && s.StandardType == commandInput.StandardType
+        var duplicateHistoryEntity = await _applicationContext
+            .StandardsStudentsHistory.AsNoTracking()
+            .Where(s =>
+                s.StudentGuid == commandInput.StudentGuid
+                && s.StandardType == commandInput.StandardType
             )
             .OrderByDescending(s => s.Points)
             .FirstOrDefaultAsync();
@@ -147,8 +146,8 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
             return validation.ValidationException;
         }
 
-        var student = await _applicationContext.Students
-            .Include(s => s.Group)
+        var student = await _applicationContext
+            .Students.Include(s => s.Group)
             .FirstOrDefaultAsync(s => s.StudentGuid == commandPayload.StudentGuid);
 
         if (student is null)
@@ -168,12 +167,11 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
 
         if (commandPayload.IsOverride)
         {
-            var points = await _applicationContext.StandardsStudentsHistory
-                .AsNoTracking()
-                .Where(
-                    s =>
-                        s.StudentGuid == commandPayload.StudentGuid
-                        && s.StandardType == commandPayload.StandardType
+            var points = await _applicationContext
+                .StandardsStudentsHistory.AsNoTracking()
+                .Where(s =>
+                    s.StudentGuid == commandPayload.StudentGuid
+                    && s.StandardType == commandPayload.StandardType
                 )
                 .OrderByDescending(s => s.Points)
                 .Select(s => s.Points)

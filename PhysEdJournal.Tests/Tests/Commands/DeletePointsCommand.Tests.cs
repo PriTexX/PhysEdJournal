@@ -58,8 +58,8 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         await context.PointsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.PointsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyObj = context.PointsStudentsHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
         var payload = new DeletePointsCommandPayload
         {
@@ -74,14 +74,14 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.PointsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.PointsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedAdditionalPoints, studentFromDb.AdditionalPoints);
-        var historyEntityFromDb = studentFromDb.PointsStudentHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyEntityFromDb = studentFromDb.PointsStudentHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
         Assert.Null(historyEntityFromDb);
     }
@@ -122,8 +122,8 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         await context.PointsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.PointsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyObj = context.PointsStudentsHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
 
         var payload = new DeletePointsCommandPayload
@@ -139,14 +139,14 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.PointsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.PointsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedAdditionalPoints, studentFromDb.AdditionalPoints);
-        var historyEntityFromDb = studentFromDb.PointsStudentHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyEntityFromDb = studentFromDb.PointsStudentHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
         Assert.Null(historyEntityFromDb);
     }
@@ -185,8 +185,8 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         await context.PointsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.PointsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyObj = context.PointsStudentsHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
 
         var payload = new DeletePointsCommandPayload
@@ -301,8 +301,8 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         await context.PointsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.PointsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyObj = context.PointsStudentsHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
 
         var payload = new DeletePointsCommandPayload
@@ -363,8 +363,8 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         await context.PointsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.PointsStudentsHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyObj = context.PointsStudentsHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
 
         var payload = new DeletePointsCommandPayload
@@ -380,14 +380,14 @@ public sealed class DeletePointsCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.PointsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.PointsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedAdditionalPoints, studentFromDb.AdditionalPoints);
-        var historyEntityFromDb = studentFromDb.PointsStudentHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var historyEntityFromDb = studentFromDb.PointsStudentHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
         Assert.Null(historyEntityFromDb);
     }

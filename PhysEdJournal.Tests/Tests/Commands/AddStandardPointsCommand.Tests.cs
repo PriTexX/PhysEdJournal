@@ -63,14 +63,14 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         //Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.StandardsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.StandardsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.NotNull(
-            studentFromDb.StandardsStudentHistory.FirstOrDefault(
-                h => h.Points == historyEntity.Points
+            studentFromDb.StandardsStudentHistory.FirstOrDefault(h =>
+                h.Points == historyEntity.Points
             )
         );
     }
@@ -129,14 +129,14 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         //Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.StandardsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.StandardsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.NotNull(
-            studentFromDb.StandardsStudentHistory.FirstOrDefault(
-                h => h.Points == historyEntity.Points
+            studentFromDb.StandardsStudentHistory.FirstOrDefault(h =>
+                h.Points == historyEntity.Points
             )
         );
     }
@@ -459,8 +459,8 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         Assert.True(firstTry.IsOk);
         Assert.True(overrideTry.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.StandardsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.StandardsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);

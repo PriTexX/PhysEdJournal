@@ -33,13 +33,13 @@ public sealed class ArchiveStudentJob : IJob
         {
             _logger.LogInformation("Archiving job has started");
 
-            var students = await _applicationContext.Students
-                .Include(s => s.Group)
+            var students = await _applicationContext
+                .Students.Include(s => s.Group)
                 .Where(s => s.HasDebtFromPreviousSemester)
                 .ToListAsync();
 
-            var activeSemester = await _applicationContext.Semesters
-                .Where(s => s.IsCurrent)
+            var activeSemester = await _applicationContext
+                .Semesters.Where(s => s.IsCurrent)
                 .FirstAsync();
 
             totalStudents = students.Count;

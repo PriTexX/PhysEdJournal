@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
-
 using PResult;
 
 namespace PhysEdJournal.Infrastructure.Commands;
@@ -48,8 +47,8 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
         // so why not to initialize it with this capacity?
         var existingStudentsGuids = new List<string>(4000);
 
-        var dbGroups = await applicationContext.Groups
-            .Select(g => g.GroupName)
+        var dbGroups = await applicationContext
+            .Groups.Select(g => g.GroupName)
             .ToDictionaryAsync(g => g, _ => true);
 
         var offset = 0;
@@ -72,8 +71,8 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
             var studentsGuids = actualStudents.Select(s => s.Guid).ToList();
 
-            var dbStudents = await applicationContext.Students
-                .Where(s => studentsGuids.Contains(s.StudentGuid))
+            var dbStudents = await applicationContext
+                .Students.Where(s => studentsGuids.Contains(s.StudentGuid))
                 .ToDictionaryAsync(s => s.StudentGuid);
 
             foreach (var student in actualStudents.Where(StudentHasPELessons))
@@ -122,8 +121,8 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
             await applicationContext.SaveChangesAsync();
         }
 
-        await applicationContext.Students
-            .Where(s => !existingStudentsGuids.Contains(s.StudentGuid))
+        await applicationContext
+            .Students.Where(s => !existingStudentsGuids.Contains(s.StudentGuid))
             .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsActive, false));
 
         _logger.LogInformation($"Finished {nameof(SyncStudentsCommand)}");
@@ -133,8 +132,7 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
     private bool StudentHasPELessons(Student s)
     {
-        // Only 2X1 and 2X9 groups and
-        // 1-3 courses have PE lessons
-        return s.Course < 4 && (s.Group[2] == '1' || s.Group[2] == '9');
+        // Only 2X1 and 2X9 groups have PE lessons
+        return s.Group[2] == '1' || s.Group[2] == '9';
     }
 }

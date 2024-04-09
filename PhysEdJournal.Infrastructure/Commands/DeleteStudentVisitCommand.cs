@@ -31,8 +31,8 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
         DeleteStudentVisitCommandPayload commandCommandPayload
     )
     {
-        var history = await _applicationContext.VisitsStudentsHistory.FirstOrDefaultAsync(
-            s => s.Id == commandCommandPayload.HistoryId
+        var history = await _applicationContext.VisitsStudentsHistory.FirstOrDefaultAsync(s =>
+            s.Id == commandCommandPayload.HistoryId
         );
 
         if (history is null)
@@ -48,8 +48,8 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
             return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
-        var student = await _applicationContext.Students.FirstAsync(
-            s => s.StudentGuid == history.StudentGuid
+        var student = await _applicationContext.Students.FirstAsync(s =>
+            s.StudentGuid == history.StudentGuid
         );
 
         if (
