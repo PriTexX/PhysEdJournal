@@ -22,7 +22,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(validSemesterName);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext(cache);
         var semester = await assertContext.Semesters.FindAsync(validSemesterName);
         Assert.NotNull(semester);
@@ -44,7 +44,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(invalidSemesterName);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>

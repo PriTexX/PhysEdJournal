@@ -37,7 +37,7 @@ public sealed class MigrateToNextSemesterCommand : ICommand<string, Unit>
 
             stopwatch.Stop();
 
-            if (res.IsError)
+            if (res.IsErr)
             {
                 _logger.LogError(
                     res.UnsafeError,
@@ -95,7 +95,7 @@ public sealed class MigrateToNextSemesterCommand : ICommand<string, Unit>
 
         var res = await startNewSemesterCommand.ExecuteAsync(semesterName);
 
-        if (res.IsError)
+        if (res.IsErr)
         {
             _logger.LogError(res.UnsafeError, "Could not start new semester");
             return res.UnsafeError;
@@ -116,7 +116,7 @@ public sealed class MigrateToNextSemesterCommand : ICommand<string, Unit>
                     }
                 );
 
-                if (archiveRes.IsError)
+                if (archiveRes.IsErr)
                 {
                     _logger.LogWarning(
                         archiveRes.UnsafeError,

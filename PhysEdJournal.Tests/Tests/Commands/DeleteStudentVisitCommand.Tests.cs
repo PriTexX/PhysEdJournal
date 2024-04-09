@@ -52,7 +52,7 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students
             .Include(s => s.VisitsStudentHistory)
@@ -109,7 +109,7 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students
             .Include(s => s.VisitsStudentHistory)
@@ -164,7 +164,7 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -212,7 +212,7 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -263,7 +263,7 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -316,7 +316,7 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students
             .Include(s => s.VisitsStudentHistory)

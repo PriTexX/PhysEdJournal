@@ -60,7 +60,7 @@ public sealed class ArchiveStudentJob : IJob
                 {
                     var result = await _command.ExecuteAsync(archivePayload);
 
-                    if (result.IsError)
+                    if (result.IsErr)
                     {
                         _logger.LogWarning(
                             result.UnsafeError,

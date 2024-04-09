@@ -61,7 +61,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students
             .Include(s => s.StandardsStudentHistory)
@@ -127,7 +127,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students
             .Include(s => s.StandardsStudentHistory)
@@ -185,7 +185,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -241,7 +241,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -292,7 +292,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -341,7 +341,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -393,8 +393,8 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.True(firstTry.IsSuccess);
-        Assert.False(result.IsSuccess);
+        Assert.True(firstTry.IsOk);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -456,8 +456,8 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var overrideTry = await command.ExecuteAsync(payload2);
 
         //Assert
-        Assert.True(firstTry.IsSuccess);
-        Assert.True(overrideTry.IsSuccess);
+        Assert.True(firstTry.IsOk);
+        Assert.True(overrideTry.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students
             .Include(s => s.StandardsStudentHistory)
@@ -521,8 +521,8 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var overrideTry = await command.ExecuteAsync(payload2);
 
         //Assert
-        Assert.True(firstTry.IsSuccess);
-        Assert.False(overrideTry.IsSuccess);
+        Assert.True(firstTry.IsOk);
+        Assert.False(overrideTry.IsOk);
         overrideTry.Match(
             _ => true,
             exception =>
@@ -574,7 +574,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -625,7 +625,7 @@ public sealed class AddStandardPointsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>

@@ -33,7 +33,7 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         group = await assertContext.Groups.FindAsync(group.GroupName);
         Assert.NotNull(group);
@@ -63,7 +63,7 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -96,7 +96,7 @@ public sealed class AssignCuratorCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>

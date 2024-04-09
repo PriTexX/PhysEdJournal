@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>aspnet-PhysEdJournal.Api-0E966DF1-BDA5-4B29-9BF4-01DA825A95EF</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <CodeAnalysisRuleSet>..\CodeStyle.ruleset</CodeAnalysisRuleSet>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,15 +16,15 @@
         <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.16.0" />
         <PackageReference Include="HotChocolate.Data" Version="12.16.0" />
         <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.16.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.12" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.12" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.13">
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Identity.Web" Version="1.16.0" />
-        <PackageReference Include="Serilog" Version="2.12.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="2.17.4" />
+        <PackageReference Include="Serilog" Version="3.1.1" />
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

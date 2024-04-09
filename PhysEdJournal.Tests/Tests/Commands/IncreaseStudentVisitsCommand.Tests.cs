@@ -40,7 +40,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students.FindAsync(student.StudentGuid);
         Assert.NotNull(studentFromDb);
@@ -75,7 +75,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -116,7 +116,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -157,7 +157,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -199,8 +199,8 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.True(prevRes.IsSuccess);
-        Assert.False(result.IsSuccess);
+        Assert.True(prevRes.IsOk);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -241,7 +241,7 @@ public sealed class IncreaseStudentVisitsCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>

@@ -37,7 +37,7 @@ public sealed class DeActivateStudentCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(student.StudentGuid);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var studentFromDb = await assertContext.Students.FindAsync(student.StudentGuid);
         Assert.NotNull(studentFromDb);
@@ -58,7 +58,7 @@ public sealed class DeActivateStudentCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(student.StudentGuid);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>

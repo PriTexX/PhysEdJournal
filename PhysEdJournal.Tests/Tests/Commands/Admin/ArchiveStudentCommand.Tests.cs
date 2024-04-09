@@ -72,7 +72,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var archivedStudentFromDb = await assertContext.ArchivedStudents.FindAsync(
             student.StudentGuid,
@@ -168,7 +168,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.True(result.IsSuccess);
+        Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
         var activeStudent = await assertContext.Students
             .Where(s => s.StudentGuid == student.StudentGuid)
@@ -224,7 +224,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>
@@ -269,7 +269,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var result = await command.ExecuteAsync(payload);
 
         //Assert
-        Assert.False(result.IsSuccess);
+        Assert.False(result.IsOk);
         result.Match(
             _ => true,
             exception =>

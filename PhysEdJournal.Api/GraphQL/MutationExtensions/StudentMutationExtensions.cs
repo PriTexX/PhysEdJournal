@@ -73,7 +73,7 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
         );
 
-        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
         var addPointsPayload = new AddPointsCommandPayload
         {
@@ -135,7 +135,7 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
         );
 
-        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
         var addPointsForStandardPayload = new AddStandardPointsCommandPayload
         {
@@ -189,7 +189,7 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
         );
 
-        var isAdminOrSecretary = validateTeacherPermissionsResult.IsSuccess;
+        var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
         var increaseStudentVisitsPayload = new IncreaseStudentVisitsCommandPayload
         {
@@ -430,7 +430,7 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
-        var isAdmin = validationResult.IsSuccess;
+        var isAdmin = validationResult.IsOk;
 
         var res = await deleteStudentVisitCommand.ExecuteAsync(
             new DeleteStudentVisitCommandPayload
@@ -463,7 +463,7 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
-        var isAdmin = validationResult.IsSuccess;
+        var isAdmin = validationResult.IsOk;
 
         var res = await deletePointsCommand.ExecuteAsync(
             new DeletePointsCommandPayload
@@ -496,7 +496,7 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
-        var isAdmin = validationResult.IsSuccess;
+        var isAdmin = validationResult.IsOk;
 
         var res = await deleteStandardPointsCommand.ExecuteAsync(
             new DeleteStandardPointsCommandPayload()
