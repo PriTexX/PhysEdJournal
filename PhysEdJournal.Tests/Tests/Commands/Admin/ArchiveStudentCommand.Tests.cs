@@ -78,8 +78,8 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             student.StudentGuid,
             lastSemester.Name
         );
-        var activeStudent = await assertContext.Students
-            .Where(s => s.StudentGuid == student.StudentGuid)
+        var activeStudent = await assertContext
+            .Students.Where(s => s.StudentGuid == student.StudentGuid)
             .Include(s => s.PointsStudentHistory)
             .Include(s => s.VisitsStudentHistory)
             .Include(s => s.StandardsStudentHistory)
@@ -170,8 +170,8 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         //Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var activeStudent = await assertContext.Students
-            .Where(s => s.StudentGuid == student.StudentGuid)
+        var activeStudent = await assertContext
+            .Students.Where(s => s.StudentGuid == student.StudentGuid)
             .Include(s => s.PointsStudentHistory)
             .Include(s => s.VisitsStudentHistory)
             .Include(s => s.StandardsStudentHistory)

@@ -17,8 +17,8 @@ public sealed class DeActivateStudentCommand : ICommand<string, Unit>
 
     public async Task<Result<Unit>> ExecuteAsync(string studentGuid)
     {
-        var rowsAffected = await _applicationContext.Students
-            .Where(s => s.StudentGuid == studentGuid)
+        var rowsAffected = await _applicationContext
+            .Students.Where(s => s.StudentGuid == studentGuid)
             .ExecuteUpdateAsync(p => p.SetProperty(s => s.IsActive, false));
 
         if (rowsAffected == 0)

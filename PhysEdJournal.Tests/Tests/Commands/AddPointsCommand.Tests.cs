@@ -58,13 +58,13 @@ public sealed class AddPointsCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.PointsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.PointsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
-        var duplicate = studentFromDb.PointsStudentHistory.FirstOrDefault(
-            h => h.Points == historyEntity.Points
+        var duplicate = studentFromDb.PointsStudentHistory.FirstOrDefault(h =>
+            h.Points == historyEntity.Points
         );
         Assert.NotNull(duplicate);
     }

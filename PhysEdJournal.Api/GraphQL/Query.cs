@@ -100,8 +100,8 @@ public class Query
     {
         try
         {
-            return await context.Competitions
-                .Select(c => c.CompetitionName)
+            return await context
+                .Competitions.Select(c => c.CompetitionName)
                 .OrderBy(name => name)
                 .ToListAsync();
         }

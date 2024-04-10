@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Tests.Setup;
@@ -7,12 +9,20 @@ namespace PhysEdJournal.Tests.Setup;
 [Collection("Db collection")]
 public abstract class DatabaseTestsHelper
 {
-    protected static ApplicationContext CreateContext(IMemoryCache? cache = null)
+    protected static ApplicationContext CreateContext()
     {
-        var builder = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(
-            PostgresContainerFixture.ConnectionString
-        );
-        var memoryCash = cache ?? new MemoryCache(new MemoryCacheOptions());
+        var serviceProvider = new ServiceCollection()
+            .AddEntityFrameworkNpgsql()
+            .BuildServiceProvider();
+
+        var dataSource = new NpgsqlDataSourceBuilder(PostgresContainerFixture.ConnectionString)
+            .EnableDynamicJson()
+            .Build();
+
+        var builder = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseNpgsql(dataSource)
+            .UseInternalServiceProvider(serviceProvider);
+
         var dbContext = new ApplicationContext(builder.Options);
         return dbContext;
     }

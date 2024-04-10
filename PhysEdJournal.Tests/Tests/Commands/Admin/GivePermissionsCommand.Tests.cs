@@ -19,7 +19,7 @@ public sealed class GivePermissionsCommandTests : DatabaseTestsHelper
     {
         // Arrange
         var cache = CreateMemoryCache();
-        await using var context = CreateContext(cache);
+        await using var context = CreateContext();
         await ClearDatabase(context);
 
         var command = new GivePermissionsCommand(context, cache);
@@ -50,7 +50,7 @@ public sealed class GivePermissionsCommandTests : DatabaseTestsHelper
     {
         // Arrange
         var cache = CreateMemoryCache();
-        await using var context = CreateContext(cache);
+        await using var context = CreateContext();
         await ClearDatabase(context);
 
         var command = new GivePermissionsCommand(context, cache);
@@ -91,7 +91,7 @@ public sealed class GivePermissionsCommandTests : DatabaseTestsHelper
     {
         // Arrange
         var cache = CreateMemoryCache();
-        await using var context = CreateContext(cache);
+        await using var context = CreateContext();
         await ClearDatabase(context);
 
         var command = new GivePermissionsCommand(context, cache);

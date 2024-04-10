@@ -51,8 +51,8 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             return new NegativePointAmount();
         }
 
-        var student = await _applicationContext.Students
-            .Include(s => s.Group)
+        var student = await _applicationContext
+            .Students.Include(s => s.Group)
             .FirstOrDefaultAsync(s => s.StudentGuid == commandInput.StudentGuid);
 
         if (student is null)
@@ -62,12 +62,11 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
 
         if (commandInput.WorkType == WorkType.ExternalFitness)
         {
-            var anotherFitness = await _applicationContext.PointsStudentsHistory
-                .AsNoTracking()
-                .Where(
-                    p =>
-                        p.StudentGuid == commandInput.StudentGuid
-                        && p.WorkType == WorkType.ExternalFitness
+            var anotherFitness = await _applicationContext
+                .PointsStudentsHistory.AsNoTracking()
+                .Where(p =>
+                    p.StudentGuid == commandInput.StudentGuid
+                    && p.WorkType == WorkType.ExternalFitness
                 )
                 .FirstOrDefaultAsync();
 
@@ -84,8 +83,8 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
 
         if (commandInput.WorkType == WorkType.GTO)
         {
-            var anotherGTO = await _applicationContext.PointsStudentsHistory
-                .AsNoTracking()
+            var anotherGTO = await _applicationContext
+                .PointsStudentsHistory.AsNoTracking()
                 .Where(p => p.StudentGuid == commandInput.StudentGuid && p.WorkType == WorkType.GTO)
                 .FirstOrDefaultAsync();
 
@@ -138,8 +137,8 @@ public sealed class AddPointsCommand : ICommand<AddPointsCommandPayload, Unit>
             return validation.ValidationException;
         }
 
-        var student = await _applicationContext.Students
-            .Include(s => s.Group)
+        var student = await _applicationContext
+            .Students.Include(s => s.Group)
             .FirstAsync(s => s.StudentGuid == commandPayload.StudentGuid);
 
         var pointsStudentHistoryEntity = new PointsStudentHistoryEntity

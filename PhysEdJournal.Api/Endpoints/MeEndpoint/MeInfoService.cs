@@ -16,18 +16,15 @@ public sealed class MeInfoService
 
     public async Task<PResult.Result<StudentInfoResponse>> GetStudentInfo(string studentGuid)
     {
-        var studentActivity = await _applicationContext.Students
-            .Where(s => s.StudentGuid == studentGuid)
-            .Select(
-                s =>
-                    new
-                    {
-                        s.AdditionalPoints,
-                        s.PointsForStandards,
-                        s.Visits,
-                        s.Group!.VisitValue,
-                    }
-            )
+        var studentActivity = await _applicationContext
+            .Students.Where(s => s.StudentGuid == studentGuid)
+            .Select(s => new
+            {
+                s.AdditionalPoints,
+                s.PointsForStandards,
+                s.Visits,
+                s.Group!.VisitValue,
+            })
             .FirstOrDefaultAsync();
 
         if (studentActivity is null)
@@ -45,8 +42,8 @@ public sealed class MeInfoService
 
     public async Task<PResult.Result<ProfessorInfoResponse>> GetProfessorInfo(string professorGuid)
     {
-        var teacherPermissions = await _applicationContext.Teachers
-            .Where(t => t.TeacherGuid == professorGuid)
+        var teacherPermissions = await _applicationContext
+            .Teachers.Where(t => t.TeacherGuid == professorGuid)
             .Select(t => new { t.Permissions })
             .FirstOrDefaultAsync();
 
@@ -55,8 +52,8 @@ public sealed class MeInfoService
             return new TeacherNotFoundException(professorGuid);
         }
 
-        var textTeacherPermissions = teacherPermissions.Permissions
-            .ToString()
+        var textTeacherPermissions = teacherPermissions
+            .Permissions.ToString()
             .Split(",")
             .Select(s => s.Trim())
             .ToList();

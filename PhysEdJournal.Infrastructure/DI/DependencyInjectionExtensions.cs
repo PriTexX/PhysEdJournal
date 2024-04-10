@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
@@ -18,8 +19,12 @@ public static class DependencyInjectionExtensions
         IConfiguration configuration
     )
     {
-        services.AddDbContext<ApplicationContext>(
-            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+            configuration.GetConnectionString("DefaultConnection")
+        );
+
+        services.AddDbContext<ApplicationContext>(options =>
+            options.UseNpgsql(dataSourceBuilder.EnableDynamicJson().Build())
         );
 
         services.AddMemoryCache();
@@ -47,7 +52,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<DeleteCompetitionCommand>();
         services.AddScoped<GivePermissionsCommand>();
         services.AddScoped<StartNewSemesterCommand>();
-        services.AddScoped<UpdateStudentsInfoCommand>();
+        services.AddScoped<SyncStudentsCommand>();
         services.AddScoped<DeleteStudentVisitCommand>();
         services.AddScoped<DeleteStandardPointsCommand>();
         services.AddScoped<DeletePointsCommand>();
@@ -57,18 +62,28 @@ public static class DependencyInjectionExtensions
     private static void AddMyQuartz(this IServiceCollection services)
     {
         services.AddScoped<ArchiveStudentJob>();
+        services.AddScoped<SyncStudentsJob>();
 
         services.AddQuartz(q =>
         {
             q.UseJobFactory<MicrosoftDependencyInjectionJobFactory>();
-            var jobKey = new JobKey("ArchiveStudentJob");
-            q.AddJob<ArchiveStudentJob>(opts => opts.WithIdentity(jobKey));
 
-            q.AddTrigger(
-                opts =>
-                    opts.ForJob(jobKey)
-                        .WithIdentity("ArchiveStudentJob-trigger")
-                        .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
+            var archiveStudentsJobKey = new JobKey(nameof(ArchiveStudentJob));
+            q.AddJob<ArchiveStudentJob>(opts => opts.WithIdentity(archiveStudentsJobKey));
+
+            q.AddTrigger(opts =>
+                opts.ForJob(archiveStudentsJobKey)
+                    .WithIdentity($"${nameof(ArchiveStudentJob)}-trigger")
+                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
+            );
+
+            var syncStudentsJobKey = new JobKey(nameof(SyncStudentsJob));
+            q.AddJob<SyncStudentsJob>(opts => opts.WithIdentity(syncStudentsJobKey));
+
+            q.AddTrigger(opts =>
+                opts.ForJob(syncStudentsJobKey)
+                    .WithIdentity($"{nameof(SyncStudentsJob)}-trigger")
+                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
             );
         });
         services.AddQuartzServer(q => q.WaitForJobsToComplete = true);

@@ -26,8 +26,8 @@ public sealed class CreateTeacherCommand : ICommand<CreateTeacherCommandPayload,
 
     public async Task<Result<Unit>> ExecuteAsync(CreateTeacherCommandPayload commandPayload)
     {
-        var teacherGuid = await _applicationContext.Teachers
-            .AsNoTracking()
+        var teacherGuid = await _applicationContext
+            .Teachers.AsNoTracking()
             .Where(t => t.TeacherGuid == commandPayload.TeacherGuid)
             .Select(t => t.TeacherGuid)
             .FirstOrDefaultAsync();

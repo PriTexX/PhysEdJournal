@@ -39,13 +39,12 @@ public class TeacherMutationExtensions
         var result = await createTeacherCommand.ExecuteAsync(createTeacherPayload);
 
         return result.Match(
-            _ =>
-                new TeacherEntity
-                {
-                    FullName = fullName,
-                    TeacherGuid = teacherGuid,
-                    Permissions = TeacherPermissions.DefaultAccess,
-                },
+            _ => new TeacherEntity
+            {
+                FullName = fullName,
+                TeacherGuid = teacherGuid,
+                Permissions = TeacherPermissions.DefaultAccess,
+            },
             exception => throw exception
         );
     }

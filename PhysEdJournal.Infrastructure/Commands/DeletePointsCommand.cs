@@ -29,8 +29,8 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
 
     public async Task<Result<Unit>> ExecuteAsync(DeletePointsCommandPayload commandPayload)
     {
-        var history = await _applicationContext.PointsStudentsHistory.FirstOrDefaultAsync(
-            s => s.Id == commandPayload.HistoryId
+        var history = await _applicationContext.PointsStudentsHistory.FirstOrDefaultAsync(s =>
+            s.Id == commandPayload.HistoryId
         );
 
         if (history is null)
@@ -43,8 +43,8 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
             return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
-        var student = await _applicationContext.Students.FirstAsync(
-            s => s.StudentGuid == history.StudentGuid
+        var student = await _applicationContext.Students.FirstAsync(s =>
+            s.StudentGuid == history.StudentGuid
         );
 
         if (

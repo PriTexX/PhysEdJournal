@@ -25,8 +25,8 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
 
     public async Task<Result<Unit>> ExecuteAsync(ArchiveStudentCommandPayload commandPayload)
     {
-        var student = await _applicationContext.Students
-            .Where(s => s.StudentGuid == commandPayload.StudentGuid)
+        var student = await _applicationContext
+            .Students.Where(s => s.StudentGuid == commandPayload.StudentGuid)
             .Include(s => s.PointsStudentHistory)
             .Include(s => s.StandardsStudentHistory)
             .Include(s => s.VisitsStudentHistory)
@@ -75,47 +75,38 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
                 GroupNumber = student.GroupNumber,
                 Visits = student.VisitsStudentHistory?.Count ?? 0,
                 VisitsHistory =
-                    student.VisitsStudentHistory
-                        ?.Select(
-                            h =>
-                                new ArchivedHistory
-                                {
-                                    Date = h.Date,
-                                    StudentGuid = h.StudentGuid,
-                                    TeacherGuid = h.TeacherGuid,
-                                    Points = visitValue,
-                                }
-                        )
+                    student
+                        .VisitsStudentHistory?.Select(h => new ArchivedHistory
+                        {
+                            Date = h.Date,
+                            StudentGuid = h.StudentGuid,
+                            TeacherGuid = h.TeacherGuid,
+                            Points = visitValue,
+                        })
                         .ToList() ?? new List<ArchivedHistory>(),
                 PointsHistory =
-                    student.PointsStudentHistory
-                        ?.Select(
-                            h =>
-                                new ArchivedPointsHistory
-                                {
-                                    Date = h.Date,
-                                    StudentGuid = h.StudentGuid,
-                                    TeacherGuid = h.TeacherGuid,
-                                    Points = h.Points,
-                                    WorkType = h.WorkType,
-                                    Comment = h.Comment,
-                                }
-                        )
+                    student
+                        .PointsStudentHistory?.Select(h => new ArchivedPointsHistory
+                        {
+                            Date = h.Date,
+                            StudentGuid = h.StudentGuid,
+                            TeacherGuid = h.TeacherGuid,
+                            Points = h.Points,
+                            WorkType = h.WorkType,
+                            Comment = h.Comment,
+                        })
                         .ToList() ?? new List<ArchivedPointsHistory>(),
                 StandardsHistory =
-                    student.StandardsStudentHistory
-                        ?.Select(
-                            h =>
-                                new ArchivedStandardsHistory
-                                {
-                                    Date = h.Date,
-                                    StudentGuid = h.StudentGuid,
-                                    TeacherGuid = h.TeacherGuid,
-                                    Points = h.Points,
-                                    StandardType = h.StandardType,
-                                    Comment = h.Comment,
-                                }
-                        )
+                    student
+                        .StandardsStudentHistory?.Select(h => new ArchivedStandardsHistory
+                        {
+                            Date = h.Date,
+                            StudentGuid = h.StudentGuid,
+                            TeacherGuid = h.TeacherGuid,
+                            Points = h.Points,
+                            StandardType = h.StandardType,
+                            Comment = h.Comment,
+                        })
                         .ToList() ?? new List<ArchivedStandardsHistory>(),
             }
         );

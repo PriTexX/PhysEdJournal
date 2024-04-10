@@ -52,8 +52,10 @@ internal sealed class IncreaseStudentVisitsCommandValidator
             return new VisitExpiredException(commandInput.Date);
         }
 
-        var recordCopy = await _applicationContext.VisitsStudentsHistory
-            .Where(v => v.StudentGuid == commandInput.StudentGuid && v.Date == commandInput.Date)
+        var recordCopy = await _applicationContext
+            .VisitsStudentsHistory.Where(v =>
+                v.StudentGuid == commandInput.StudentGuid && v.Date == commandInput.Date
+            )
             .FirstOrDefaultAsync();
 
         if (recordCopy is not null)
@@ -86,8 +88,8 @@ public sealed class IncreaseStudentVisitsCommand
             return validation.ValidationException;
         }
 
-        var student = await _applicationContext.Students
-            .Include(s => s.Group)
+        var student = await _applicationContext
+            .Students.Include(s => s.Group)
             .FirstOrDefaultAsync(s => s.StudentGuid == commandPayload.StudentGuid);
 
         if (student is null)

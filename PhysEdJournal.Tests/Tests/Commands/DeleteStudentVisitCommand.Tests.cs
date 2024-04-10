@@ -38,8 +38,8 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         await context.VisitsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         var payload = new DeleteStudentVisitCommandPayload
         {
@@ -54,14 +54,14 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.VisitsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.VisitsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedVisits, studentFromDb.Visits);
-        var historyEntityFromDb = studentFromDb.VisitsStudentHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyEntityFromDb = studentFromDb.VisitsStudentHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         Assert.Null(historyEntityFromDb);
     }
@@ -95,8 +95,8 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         await context.VisitsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         var payload = new DeleteStudentVisitCommandPayload
         {
@@ -111,14 +111,14 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.VisitsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.VisitsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedVisits, studentFromDb.Visits);
-        var historyEntityFromDb = studentFromDb.VisitsStudentHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyEntityFromDb = studentFromDb.VisitsStudentHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         Assert.Null(historyEntityFromDb);
     }
@@ -150,8 +150,8 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         await context.VisitsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         var payload = new DeleteStudentVisitCommandPayload
         {
@@ -249,8 +249,8 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         await context.VisitsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         var payload = new DeleteStudentVisitCommandPayload
         {
@@ -302,8 +302,8 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         await context.VisitsStudentsHistory.AddAsync(historyEntity);
         await context.SaveChangesAsync();
 
-        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyObj = context.VisitsStudentsHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         var payload = new DeleteStudentVisitCommandPayload
         {
@@ -318,14 +318,14 @@ public sealed class DeleteStudentVisitCommandTests : DatabaseTestsHelper
         // Assert
         Assert.True(result.IsOk);
         await using var assertContext = CreateContext();
-        var studentFromDb = await assertContext.Students
-            .Include(s => s.VisitsStudentHistory)
+        var studentFromDb = await assertContext
+            .Students.Include(s => s.VisitsStudentHistory)
             .Where(s => s.StudentGuid == student.StudentGuid)
             .FirstOrDefaultAsync();
         Assert.NotNull(studentFromDb);
         Assert.Equal(expectedVisits, studentFromDb.Visits);
-        var historyEntityFromDb = studentFromDb.VisitsStudentHistory.FirstOrDefault(
-            h => h.Date == historyEntity.Date
+        var historyEntityFromDb = studentFromDb.VisitsStudentHistory.FirstOrDefault(h =>
+            h.Date == historyEntity.Date
         );
         Assert.Null(historyEntityFromDb);
     }

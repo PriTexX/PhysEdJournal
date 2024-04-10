@@ -43,8 +43,8 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
 
         await using var transaction = await _applicationContext.Database.BeginTransactionAsync();
 
-        var pointsStudentHistory = await _applicationContext.PointsStudentsHistory
-            .Where(h => h.StudentGuid == commandPayload.StudentGuid)
+        var pointsStudentHistory = await _applicationContext
+            .PointsStudentsHistory.Where(h => h.StudentGuid == commandPayload.StudentGuid)
             .ToListAsync();
 
         student.AdditionalPoints = pointsStudentHistory.Aggregate(
@@ -52,8 +52,8 @@ public sealed class UnArchiveStudentCommand : ICommand<UnArchiveStudentCommandPa
             (prev, next) => prev + next.Points
         );
 
-        var standardsStudentHistory = await _applicationContext.StandardsStudentsHistory
-            .Where(h => h.StudentGuid == commandPayload.StudentGuid)
+        var standardsStudentHistory = await _applicationContext
+            .StandardsStudentsHistory.Where(h => h.StudentGuid == commandPayload.StudentGuid)
             .ToListAsync();
 
         student.PointsForStandards = standardsStudentHistory.Aggregate(

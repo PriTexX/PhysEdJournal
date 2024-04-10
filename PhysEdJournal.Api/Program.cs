@@ -26,8 +26,8 @@ var builder = WebApplication.CreateBuilder(args);
     Application options
  */
 
-builder.Services
-    .AddOptions<ApplicationOptions>()
+builder
+    .Services.AddOptions<ApplicationOptions>()
     .BindConfiguration(ApplicationOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
@@ -42,8 +42,8 @@ builder.Configuration.GetSection(ApplicationOptions.SectionName).Bind(applicatio
 builder.Host.UseSerilog(
     (context, configuration) =>
     {
-        configuration.MinimumLevel
-            .Information()
+        configuration
+            .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -71,18 +71,17 @@ builder.Host.UseSerilog(
     Authentication & Authorization
  */
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(
-        options =>
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                IssuerSigningKey = GetSecurityKey(applicationOptions.RsaPublicKey),
-                ValidIssuer = "humanresourcesdepartmentapi.mospolytech.ru",
-                ValidAudience = "HumanResourcesDepartment",
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true,
-            }
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = GetSecurityKey(applicationOptions.RsaPublicKey),
+            ValidIssuer = "humanresourcesdepartmentapi.mospolytech.ru",
+            ValidAudience = "HumanResourcesDepartment",
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+        }
     );
 
 builder.Services.AddAuthorization();
@@ -109,8 +108,8 @@ builder.Services.AddEndpointsApiExplorer();
     GraphQL
  */
 
-builder.Services
-    .AddGraphQLServer()
+builder
+    .Services.AddGraphQLServer()
     .InitializeOnStartup()
     .AddDiagnosticEventListener<ErrorLoggingDiagnosticsEventListener>()
     .AddAuthorization()
@@ -131,13 +130,12 @@ builder.Services
     .AddProjections()
     .AddFiltering()
     .AddConvention<IFilterConvention>(
-        new FilterConventionExtension(
-            x =>
-                x.AddProviderExtension(
-                    new QueryableFilterProviderExtension(
-                        y => y.AddFieldHandler<QueryableStringInvariantContainsHandler>()
-                    )
+        new FilterConventionExtension(x =>
+            x.AddProviderExtension(
+                new QueryableFilterProviderExtension(y =>
+                    y.AddFieldHandler<QueryableStringInvariantContainsHandler>()
                 )
+            )
         )
     )
     .AddSorting()

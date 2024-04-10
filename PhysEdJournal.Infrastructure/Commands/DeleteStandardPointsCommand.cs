@@ -30,8 +30,8 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
     public async Task<Result<Unit>> ExecuteAsync(DeleteStandardPointsCommandPayload commandPayload)
     {
-        var history = await _applicationContext.StandardsStudentsHistory.FirstOrDefaultAsync(
-            s => s.Id == commandPayload.HistoryId
+        var history = await _applicationContext.StandardsStudentsHistory.FirstOrDefaultAsync(s =>
+            s.Id == commandPayload.HistoryId
         );
 
         if (history is null)
@@ -44,8 +44,8 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
             return new TeacherGuidMismatchException(history.TeacherGuid);
         }
 
-        var student = await _applicationContext.Students.FirstAsync(
-            s => s.StudentGuid == history.StudentGuid
+        var student = await _applicationContext.Students.FirstAsync(s =>
+            s.StudentGuid == history.StudentGuid
         );
 
         if (
@@ -57,8 +57,8 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
             return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
         }
 
-        var totalPointsForStandards = await _applicationContext.StandardsStudentsHistory
-            .Where(h => h.StudentGuid == student.StudentGuid)
+        var totalPointsForStandards = await _applicationContext
+            .StandardsStudentsHistory.Where(h => h.StudentGuid == student.StudentGuid)
             .SumAsync(h => h.Points);
 
         var pointsForStandard = totalPointsForStandards - history.Points;

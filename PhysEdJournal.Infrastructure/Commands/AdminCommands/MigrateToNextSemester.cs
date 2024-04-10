@@ -80,13 +80,12 @@ public sealed class MigrateToNextSemesterCommand : ICommand<string, Unit>
 
         _logger.LogInformation("Start migration to new semester: {semester}", semesterName);
 
-        var studentGuids = await applicationContext.Students
-            .AsNoTracking()
-            .Where(
-                s =>
-                    !s.HasDebtFromPreviousSemester
-                    && s.CurrentSemesterName != semesterName
-                    && s.IsActive
+        var studentGuids = await applicationContext
+            .Students.AsNoTracking()
+            .Where(s =>
+                !s.HasDebtFromPreviousSemester
+                && s.CurrentSemesterName != semesterName
+                && s.IsActive
             )
             .Select(s => s.StudentGuid)
             .ToListAsync();
