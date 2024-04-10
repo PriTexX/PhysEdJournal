@@ -43,9 +43,7 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
         var currentSemesterName = (await applicationContext.GetActiveSemester()).Name;
 
-        // We expect to have more than 4000 students
-        // so why not to initialize it with this capacity?
-        var existingStudentsGuids = new List<string>(4000);
+        var existingStudentsGuids = new List<string>();
 
         var dbGroups = await applicationContext
             .Groups.Select(g => g.GroupName)
@@ -96,6 +94,7 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
                     dbStudent.StudentGuid = student.Guid;
                     dbStudent.Department = student.Department;
                     dbStudent.Course = student.Course;
+                    dbStudent.IsActive = true;
 
                     applicationContext.Students.Update(dbStudent);
                 }

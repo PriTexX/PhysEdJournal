@@ -12,7 +12,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
     {
         // Arrange
         var cache = CreateMemoryCache();
-        await using var context = CreateContext(cache);
+        await using var context = CreateContext();
         await ClearDatabase(context);
 
         var command = new StartNewSemesterCommand(context);
@@ -23,7 +23,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
 
         // Assert
         Assert.True(result.IsOk);
-        await using var assertContext = CreateContext(cache);
+        await using var assertContext = CreateContext();
         var semester = await assertContext.Semesters.FindAsync(validSemesterName);
         Assert.NotNull(semester);
         Assert.Equal(semester.Name, validSemesterName);
@@ -34,7 +34,7 @@ public sealed class StartNewSemesterCommandTests : DatabaseTestsHelper
     {
         // Arrange
         var cache = CreateMemoryCache();
-        await using var context = CreateContext(cache);
+        await using var context = CreateContext();
         await ClearDatabase(context);
 
         var command = new StartNewSemesterCommand(context);
