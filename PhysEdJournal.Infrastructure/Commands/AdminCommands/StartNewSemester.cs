@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
@@ -21,6 +20,7 @@ internal sealed partial class StartNewSemesterCommandValidator : ICommandValidat
         return ValidationResult.Success;
     }
 
+    /// ReSharper disable once CS8795
     [GeneratedRegex(@"\d{4}-\d{4}/\w{5}")]
     private static partial Regex MyRegex();
 }

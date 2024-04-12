@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Exceptions.SemesterExceptions;
+﻿using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Tests.Setup;
 
