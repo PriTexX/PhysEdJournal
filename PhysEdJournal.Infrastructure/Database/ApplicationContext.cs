@@ -6,16 +6,16 @@ namespace PhysEdJournal.Infrastructure.Database;
 
 public sealed class ApplicationContext : DbContext
 {
-    public DbSet<GroupEntity> Groups { get; set; } = null!;
-    public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; set; } = null!;
-    public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; set; } = null!;
-    public DbSet<StandardsStudentHistoryEntity> StandardsStudentsHistory { get; set; } = null!;
-    public DbSet<StudentEntity> Students { get; set; } = null!;
-    public DbSet<TeacherEntity> Teachers { get; set; } = null!;
-    public DbSet<ArchivedStudentEntity> ArchivedStudents { get; set; } = null!;
-    public DbSet<SemesterEntity> Semesters { get; set; } = null!;
+    public DbSet<GroupEntity> Groups { get; init; } = null!;
+    public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; init; } = null!;
+    public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; init; } = null!;
+    public DbSet<StandardsStudentHistoryEntity> StandardsStudentsHistory { get; init; } = null!;
+    public DbSet<StudentEntity> Students { get; init; } = null!;
+    public DbSet<TeacherEntity> Teachers { get; init; } = null!;
+    public DbSet<ArchivedStudentEntity> ArchivedStudents { get; init; } = null!;
+    public DbSet<SemesterEntity> Semesters { get; init; } = null!;
 
-    public DbSet<CompetitionEntity> Competitions { get; set; } = null!;
+    public DbSet<CompetitionEntity> Competitions { get; init; } = null!;
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options)
         : base(options) { }

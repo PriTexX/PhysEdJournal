@@ -19,13 +19,13 @@ public static class DependencyInjectionExtensions
         IConfiguration configuration
     )
     {
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+        var dataSource = new NpgsqlDataSourceBuilder(
             configuration.GetConnectionString("DefaultConnection")
-        );
+        )
+            .EnableDynamicJson()
+            .Build();
 
-        services.AddDbContext<ApplicationContext>(options =>
-            options.UseNpgsql(dataSourceBuilder.EnableDynamicJson().Build())
-        );
+        services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(dataSource));
 
         services.AddMemoryCache();
 
