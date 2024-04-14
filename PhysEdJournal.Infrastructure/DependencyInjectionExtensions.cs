@@ -57,6 +57,8 @@ public static class DependencyInjectionExtensions
         services.AddScoped<DeleteStandardPointsCommand>();
         services.AddScoped<DeletePointsCommand>();
         services.AddScoped<MigrateToNextSemesterCommand>();
+        services.AddScoped<AddHealthGroupCommand>();
+        services.AddScoped<ClearStudentsHealthGroupCommand>();
     }
 
     private static void AddMyQuartz(this IServiceCollection services)

@@ -510,6 +510,55 @@ public class StudentMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
+    [Error(typeof(TeacherNotFoundException))]
+    [Error(typeof(StudentNotFoundException))]
+    [Error(typeof(CuratorGuidMismatch))]
+    public async Task<Success> AddStudentHealthGroup(
+        string studentGuid,
+        HealthGroupType healthGroup,
+        [Service] AddHealthGroupCommand addHealthGroupCommand,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        var callerGuid = GetCallerGuid(claimsPrincipal);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            TeacherPermissions.DefaultAccess
+        );
+
+        var res = await addHealthGroupCommand.ExecuteAsync(
+            new AddHealthGroupPayload
+            {
+                HealthGroup = healthGroup,
+                StudentGuid = studentGuid,
+                TeacherGuid = callerGuid,
+            }
+        );
+
+        return res.Match(_ => true, exception => throw exception);
+    }
+
+    [Error(typeof(TeacherNotFoundException))]
+    public async Task<Success> ClearStudentsHealthGroup(
+        [Service] ClearStudentsHealthGroupCommand clearStudentsHealthGroupCommand,
+        [Service] PermissionValidator permissionValidator,
+        ClaimsPrincipal claimsPrincipal
+    )
+    {
+        var callerGuid = GetCallerGuid(claimsPrincipal);
+
+        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+            callerGuid,
+            FOR_ONLY_ADMIN_USE_PERMISSIONS
+        );
+
+        var res = await clearStudentsHealthGroupCommand.ExecuteAsync(EmptyPayload.Empty);
+
+        return res.Match(_ => true, exception => throw exception);
+    }
+
     private static string GetCallerGuid(ClaimsPrincipal claimsPrincipal)
     {
         var callerGuid = claimsPrincipal.Claims.First(c => c.Type == "IndividualGuid").Value;
