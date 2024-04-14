@@ -6,7 +6,7 @@ using PhysEdJournal.Infrastructure.Database;
 using Quartz;
 using static PhysEdJournal.Core.Constants.PointsConstants;
 
-namespace PhysEdJournal.Infrastructure.Services.Quartz.Jobs;
+namespace PhysEdJournal.Infrastructure.Jobs;
 
 public sealed class ArchiveStudentJob : IJob
 {

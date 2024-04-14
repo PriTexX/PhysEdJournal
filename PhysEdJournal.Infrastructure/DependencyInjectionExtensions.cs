@@ -5,12 +5,12 @@ using Npgsql;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.Services.Quartz.Jobs;
+using PhysEdJournal.Infrastructure.Jobs;
 using Quartz;
 using Quartz.AspNetCore;
 using Quartz.Simpl;
 
-namespace PhysEdJournal.Infrastructure.DI;
+namespace PhysEdJournal.Infrastructure;
 
 public static class DependencyInjectionExtensions
 {

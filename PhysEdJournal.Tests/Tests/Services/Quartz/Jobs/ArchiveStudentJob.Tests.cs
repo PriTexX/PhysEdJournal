@@ -2,7 +2,7 @@
 using Moq;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Services.Quartz.Jobs;
+using PhysEdJournal.Infrastructure.Jobs;
 using PhysEdJournal.Tests.Setup;
 using PhysEdJournal.Tests.Setup.Utils;
 using Quartz;

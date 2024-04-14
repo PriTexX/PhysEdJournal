@@ -2,7 +2,7 @@ using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using Quartz;
 
-namespace PhysEdJournal.Infrastructure.Services.Quartz.Jobs;
+namespace PhysEdJournal.Infrastructure.Jobs;
 
 public sealed class SyncStudentsJob : IJob
 {

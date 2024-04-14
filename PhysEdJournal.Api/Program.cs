@@ -15,7 +15,6 @@ using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Monitoring.Logging;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
-using PhysEdJournal.Infrastructure.DI;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;

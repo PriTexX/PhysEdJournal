@@ -4,7 +4,7 @@ public enum HealthGroupType
 {
     None,
     Basic,
-    Special,
     Preparatory,
+    Special,
     HealthLimitations,
 }
