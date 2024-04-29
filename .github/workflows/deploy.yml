@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Extract specified tag
         run: |
-          echo "IMAGE_TAG=${{github.ref#refs/tags/v}}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
         
       - name: Put secrets in env
         uses: oNaiPs/secrets-to-env-action@v1
