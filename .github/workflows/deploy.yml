@@ -62,7 +62,8 @@ jobs:
           password: ${{ secrets.HOST_PASSWORD }}
           script: |
             cd /home/${{env.USERNAME}}/physedjournal
-            tar -xf deploy.tar
+            tar -xf deploy.tar -C /home/${{env.USERNAME}}/physedjournal
+            ls
             docker-compose pull
             docker-compose up -d
             rm -r /home/${{env.USERNAME}}/physedjournal
