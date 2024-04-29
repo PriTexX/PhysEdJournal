@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Extract specified tag
         run: |
-          echo "${{github.ref}}"
+          echo "IMAGE_TAG=${{github.ref#refs/tags/v}}" >> $GITHUB_ENV
         
       - name: Put secrets in env
         uses: oNaiPs/secrets-to-env-action@v1
@@ -67,6 +67,7 @@ jobs:
           script: |
             cd /home/${{env.USERNAME}}/physedjournal
             tar -xf deploy.tar -C /home/${{env.USERNAME}}/physedjournal
-            docker-compose pull
-            docker-compose up -d
+            cd deploy
+            docker-compose --env-file .env.secret pull
+            docker-compose --env-file .env.secret up -d
             rm -r /home/${{env.USERNAME}}/physedjournal

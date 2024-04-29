@@ -2,7 +2,7 @@
 
 services:
   physedjournal:
-    image: "ghcr.io/pritexx/physedjournal:latest"
+    image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}"
     labels:
       logging: "promtail"
     restart: always
