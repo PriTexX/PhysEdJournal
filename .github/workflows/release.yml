@@ -41,5 +41,6 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          echo ${{ steps.meta.outputs.tags }}
+          echo ${{ steps.meta.outputs.tags[0] }}
+          echo ${{ steps.meta.outputs.tags[1] }}
         
