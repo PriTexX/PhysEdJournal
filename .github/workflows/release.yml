@@ -30,7 +30,14 @@ jobs:
           
       - name: Extract tags for image
         run: |
-          echo "Tag name from GITHUB_REF_NAME: ${GITHUB_REF#refs/*/}"
+          TAG=${GITHUB_REF#refs/tags/v}
+          VERSIONS=(${TAG//./ })
+          VERSION=${VERSIONS[0]}.${VERSIONS[1]}
+          echo "Tag versions: $VERSION"
+          VE=(${TAG//././ })
+          VER=${VE[0]}.${VE[1].${VE[2]}
+          echo "Tag versions: $VER"
+          
 
       - name: Build and push Docker image
         run: |
