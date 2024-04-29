@@ -16,10 +16,17 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Put secrets in env
+        uses: oNaiPs/secrets-to-env-action@v1
+        with: 
+          secrets: ${{toJson(secrets)}}
+          
       - name: Test
         run: |
           echo '$HOST_PASSWORD' | envsubst > test.txt
           cat test.txt
+          echo "${HOST_PASSWORD}"
+          echo "$HOST_PASSWORD"
 #      - name: Checkout
 #        uses: actions/checkout@v3
 #
