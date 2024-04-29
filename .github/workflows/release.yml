@@ -36,6 +36,13 @@ jobs:
           echo "IMAGE_TAGS='\"${TAG};${SHORT_TAG};latest\"'" >> $GITHUB_ENV
           
       - name: Build and push Docker image
-        run: |
-          echo "hello"
+        run: dotnet publish \
+          --os linux \
+          --arch x64 \
+          -c Release \
+          -p PublishProfile=DefaultContainer \
+          -p ContainerRegistry=${{ env.REGISTRY }} \
+          -p ContainerRepository=${{ env.IMAGE_NAME }} \
+          -p ContainerImageTags=${{ env.IMAGE_TAGS }}
+          
         
