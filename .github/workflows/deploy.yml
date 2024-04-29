@@ -25,8 +25,14 @@ jobs:
         uses: actions/checkout@v3
           
       - name: Create secret env file
-        run: envsubst < deploy/.env.template > deploy/.env.secret 
+        run: envsubst < deploy/.env.template > deploy/.env.secret
 
+      - name: Tar deploy folder
+        run: |
+          mkdir ../deploy-files
+          cp -r deploy ../deploy-files
+          tar -cvf deploy.tar ../deploy-files/
+      
       - name: Install OpenVPN
         run: |
           sudo apt update
@@ -42,13 +48,13 @@ jobs:
           username: ${{secrets.OVPN_USERNAME}}
           password: ${{secrets.OVPN_PASSWORD}}
 
-      - name: Copy docker-compose
+      - name: Copy deploy.tar
         uses: appleboy/scp-action@master
         with:
           host: ${{secrets.HOST}}
           username: ${{env.USERNAME}}
           password: ${{ secrets.HOST_PASSWORD }}
-          source: "deploy"
+          source: "deploy.tar"
           target: "/home/${{env.USERNAME}}/physedjournal"
 
       - name: Pull and run containers
@@ -58,7 +64,8 @@ jobs:
           username: ${{ env.USERNAME }}
           password: ${{ secrets.HOST_PASSWORD }}
           script: |
-            cd /home/${{env.USERNAME}}/physedjournal/deploy
+            cd /home/${{env.USERNAME}}/physedjournal
+            tar -xf deploy.tar
             docker-compose pull
             docker-compose up -d
             rm -r /home/${{env.USERNAME}}/physedjournal
