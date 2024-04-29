@@ -33,7 +33,7 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/v}
           VERSIONS=(${TAG//./ })
           SHORT_TAG=${VERSIONS[0]}.${VERSIONS[1]}
-          FULL_TAG=${VERSIONS[0]}.${VERSIONS[1].${VERSIONS[2]}}
+          FULL_TAG=${VERSIONS[0]}.${VERSIONS[1]}.${VERSIONS[2]}
           echo "Tag versions: $SHORT_TAG $FULL_TAG"
           
 
