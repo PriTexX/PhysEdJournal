@@ -28,10 +28,7 @@ jobs:
         run: envsubst < deploy/.env.template > deploy/.env.secret
 
       - name: Tar deploy folder
-        run: |
-          mkdir ../deploy-files
-          cp -r deploy/* ../deploy-files/
-          tar -cvf deploy.tar ../deploy-files/
+        run: tar -cvf deploy.tar deploy/
       
       - name: Install OpenVPN
         run: |
