@@ -32,11 +32,9 @@ jobs:
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
           VERSIONS=(${TAG//./ })
-          VERSION=${VERSIONS[0]}.${VERSIONS[1]}
-          echo "Tag versions: $VERSION"
-          VE=(${TAG//././ })
-          VER=${VE[0]}.${VE[1].${VE[2]}
-          echo "Tag versions: $VER"
+          SHORT_TAG=${VERSIONS[0]}.${VERSIONS[1]}
+          FULL_TAG=${VERSIONS[0]}.${VERSIONS[1].${VERSIONS[2]}}
+          echo "Tag versions: $SHORT_TAG $FULL_TAG"
           
 
       - name: Build and push Docker image
