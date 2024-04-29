@@ -4,6 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <IsPublishable>true</IsPublishable>
+        <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
         <UserSecretsId>aspnet-PhysEdJournal.Api-0E966DF1-BDA5-4B29-9BF4-01DA825A95EF</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <CodeAnalysisRuleSet>..\CodeStyle.ruleset</CodeAnalysisRuleSet>
