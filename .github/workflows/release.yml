@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-    
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -27,14 +27,13 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Extract tags for image
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
           VERSIONS=(${TAG//./ })
           SHORT_TAG=${VERSIONS[0]}.${VERSIONS[1]}
           echo "IMAGE_TAGS='\"${TAG};${SHORT_TAG};latest\"'" >> $GITHUB_ENV
-          
+
       - name: Build and push Docker image
         run: dotnet publish --os linux --arch x64 -c Release -p PublishProfile=DefaultContainer -p ContainerRegistry=${{ env.REGISTRY }} -p ContainerRepository=${{ env.IMAGE_NAME }} -p ContainerImageTags=${{ env.IMAGE_TAGS }}
-        
