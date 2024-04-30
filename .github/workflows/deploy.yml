@@ -69,5 +69,5 @@ jobs:
             tar -xf deploy.tar -C /home/${{env.USERNAME}}/physedjournal
             cd deploy
             IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose pull
-            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose up -d
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose -p physedjournal up -d
             rm -r /home/${{env.USERNAME}}/physedjournal
