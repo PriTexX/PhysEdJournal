@@ -6,14 +6,34 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  USERNAME: admin2
   
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      packages: write
     steps:
+      - name: Extract specified tag
+        run: |
+          echo "IMAGE_TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        
+      - name: Put secrets in env
+        uses: oNaiPs/secrets-to-env-action@v1
+        with: 
+          secrets: ${{toJson(secrets)}}
+          
       - name: Checkout
         uses: actions/checkout@v3
+          
+      - name: Create secret env file
+        run: envsubst < deploy/.env.template > deploy/.env.secret
 
+      - name: Tar deploy folder
+        run: tar -cvf deploy.tar deploy/
+      
       - name: Install OpenVPN
         run: |
           sudo apt update
@@ -29,24 +49,25 @@ jobs:
           username: ${{secrets.OVPN_USERNAME}}
           password: ${{secrets.OVPN_PASSWORD}}
 
-      - name: Copy docker-compose
+      - name: Copy deploy.tar
         uses: appleboy/scp-action@master
         with:
           host: ${{secrets.HOST}}
-          username: ${{ secrets.HOST_USERNAME }}
+          username: ${{env.USERNAME}}
           password: ${{ secrets.HOST_PASSWORD }}
-          source: "docker-compose.yml"
-          target: "/home/pritexx/physedjournal"
+          source: "deploy.tar"
+          target: "/home/${{env.USERNAME}}/physedjournal"
 
       - name: Pull and run containers
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{secrets.HOST}}
-          username: ${{ secrets.HOST_USERNAME }}
+          username: ${{ env.USERNAME }}
           password: ${{ secrets.HOST_PASSWORD }}
           script: |
-            cd /home/pritexx/physedjournal
-            echo "${{secrets.ENV_FILE}}" > .env
-            docker-compose pull
-            docker-compose --env-file .env up -d
-            rm -r /home/pritexx/physedjournal
+            cd /home/${{env.USERNAME}}/physedjournal
+            tar -xf deploy.tar -C /home/${{env.USERNAME}}/physedjournal
+            cd deploy
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose pull
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose -p physedjournal up -d
+            rm -r /home/${{env.USERNAME}}/physedjournal

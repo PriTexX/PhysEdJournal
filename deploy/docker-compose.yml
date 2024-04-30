@@ -2,13 +2,13 @@
 
 services:
   physedjournal:
-    image: "ghcr.io/pritexx/physedjournal:latest"
+    image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}"
     labels:
       logging: "promtail"
     restart: always
     container_name: physedjournal
-    environment:
-      ConnectionStrings:DefaultConnection: ${DB_CONNECTION_STRING}
+    env_file:
+      - .env.secret
     depends_on: 
       loki:
         condition: service_healthy
