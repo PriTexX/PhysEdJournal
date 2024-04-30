@@ -1,0 +1,8 @@
+{
+  "label": "Релизы",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Все что нужно знать о релизах."
+  }
+}

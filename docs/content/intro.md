@@ -1,47 +1,42 @@
 ---
 slug: /
+sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Документация
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Здесь содержится вся документация проекта.
 
-## Getting Started
+Ее мы ведем в формате MDX - это формат Markdown с поддержкой JSX компонентов. \
+Для генерации сайта из файлов документации используется [Docusaurus](https://docusaurus.io).
 
-Get started by **creating a new site**.
+## Как вести документацию?
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+### Установка зависимостей
 
-### What you'll need
+Для локальной работы с документацией нужно установить [Node.js](https://nodejs.org)
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
+Также нужно поставить `yarn`
 
 ```bash
-npm init docusaurus@latest my-website classic
+npm install --global yarn
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
+После чего перейти в директорию с документацией и скачать библиотеки
 
 ```bash
-cd my-website
-npm run start
+cd docs
+yarn
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+### Редактирование
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+Все файлы с документацией лежат в каталоге `docs/content` - переходим туда 
+и редактируем файлы любым удобным редактором. 
+Потом запускаем локальную веб-сервер для просмотра документации в реальном времени
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+```bash
+yarn start
+```
+
+Теперь можно просматривать документацию по адресу http://localhost:3000/PhysEdJournal/. Также при редактировании файлов изменения будут сразу отражаться и на сайте. 
