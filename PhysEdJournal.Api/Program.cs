@@ -12,7 +12,7 @@ using PhysEdJournal.Api.GraphQL;
 using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Api.Monitoring.Logging;
+using PhysEdJournal.Api.Middlewares;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using Serilog;
@@ -148,6 +148,8 @@ builder
     );
 
 var app = builder.Build();
+
+app.UseRequestId();
 
 app.UseHttpsRedirection();
 app.UseCors(corsPolicyBuilder =>
