@@ -39,9 +39,9 @@ sidebar_position: 1
 ## Структура проектов
 
 Основу приложения составляют 3 проекта
-- [PhysEdJournal.Api](api_project) - Апи проекта
-- [PhysEdJournal.Infrastructure](infrastructure_project) - Здесь содержится вся бизнес-логика
-- [PhysEdJournal.Core](core_project) - Модели бд, основные типы и ошибки
+- [PhysEdJournal.Api](api-project) - Апи проекта
+- [PhysEdJournal.Infrastructure](infrastructure-project) - Здесь содержится вся бизнес-логика
+- [PhysEdJournal.Core](core-project) - Модели бд, основные типы и ошибки
 
 А также вспомогательный проект
 - **PhysEdJournal.Tests** - проект с тестами приложения

@@ -42,7 +42,6 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: 'PhysEdJournal',
       logo: {
