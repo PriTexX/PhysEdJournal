@@ -1,6 +1,9 @@
-﻿namespace PhysEdJournal.Core.Entities.Types;
+﻿using System.Text.Json.Serialization;
+
+namespace PhysEdJournal.Core.Entities.Types;
 
 [Flags]
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum TeacherPermissions
 {
     DefaultAccess = 0,

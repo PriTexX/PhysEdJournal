@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Constants;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
@@ -45,7 +45,7 @@ internal sealed class IncreaseStudentVisitsCommandValidator
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > VisitConstants.VISIT_LIFE_DAYS
+                > Constants.VisitLifeDays
             && !commandInput.IsAdmin
         )
         {

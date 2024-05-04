@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
-using static PhysEdJournal.Core.Constants.VisitConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -54,11 +54,11 @@ public sealed class DeleteStudentVisitCommand : ICommand<DeleteStudentVisitComma
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > DAYS_TO_DELETE_VISIT
+                > Constants.DaysToDeleteVisit
             && !commandCommandPayload.IsAdmin
         )
         {
-            return new VisitOutdatedException(DAYS_TO_DELETE_VISIT);
+            return new VisitOutdatedException(Constants.DaysToDeleteVisit);
         }
 
         student.Visits--;

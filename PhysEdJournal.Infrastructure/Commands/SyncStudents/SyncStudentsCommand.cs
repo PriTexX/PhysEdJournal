@@ -7,7 +7,7 @@ using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
 
-namespace PhysEdJournal.Infrastructure.Commands;
+namespace PhysEdJournal.Infrastructure.Commands.SyncStudents;
 
 public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
@@ -94,14 +94,14 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
             ? student.ArchivedVisitValue
             : student.Group.VisitValue;
 
-        var totalPoints = CalculateTotalPoints(
+        var totalPoints = Constants.CalculateTotalPoints(
             student.Visits,
             visitValue,
             student.AdditionalPoints,
             student.PointsForStandards
         );
 
-        if (totalPoints < REQUIRED_POINT_AMOUNT)
+        if (totalPoints < Constants.RequiredPointsAmount)
         {
             if (!student.HasDebtFromPreviousSemester)
             {

@@ -1,7 +1,7 @@
 ﻿namespace PhysEdJournal.Core.Exceptions.GroupExceptions;
 
-public class NullVisitValueException : Exception
+public class WrongVisitValueException : Exception
 {
-    public NullVisitValueException(double visitValue)
+    public WrongVisitValueException(double visitValue)
         : base($"Visit value cannot be negative. Visit value: {visitValue}") { }
 }

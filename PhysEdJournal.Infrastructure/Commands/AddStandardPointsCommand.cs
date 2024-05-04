@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions;
@@ -8,7 +9,6 @@ using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -59,21 +59,21 @@ internal sealed class AddStandardPointsCommandValidator
             ? student.ArchivedVisitValue
             : student.Group.VisitValue;
 
-        var totalPoints = CalculateTotalPoints(
+        var totalPoints = Constants.CalculateTotalPoints(
             student.Visits,
             visitValue,
             student.AdditionalPoints,
             student.PointsForStandards
         );
 
-        if (totalPoints < 30)
+        if (totalPoints < Constants.MinTotalPointsToPassStandards)
         {
             return new NotEnoughPointsForStandardException();
         }
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > POINTS_LIFE_DAYS
+                > Constants.PointsLifeDays
             && !commandInput.IsAdmin
         )
         {
@@ -85,9 +85,12 @@ internal sealed class AddStandardPointsCommandValidator
             return new NonWorkingDayException(commandInput.Date.DayOfWeek);
         }
 
-        if (commandInput.Points > MAX_POINTS_FOR_ONE_STANDARD)
+        if (commandInput.Points > Constants.MaxPointsForOneStandard)
         {
-            return new PointsOverflowException(commandInput.Points, MAX_POINTS_FOR_ONE_STANDARD);
+            return new PointsOverflowException(
+                commandInput.Points,
+                Constants.MaxPointsForOneStandard
+            );
         }
 
         if (commandInput.Points <= 0)
@@ -205,9 +208,9 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
     private int AdjustStudentPointsAmount(int studentTotalPointsForStandards, int pointsToImplement)
     {
         int adjustedStudentPointsAmount;
-        if (studentTotalPointsForStandards + pointsToImplement > MAX_POINTS_FOR_STANDARDS)
+        if (studentTotalPointsForStandards + pointsToImplement > Constants.MaxPointsForStandards)
         {
-            adjustedStudentPointsAmount = MAX_POINTS_FOR_STANDARDS;
+            adjustedStudentPointsAmount = Constants.MaxPointsForStandards;
         }
         else
         {

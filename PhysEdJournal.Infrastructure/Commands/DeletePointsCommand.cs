@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -49,11 +49,11 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsCommandPayload, U
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > DAYS_TO_DELETE_POINTS
+                > Constants.DaysToDeletePoints
             && !commandPayload.IsAdmin
         )
         {
-            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
+            return new PointsOutdatedException(Constants.DaysToDeletePoints);
         }
 
         student.AdditionalPoints -= history.Points;

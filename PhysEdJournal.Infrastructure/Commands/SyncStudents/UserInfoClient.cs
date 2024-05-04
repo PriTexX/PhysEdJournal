@@ -2,7 +2,7 @@
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 
-namespace PhysEdJournal.Infrastructure.Commands;
+namespace PhysEdJournal.Infrastructure.Commands.SyncStudents;
 
 internal sealed class Student
 {

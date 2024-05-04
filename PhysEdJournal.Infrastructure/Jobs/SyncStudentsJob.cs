@@ -1,4 +1,5 @@
 using PhysEdJournal.Infrastructure.Commands;
+using PhysEdJournal.Infrastructure.Commands.SyncStudents;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using Quartz;
 
