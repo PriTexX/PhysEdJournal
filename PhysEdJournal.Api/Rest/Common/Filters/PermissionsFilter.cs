@@ -33,14 +33,13 @@ public static class PermissionsFilter
 
         if (validationResult.IsErr)
         {
-            return Results.Json(
-                new
+            return Response.Error(
+                new ErrorResponse
                 {
-                    success = false,
-                    type = "not-enough-permissions",
-                    detail = "У вас недостаточно прав",
-                },
-                statusCode: StatusCodes.Status403Forbidden
+                    Type = "not-enough-permissions",
+                    Detail = "У вас недостаточно прав",
+                    StatusCode = StatusCodes.Status403Forbidden,
+                }
             );
         }
 

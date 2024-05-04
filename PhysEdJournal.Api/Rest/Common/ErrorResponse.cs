@@ -1,6 +1,6 @@
 namespace PhysEdJournal.Api.Rest.Common;
 
-public sealed class ErrorResponse
+public readonly struct ErrorResponse
 {
     public required int StatusCode { get; init; }
 
