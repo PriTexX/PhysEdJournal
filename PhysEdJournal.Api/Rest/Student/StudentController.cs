@@ -59,14 +59,6 @@ public static class StudentController
             query = query.Where(s => EF.Functions.ILike(s.FullName, $"%{filter.FullName}%"));
         }
 
-        if (!string.IsNullOrWhiteSpace(filter.Department))
-        {
-            query = query.Where(s =>
-                !string.IsNullOrWhiteSpace(s.Department)
-                && EF.Functions.ILike(s.Department, $"%{filter.Department}%")
-            );
-        }
-
         if (!string.IsNullOrWhiteSpace(filter.GroupNumber))
         {
             query = query.Where(s => string.Equals(s.GroupNumber, filter.GroupNumber));
