@@ -475,7 +475,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var res = await clearStudentsHealthGroupCommand.ExecuteAsync(EmptyPayload.Empty);
