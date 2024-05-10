@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Api.Rest.Common.Filters;
 using PhysEdJournal.Api.Rest.Student.Contracts;
+using PhysEdJournal.Api.Rest.Student.Contracts.Responses;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
 
@@ -40,7 +42,34 @@ public static class StudentController
             .Include(s => s.VisitsStudentHistory)
             .FirstOrDefaultAsync();
 
-        return Response.Ok(student);
+        if (student is null)
+        {
+            return Response.Error(new StudentNotFoundException(guid));
+        }
+
+        var response = new GetStudentResponse
+        {
+            StudentGuid = student.StudentGuid,
+            FullName = student.FullName,
+            GroupNumber = student.GroupNumber,
+            CurrentSemesterName = student.CurrentSemesterName,
+            HasDebtFromPreviousSemester = student.HasDebtFromPreviousSemester,
+            HadDebtInSemester = student.HadDebtInSemester,
+            ArchivedVisitValue = student.ArchivedVisitValue,
+            AdditionalPoints = student.AdditionalPoints,
+            PointsForStandards = student.PointsForStandards,
+            IsActive = student.IsActive,
+            Visits = student.Visits,
+            Course = student.Course,
+            HealthGroup = student.HealthGroup,
+            Department = student.Department,
+            Version = student.Version,
+            PointsStudentHistory = student.PointsStudentHistory?.ToList(),
+            VisitsStudentHistory = student.VisitsStudentHistory?.ToList(),
+            StandardsStudentHistory = student.StandardsStudentHistory?.ToList(),
+        };
+
+        return Response.Ok(response);
     }
 
     private static async Task<IResult> GetStudents(
@@ -78,7 +107,16 @@ public static class StudentController
             .Take(paginationParameters.PageSize)
             .ToListAsync();
 
-        return Response.Ok(data);
+        var response = data.Select(stud => new GetStudentsResponse
+            {
+                StudentGuid = stud.StudentGuid,
+                FullName = stud.FullName,
+                GroupNumber = stud.GroupNumber,
+                IsActive = stud.IsActive,
+            })
+            .ToList();
+
+        return Response.Ok(response);
     }
 
     private static async Task<IResult> ArchiveStudent(
