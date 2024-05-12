@@ -27,8 +27,7 @@ public static class CompetitionController
 
     private static async Task<IResult> CreateCompetition(
         string competitionName,
-        [FromServices] CreateCompetitionCommand createCompetitionCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] CreateCompetitionCommand createCompetitionCommand
     )
     {
         var result = await createCompetitionCommand.ExecuteAsync(competitionName);
@@ -38,8 +37,7 @@ public static class CompetitionController
 
     private static async Task<IResult> DeleteCompetition(
         string competitionName,
-        [FromServices] DeleteCompetitionCommand deleteCompetitionCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] DeleteCompetitionCommand deleteCompetitionCommand
     )
     {
         var result = await deleteCompetitionCommand.ExecuteAsync(competitionName);

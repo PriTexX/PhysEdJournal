@@ -121,8 +121,7 @@ public static class StudentController
 
     private static async Task<IResult> ArchiveStudent(
         [FromBody] ArchiveStudentRequest request,
-        [FromServices] ArchiveStudentCommand archiveStudentCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] ArchiveStudentCommand archiveStudentCommand
     )
     {
         var archiveStudentPayload = new ArchiveStudentCommandPayload

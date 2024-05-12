@@ -21,7 +21,6 @@ public static class SemesterController
     private static async Task<IResult> StartNewSemester(
         string semesterName,
         [FromServices] StartNewSemesterCommand startNewSemesterCommand,
-        [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
     {

@@ -29,7 +29,6 @@ public static class TeacherController
     private static async Task<IResult> CreateTeacherAsync(
         [FromBody] CreateTeacherRequest request,
         [FromServices] CreateTeacherCommand createTeacherCommand,
-        [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
     {

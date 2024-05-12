@@ -28,8 +28,7 @@ public static class GroupController
 
     private static async Task<IResult> AssignCuratorToGroup(
         [FromBody] AssignCuratorToGroupRequest request,
-        [FromServices] AssignCuratorCommand assignCuratorCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] AssignCuratorCommand assignCuratorCommand
     )
     {
         var assignCuratorPayload = new AssignCuratorCommandPayload
@@ -45,8 +44,7 @@ public static class GroupController
 
     private static async Task<IResult> AssignVisitValue(
         [FromBody] AssignVisitValueRequest request,
-        [FromServices] AssignVisitValueCommand assignVisitValueCommand,
-        [FromServices] PermissionValidator permissionValidator
+        [FromServices] AssignVisitValueCommand assignVisitValueCommand
     )
     {
         var assignVisitValuePayload = new AssignVisitValueCommandPayload
