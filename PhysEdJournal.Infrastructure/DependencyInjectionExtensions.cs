@@ -76,7 +76,7 @@ public static class DependencyInjectionExtensions
             q.AddTrigger(opts =>
                 opts.ForJob(archiveStudentsJobKey)
                     .WithIdentity($"${nameof(ArchiveStudentJob)}-trigger")
-                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
+                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(3, 0))
             );
 
             var syncStudentsJobKey = new JobKey(nameof(SyncStudentsJob));
@@ -85,7 +85,7 @@ public static class DependencyInjectionExtensions
             q.AddTrigger(opts =>
                 opts.ForJob(syncStudentsJobKey)
                     .WithIdentity($"{nameof(SyncStudentsJob)}-trigger")
-                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(6, 0))
+                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(4, 0))
             );
         });
         services.AddQuartzServer(q => q.WaitForJobsToComplete = true);

@@ -31,7 +31,7 @@ public sealed class ArchiveStudentJob : IJob
         var successfullyArchivedStudentsCounter = 0;
         try
         {
-            _logger.LogInformation("Archiving job has started");
+            _logger.LogInformation("Starting archiving job");
 
             var students = await _applicationContext
                 .Students.Include(s => s.Group)
@@ -64,7 +64,7 @@ public sealed class ArchiveStudentJob : IJob
                     {
                         _logger.LogWarning(
                             result.UnsafeError,
-                            "Failed to archive student with guid = {ArchivePayloadStudentGuid}",
+                            "Couldn't archive student with guid = {ArchivePayloadStudentGuid}",
                             archivePayload.StudentGuid
                         );
                         continue;
