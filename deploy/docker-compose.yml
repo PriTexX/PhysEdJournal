@@ -12,16 +12,6 @@ services:
     depends_on: 
       loki:
         condition: service_healthy
-        
-  stage-physedjournal:
-    image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}"
-    restart: always
-    container_name: stage-physedjournal
-    env_file:
-      - .env.stage.secret
-    depends_on:
-      loki:
-        condition: service_healthy
   
   prometheus:
     image: prom/prometheus:v2.47.0
