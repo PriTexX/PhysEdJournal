@@ -72,4 +72,5 @@ jobs:
             cd deploy
             IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose pull
             IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose -p physedjournal up -d
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose restart
             rm -r /home/${{env.USERNAME}}/physedjournal
