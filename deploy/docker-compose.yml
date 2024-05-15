@@ -12,6 +12,16 @@ services:
     depends_on: 
       loki:
         condition: service_healthy
+        
+  stage-physedjournal:
+    image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}"
+    restart: always
+    container_name: stage-physedjournal
+    env_file:
+      - .env.stage.secret
+    depends_on:
+      loki:
+        condition: service_healthy
   
   prometheus:
     image: prom/prometheus:v2.47.0
@@ -33,6 +43,7 @@ services:
   loki:
     image: grafana/loki:2.8.0
     container_name: loki
+    restart: always
     volumes:
       - loki-data:/loki
       - ./loki/loki.yaml:/etc/config/loki.yaml
@@ -73,25 +84,26 @@ services:
     image: quay.io/prometheus/node-exporter:v1.5.0
     container_name: node_exporter
     command: "--path.rootfs=/host"
-    pid: host
     restart: always
+    pid: host
     volumes:
       - /:/host:ro,rslave
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.2
     container_name: cadvisor
+    restart: always
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true
-    restart: always
   
   nginx:
     image: nginx:1.23
     container_name: nginx
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -100,7 +112,6 @@ services:
     volumes:
       - /etc/letsencrypt:/etc/certs:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    restart: always
 
 volumes:
   prometheus-data:

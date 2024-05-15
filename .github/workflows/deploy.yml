@@ -29,7 +29,9 @@ jobs:
         uses: actions/checkout@v3
           
       - name: Create secret env file
-        run: envsubst < deploy/.env.template > deploy/.env.secret
+        run: |
+          envsubst < deploy/.env.template > deploy/.env.secret
+          envsubst < deploy/.env.stage.template > deploy/.env.stage.secret
 
       - name: Tar deploy folder
         run: tar -cvf deploy.tar deploy/
