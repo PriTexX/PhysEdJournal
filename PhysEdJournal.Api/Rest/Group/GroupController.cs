@@ -18,12 +18,14 @@ public static class GroupController
         groupRouter
             .MapPost("/curator", AssignCuratorToGroup)
             .AddValidation(AssignCuratorToGroupRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
 
         groupRouter
             .MapPost("/visit-value", AssignVisitValue)
             .AddValidation(AssignVisitValueRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> AssignCuratorToGroup(

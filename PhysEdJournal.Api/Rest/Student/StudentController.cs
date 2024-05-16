@@ -23,7 +23,8 @@ public static class StudentController
         studentRouter
             .MapPost("/archive", ArchiveStudent)
             .AddValidation(ArchiveStudentRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
 
         studentRouter.MapGet("/{guid}", GetStudent);
 

@@ -18,12 +18,14 @@ public static class TeacherController
         teacherRouter
             .MapPost("/", CreateTeacherAsync)
             .AddValidation(CreateTeacherRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
 
         teacherRouter
             .MapPost("/permissions", GivePermissionsToTeacherAsync)
             .AddValidation(GivePermissionsToTeacherRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> CreateTeacherAsync(

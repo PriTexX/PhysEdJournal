@@ -18,11 +18,13 @@ public static class CompetitionController
 
         competitionRouter
             .MapPost("/", CreateCompetition)
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
 
         competitionRouter
             .MapDelete("/", DeleteCompetition)
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> CreateCompetition(

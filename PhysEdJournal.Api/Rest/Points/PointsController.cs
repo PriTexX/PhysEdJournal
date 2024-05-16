@@ -18,29 +18,35 @@ public static class PointsController
         pointsRouter
             .MapPost("/other", AddPointsToStudent)
             .AddValidation(AddPointsToStudentRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.DefaultAccess);
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
 
         pointsRouter
             .MapPost("/standard", AddPointsForStandardToStudent)
             .AddValidation(AddPointsForStandardToStudentRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.DefaultAccess);
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
 
         pointsRouter
             .MapPost("/visit", IncreaseStudentVisits)
             .AddValidation(IncreaseStudentVisitsRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.DefaultAccess);
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
 
         pointsRouter
             .MapDelete("/visit", DeleteStudentVisit)
-            .AddPermissionsValidation(TeacherPermissions.DefaultAccess);
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
 
         pointsRouter
             .MapDelete("/other", DeletePoints)
-            .AddPermissionsValidation(TeacherPermissions.DefaultAccess);
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
 
         pointsRouter
             .MapDelete("/standard", DeleteStandardPoints)
-            .AddPermissionsValidation(TeacherPermissions.DefaultAccess);
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> AddPointsToStudent(

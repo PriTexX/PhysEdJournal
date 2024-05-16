@@ -22,12 +22,13 @@ public static class PermissionsFilter
     )
     {
         var callerGuid = context
-            .HttpContext.User.Claims.First(c => c.Type == "IndividualGuid")
-            .Value;
+            .HttpContext.User.Claims.FirstOrDefault(c => c.Type == "IndividualGuid")
+            ?.Value;
 
         var validator = context.HttpContext.RequestServices.GetService<PermissionValidator>();
 
         ArgumentNullException.ThrowIfNull(validator);
+        ArgumentNullException.ThrowIfNull(callerGuid);
 
         var validationResult = await validator.ValidateTeacherPermissions(callerGuid, permissions);
 

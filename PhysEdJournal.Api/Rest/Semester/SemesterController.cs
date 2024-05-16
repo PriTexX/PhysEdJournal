@@ -15,7 +15,8 @@ public static class SemesterController
 
         router
             .MapPost("/semester", StartNewSemester)
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess);
+            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> StartNewSemester(
