@@ -11,10 +11,10 @@ namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 public sealed class ArchiveStudentCommandPayload
 {
     public required string StudentGuid { get; init; }
-    public required string SemesterName { get; init; }
 }
 
-public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayload, Unit>
+public sealed class ArchiveStudentCommand
+    : ICommand<ArchiveStudentCommandPayload, ArchivedStudentEntity>
 {
     private readonly ApplicationContext _applicationContext;
 
@@ -23,7 +23,9 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         _applicationContext = applicationContext;
     }
 
-    public async Task<Result<Unit>> ExecuteAsync(ArchiveStudentCommandPayload commandPayload)
+    public async Task<Result<ArchivedStudentEntity>> ExecuteAsync(
+        ArchiveStudentCommandPayload commandPayload
+    )
     {
         var student = await _applicationContext
             .Students.Where(s => s.StudentGuid == commandPayload.StudentGuid)
@@ -39,6 +41,8 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         }
 
         ArgumentNullException.ThrowIfNull(student.Group);
+
+        var activeSemester = await _applicationContext.Semesters.SingleAsync(s => s.IsCurrent);
 
         var visitValue = student.HasDebtFromPreviousSemester
             ? student.ArchivedVisitValue
@@ -66,50 +70,50 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
             return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
         }
 
-        _applicationContext.ArchivedStudents.Add(
-            new ArchivedStudentEntity
-            {
-                StudentGuid = student.StudentGuid,
-                SemesterName = student.CurrentSemesterName,
-                FullName = student.FullName,
-                GroupNumber = student.GroupNumber,
-                Visits = student.VisitsStudentHistory?.Count ?? 0,
-                VisitsHistory =
-                    student
-                        .VisitsStudentHistory?.Select(h => new ArchivedHistory
-                        {
-                            Date = h.Date,
-                            StudentGuid = h.StudentGuid,
-                            TeacherGuid = h.TeacherGuid,
-                            Points = visitValue,
-                        })
-                        .ToList() ?? new List<ArchivedHistory>(),
-                PointsHistory =
-                    student
-                        .PointsStudentHistory?.Select(h => new ArchivedPointsHistory
-                        {
-                            Date = h.Date,
-                            StudentGuid = h.StudentGuid,
-                            TeacherGuid = h.TeacherGuid,
-                            Points = h.Points,
-                            WorkType = h.WorkType,
-                            Comment = h.Comment,
-                        })
-                        .ToList() ?? new List<ArchivedPointsHistory>(),
-                StandardsHistory =
-                    student
-                        .StandardsStudentHistory?.Select(h => new ArchivedStandardsHistory
-                        {
-                            Date = h.Date,
-                            StudentGuid = h.StudentGuid,
-                            TeacherGuid = h.TeacherGuid,
-                            Points = h.Points,
-                            StandardType = h.StandardType,
-                            Comment = h.Comment,
-                        })
-                        .ToList() ?? new List<ArchivedStandardsHistory>(),
-            }
-        );
+        var archivedStudent = new ArchivedStudentEntity
+        {
+            StudentGuid = student.StudentGuid,
+            SemesterName = student.CurrentSemesterName,
+            FullName = student.FullName,
+            GroupNumber = student.GroupNumber,
+            Visits = student.VisitsStudentHistory?.Count ?? 0,
+            VisitsHistory =
+                student
+                    .VisitsStudentHistory?.Select(h => new ArchivedHistory
+                    {
+                        Date = h.Date,
+                        StudentGuid = h.StudentGuid,
+                        TeacherGuid = h.TeacherGuid,
+                        Points = visitValue,
+                    })
+                    .ToList() ?? new List<ArchivedHistory>(),
+            PointsHistory =
+                student
+                    .PointsStudentHistory?.Select(h => new ArchivedPointsHistory
+                    {
+                        Date = h.Date,
+                        StudentGuid = h.StudentGuid,
+                        TeacherGuid = h.TeacherGuid,
+                        Points = h.Points,
+                        WorkType = h.WorkType,
+                        Comment = h.Comment,
+                    })
+                    .ToList() ?? new List<ArchivedPointsHistory>(),
+            StandardsHistory =
+                student
+                    .StandardsStudentHistory?.Select(h => new ArchivedStandardsHistory
+                    {
+                        Date = h.Date,
+                        StudentGuid = h.StudentGuid,
+                        TeacherGuid = h.TeacherGuid,
+                        Points = h.Points,
+                        StandardType = h.StandardType,
+                        Comment = h.Comment,
+                    })
+                    .ToList() ?? new List<ArchivedStandardsHistory>(),
+        };
+
+        _applicationContext.ArchivedStudents.Add(archivedStudent);
 
         student.VisitsStudentHistory?.Clear();
         student.PointsStudentHistory?.Clear();
@@ -123,13 +127,13 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentCommandPayloa
         student.Visits = 0;
         student.AdditionalPoints = 0;
         student.PointsForStandards = 0;
-        student.CurrentSemesterName = commandPayload.SemesterName;
+        student.CurrentSemesterName = activeSemester.Name;
         student.ArchivedVisitValue = 0;
         student.HasDebtFromPreviousSemester = false;
 
         _applicationContext.Update(student);
         await _applicationContext.SaveChangesAsync();
 
-        return Unit.Default;
+        return archivedStudent;
     }
 }

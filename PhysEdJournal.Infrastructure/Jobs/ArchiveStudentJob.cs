@@ -38,10 +38,6 @@ public sealed class ArchiveStudentJob : IJob
                 .Where(s => s.HasDebtFromPreviousSemester)
                 .ToListAsync();
 
-            var activeSemester = await _applicationContext
-                .Semesters.Where(s => s.IsCurrent)
-                .FirstAsync();
-
             totalStudents = students.Count;
             foreach (var stud in students)
             {
@@ -53,7 +49,6 @@ public sealed class ArchiveStudentJob : IJob
                 var archivePayload = new ArchiveStudentCommandPayload
                 {
                     StudentGuid = stud.StudentGuid,
-                    SemesterName = activeSemester.Name,
                 };
 
                 try

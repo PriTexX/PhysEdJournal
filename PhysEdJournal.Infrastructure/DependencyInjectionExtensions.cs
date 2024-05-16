@@ -56,7 +56,6 @@ public static class DependencyInjectionExtensions
         services.AddScoped<DeleteStudentVisitCommand>();
         services.AddScoped<DeleteStandardPointsCommand>();
         services.AddScoped<DeletePointsCommand>();
-        services.AddScoped<MigrateToNextSemesterCommand>();
         services.AddScoped<AddHealthGroupCommand>();
         services.AddScoped<ClearStudentsHealthGroupCommand>();
     }

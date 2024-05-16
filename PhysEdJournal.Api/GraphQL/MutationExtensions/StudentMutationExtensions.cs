@@ -216,12 +216,11 @@ public class StudentMutationExtensions
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
     [Error(typeof(ConcurrencyError))]
-    public async Task<Success> ArchiveStudent(
+    public async Task<ArchivedStudentEntity> ArchiveStudent(
         [Service] ArchiveStudentCommand archiveStudentCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal,
-        string studentGuid,
-        string semesterName
+        string studentGuid
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
@@ -231,90 +230,11 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
-        var archiveStudentPayload = new ArchiveStudentCommandPayload
-        {
-            StudentGuid = studentGuid,
-            SemesterName = semesterName,
-        };
+        var archiveStudentPayload = new ArchiveStudentCommandPayload { StudentGuid = studentGuid };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
 
-        return res.Match(_ => true, exception => throw exception);
-    }
-
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(ConcurrencyError))]
-    public async Task<Success> MigrateToNewSemester(
-        [Service] MigrateToNextSemesterCommand migrateToNextSemesterCommand,
-        [Service] PermissionValidator permissionValidator,
-        [Service] ILogger<MigrateToNextSemesterCommand> logger,
-        ClaimsPrincipal claimsPrincipal,
-        string semesterName
-    )
-    {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
-
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
-            callerGuid,
-            FOR_ONLY_SUPERUSER_USE_PERMISSIONS
-        );
-
-        // We run this command in the background because it takes
-        // to much time so client closes connection before command ends
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        Task.Run(async () =>
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        {
-            try
-            {
-                logger.LogInformation(
-                    "Teacher: {teacherGuid} started {commandName}",
-                    callerGuid,
-                    nameof(MigrateToNextSemesterCommand)
-                );
-
-                // Command already logs and handles all errors
-                // so we dont need to do it here
-                await migrateToNextSemesterCommand.ExecuteAsync(semesterName);
-            }
-            catch (Exception err)
-            {
-                logger.LogError(
-                    err,
-                    "Unhandled exception happened in {commandName}",
-                    nameof(MigrateToNextSemesterCommand)
-                );
-            }
-        });
-
-        return true;
-    }
-
-    public async Task<Success> UnArchiveStudent(
-        string studentGuid,
-        string semesterName,
-        [Service] UnArchiveStudentCommand unArchiveStudentCommand,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
-    )
-    {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
-
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
-            callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
-        );
-
-        var unArchiveStudentPayload = new UnArchiveStudentCommandPayload
-        {
-            StudentGuid = studentGuid,
-            SemesterName = semesterName,
-        };
-
-        var res = await unArchiveStudentCommand.ExecuteAsync(unArchiveStudentPayload);
-
-        return res.Match(_ => true, exception => throw exception);
+        return res.Match(archivedStudent => archivedStudent, exception => throw exception);
     }
 
     [Error(typeof(NotEnoughPermissionsException))]

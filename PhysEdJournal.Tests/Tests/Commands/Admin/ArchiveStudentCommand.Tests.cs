@@ -52,11 +52,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             4
         );
 
-        var payload = new ArchiveStudentCommandPayload
-        {
-            StudentGuid = student.StudentGuid,
-            SemesterName = currentSemester.Name,
-        };
+        var payload = new ArchiveStudentCommandPayload { StudentGuid = student.StudentGuid, };
 
         await context.Semesters.AddAsync(lastSemester);
         await context.Semesters.AddAsync(currentSemester);
@@ -151,11 +147,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         );
         student.HadDebtInSemester = usedToHaveDebt;
 
-        var payload = new ArchiveStudentCommandPayload
-        {
-            StudentGuid = student.StudentGuid,
-            SemesterName = currentSemester.Name,
-        };
+        var payload = new ArchiveStudentCommandPayload { StudentGuid = student.StudentGuid, };
 
         await context.Semesters.AddAsync(lastSemester);
         await context.Semesters.AddAsync(currentSemester);
@@ -207,11 +199,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
             additionalPoints
         );
 
-        var payload = new ArchiveStudentCommandPayload
-        {
-            StudentGuid = student.StudentGuid,
-            SemesterName = currentSemester.Name,
-        };
+        var payload = new ArchiveStudentCommandPayload { StudentGuid = student.StudentGuid, };
 
         await context.Semesters.AddAsync(lastSemester);
         await context.Semesters.AddAsync(currentSemester);
@@ -253,11 +241,7 @@ public sealed class ArchiveStudentCommandTests : DatabaseTestsHelper
         var currentSemester = EntitiesFactory.CreateSemester("2021-2023/autumn", true);
         var group = EntitiesFactory.CreateGroup("211-729", 2, teacher.TeacherGuid);
 
-        var payload = new ArchiveStudentCommandPayload
-        {
-            StudentGuid = "student.StudentGuid ",
-            SemesterName = currentSemester.Name
-        };
+        var payload = new ArchiveStudentCommandPayload { StudentGuid = "student.StudentGuid ", };
 
         await context.Semesters.AddAsync(lastSemester);
         await context.Semesters.AddAsync(currentSemester);
