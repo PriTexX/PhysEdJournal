@@ -33,7 +33,6 @@ public sealed class ArchivedStudentEntity
 
     [StringLength(32)]
     [Required(AllowEmptyStrings = false)]
-    [RegularExpression(@"\d{4}-\d{4}/\w{5}")]
     public required string SemesterName { get; set; }
 
     [ForeignKey("SemesterName")]

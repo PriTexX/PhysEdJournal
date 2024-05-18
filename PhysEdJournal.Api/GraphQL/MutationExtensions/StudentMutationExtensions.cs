@@ -215,6 +215,8 @@ public class StudentMutationExtensions
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
     [Error(typeof(NotEnoughPointsException))]
+    [Error(typeof(NotCuratorError))]
+    [Error(typeof(SemesterMismatchError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<ArchivedStudentEntity> ArchiveStudent(
         [Service] ArchiveStudentCommand archiveStudentCommand,
@@ -230,7 +232,11 @@ public class StudentMutationExtensions
             FOR_ONLY_ADMIN_USE_PERMISSIONS
         );
 
-        var archiveStudentPayload = new ArchiveStudentCommandPayload { StudentGuid = studentGuid };
+        var archiveStudentPayload = new ArchiveStudentPayload
+        {
+            StudentGuid = studentGuid,
+            TeacherGuid = callerGuid,
+        };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
 

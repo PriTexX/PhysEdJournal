@@ -8,27 +8,73 @@ using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
 
-public sealed class ArchiveStudentCommandPayload
+public sealed class ArchiveStudentPayload
 {
     public required string StudentGuid { get; init; }
+    public string? TeacherGuid { get; init; }
 }
 
-public sealed class ArchiveStudentCommand
-    : ICommand<ArchiveStudentCommandPayload, ArchivedStudentEntity>
+file sealed class ArchiveStudentCommandValidator : ICommandValidator<ArchiveStudentPayload>
 {
     private readonly ApplicationContext _applicationContext;
 
-    public ArchiveStudentCommand(ApplicationContext applicationContext)
+    public ArchiveStudentCommandValidator(ApplicationContext applicationContext)
     {
         _applicationContext = applicationContext;
     }
 
-    public async Task<Result<ArchivedStudentEntity>> ExecuteAsync(
-        ArchiveStudentCommandPayload commandPayload
-    )
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(ArchiveStudentPayload input)
     {
         var student = await _applicationContext
-            .Students.Where(s => s.StudentGuid == commandPayload.StudentGuid)
+            .Students.Where(s => s.StudentGuid == input.StudentGuid)
+            .Include(s => s.Group)
+            .FirstOrDefaultAsync();
+
+        if (student is null)
+        {
+            return new StudentNotFoundException(input.StudentGuid);
+        }
+
+        ArgumentNullException.ThrowIfNull(student.Group);
+
+        var semester = await _applicationContext.Semesters.SingleAsync(s => s.IsCurrent);
+
+        if (student.CurrentSemesterName == semester.Name)
+        {
+            return new SemesterMismatchError();
+        }
+
+        if (input.TeacherGuid is not null && student.Group.CuratorGuid != input.TeacherGuid)
+        {
+            return new NotCuratorError();
+        }
+
+        return ValidationResult.Success;
+    }
+}
+
+public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, ArchivedStudentEntity>
+{
+    private readonly ApplicationContext _applicationContext;
+    private readonly ICommandValidator<ArchiveStudentPayload> _validator;
+
+    public ArchiveStudentCommand(ApplicationContext applicationContext)
+    {
+        _applicationContext = applicationContext;
+        _validator = new ArchiveStudentCommandValidator(applicationContext);
+    }
+
+    public async Task<Result<ArchivedStudentEntity>> ExecuteAsync(ArchiveStudentPayload payload)
+    {
+        var validationResult = await _validator.ValidateCommandInputAsync(payload);
+
+        if (validationResult.IsFailed)
+        {
+            return validationResult.ValidationException;
+        }
+
+        var student = await _applicationContext
+            .Students.Where(s => s.StudentGuid == payload.StudentGuid)
             .Include(s => s.PointsStudentHistory)
             .Include(s => s.StandardsStudentHistory)
             .Include(s => s.VisitsStudentHistory)
@@ -37,7 +83,7 @@ public sealed class ArchiveStudentCommand
 
         if (student is null)
         {
-            return new StudentNotFoundException(commandPayload.StudentGuid);
+            return new StudentNotFoundException(payload.StudentGuid);
         }
 
         ArgumentNullException.ThrowIfNull(student.Group);
@@ -67,7 +113,7 @@ public sealed class ArchiveStudentCommand
                 await _applicationContext.SaveChangesAsync();
             }
 
-            return new NotEnoughPointsException(commandPayload.StudentGuid, totalPoints);
+            return new NotEnoughPointsException(payload.StudentGuid, totalPoints);
         }
 
         var archivedStudent = new ArchivedStudentEntity
