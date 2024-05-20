@@ -122,13 +122,16 @@ public static class StudentController
 
     private static async Task<IResult> ArchiveStudent(
         [FromBody] ArchiveStudentRequest request,
+        HttpContext ctx,
         [FromServices] ArchiveStudentCommand archiveStudentCommand
     )
     {
-        var archiveStudentPayload = new ArchiveStudentCommandPayload
+        var userGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
+
+        var archiveStudentPayload = new ArchiveStudentPayload
         {
             StudentGuid = request.StudentGuid,
-            SemesterName = request.SemesterName,
+            TeacherGuid = userGuid,
         };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);

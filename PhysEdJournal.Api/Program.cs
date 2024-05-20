@@ -201,14 +201,14 @@ app.UseRequestId();
     Rest
  */
 
-var root = app.MapGroup("/api");
-
-PointsController.MapEndpoints(root);
-GroupController.MapEndpoints(root);
-CompetitionController.MapEndpoints(root);
-SemesterController.MapEndpoints(root);
-StudentController.MapEndpoints(root);
-TeacherController.MapEndpoints(root);
+// var root = app.MapGroup("/api");
+//
+// PointsController.MapEndpoints(root);
+// GroupController.MapEndpoints(root);
+// CompetitionController.MapEndpoints(root);
+// SemesterController.MapEndpoints(root);
+// StudentController.MapEndpoints(root);
+// TeacherController.MapEndpoints(root);
 
 /*
     Middlewares
