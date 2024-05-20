@@ -1,5 +1,8 @@
-﻿namespace PhysEdJournal.Core.Entities.Types;
+﻿using System.Text.Json.Serialization;
 
+namespace PhysEdJournal.Core.Entities.Types;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum WorkType
 {
     ExternalFitness,

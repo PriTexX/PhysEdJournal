@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.GroupExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -25,7 +25,7 @@ public class GroupMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var assignCuratorPayload = new AssignCuratorCommandPayload
@@ -41,7 +41,7 @@ public class GroupMutationExtensions
 
     [Error(typeof(NotEnoughPermissionsException))]
     [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(NullVisitValueException))]
+    [Error(typeof(WrongVisitValueException))]
     public async Task<Success> AssignVisitValue(
         string groupName,
         double newVisitValue,
@@ -54,7 +54,7 @@ public class GroupMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var assignVisitValuePayload = new AssignVisitValueCommandPayload

@@ -4,7 +4,6 @@ using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -26,7 +25,7 @@ public class TeacherMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var createTeacherPayload = new CreateTeacherCommandPayload
@@ -68,14 +67,14 @@ public class TeacherMutationExtensions
         {
             await permissionValidator.ValidateTeacherPermissionsAndThrow(
                 callerGuid,
-                FOR_ONLY_SUPERUSER_USE_PERMISSIONS
+                TeacherPermissions.SuperUser
             );
         }
         else
         {
             await permissionValidator.ValidateTeacherPermissionsAndThrow(
                 callerGuid,
-                FOR_ONLY_ADMIN_USE_PERMISSIONS
+                TeacherPermissions.AdminAccess
             );
         }
 
@@ -103,7 +102,7 @@ public class TeacherMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var result = await createCompetitionCommand.ExecuteAsync(competitionName);
@@ -125,7 +124,7 @@ public class TeacherMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var result = await deleteCompetitionCommand.ExecuteAsync(competitionName);

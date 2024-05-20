@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Constants;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions;
@@ -36,9 +36,9 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
         AddPointsCommandPayload commandInput
     )
     {
-        if (commandInput.Points > 50)
+        if (commandInput.Points > Constants.MaxPointsAmount)
         {
-            return new PointsExceededLimit(50);
+            return new PointsExceededLimit(Constants.MaxPointsAmount);
         }
 
         if (commandInput.Date > DateOnly.FromDateTime(DateTime.UtcNow))
@@ -75,9 +75,9 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
                 return new FitnessAlreadyExistsException();
             }
 
-            if (commandInput.Points > 10)
+            if (commandInput.Points > Constants.MaxPointsForExternalFitness)
             {
-                return new PointsExceededLimit(10);
+                return new PointsExceededLimit(Constants.MaxPointsForExternalFitness);
             }
         }
 
@@ -94,14 +94,14 @@ internal sealed class AddPointsCommandValidator : ICommandValidator<AddPointsCom
             }
         }
 
-        if (commandInput is { WorkType: WorkType.Science, Points: > 30 })
+        if (commandInput is { WorkType: WorkType.Science, Points: > Constants.MaxPointsForScience })
         {
-            return new PointsExceededLimit(30);
+            return new PointsExceededLimit(Constants.MaxPointsForScience);
         }
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > PointsConstants.POINTS_LIFE_DAYS
+                > Constants.PointsLifeDays
             && !commandInput.IsAdmin
         )
         {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.PointsExceptions;
 using PhysEdJournal.Core.Exceptions.StandardExceptions;
@@ -6,7 +7,6 @@ using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Commands;
 
@@ -50,11 +50,11 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > DAYS_TO_DELETE_POINTS
+                > Constants.DaysToDeletePoints
             && !commandPayload.IsAdmin
         )
         {
-            return new PointsOutdatedException(DAYS_TO_DELETE_POINTS);
+            return new PointsOutdatedException(Constants.DaysToDeletePoints);
         }
 
         var totalPointsForStandards = await _applicationContext
@@ -63,8 +63,8 @@ public sealed class DeleteStandardPointsCommand : ICommand<DeleteStandardPointsC
 
         var pointsForStandard = totalPointsForStandards - history.Points;
         var limitedPoints =
-            pointsForStandard > MAX_POINTS_FOR_STANDARDS
-                ? MAX_POINTS_FOR_STANDARDS
+            pointsForStandard > Constants.MaxPointsForStandards
+                ? Constants.MaxPointsForStandards
                 : pointsForStandard;
 
         student.PointsForStandards = limitedPoints;

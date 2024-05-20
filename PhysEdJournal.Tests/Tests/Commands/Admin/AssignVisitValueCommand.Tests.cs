@@ -70,7 +70,7 @@ public sealed class AssignVisitValueCommandTests : DatabaseTestsHelper
             _ => true,
             exception =>
             {
-                Assert.IsType<NullVisitValueException>(exception);
+                Assert.IsType<WrongVisitValueException>(exception);
                 return true;
             }
         );

@@ -43,11 +43,6 @@ public class PermissionValidator
             );
         }
 
-        if (requiredPermissions == TeacherPermissions.DefaultAccess)
-        {
-            return true;
-        }
-
         var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);
 
         if (!hasEnough)
@@ -77,12 +72,22 @@ public class PermissionValidator
         TeacherPermissions requiredPermissions
     )
     {
+        if (requiredPermissions == TeacherPermissions.DefaultAccess)
+        {
+            return true;
+        }
+
         if (permissions.HasFlag(TeacherPermissions.SuperUser))
         {
             return true;
         }
 
-        if (requiredPermissions == 0)
+        if (requiredPermissions.HasFlag(TeacherPermissions.SuperUser))
+        {
+            return false;
+        }
+
+        if (permissions.HasFlag(TeacherPermissions.AdminAccess))
         {
             return true;
         }

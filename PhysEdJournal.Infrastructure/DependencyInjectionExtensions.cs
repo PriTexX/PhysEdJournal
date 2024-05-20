@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
+using PhysEdJournal.Infrastructure.Commands.SyncStudents;
 using PhysEdJournal.Infrastructure.Database;
 using PhysEdJournal.Infrastructure.Jobs;
 using Quartz;
@@ -44,7 +45,6 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ActivateStudentCommand>();
         services.AddScoped<DeActivateStudentCommand>();
         services.AddScoped<ArchiveStudentCommand>();
-        services.AddScoped<UnArchiveStudentCommand>();
         services.AddScoped<AssignCuratorCommand>();
         services.AddScoped<AssignVisitValueCommand>();
         services.AddScoped<CreateCompetitionCommand>();

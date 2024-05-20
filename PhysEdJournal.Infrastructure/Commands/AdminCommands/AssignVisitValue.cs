@@ -21,7 +21,9 @@ internal sealed class AssignVisitValueCommandValidator
     {
         if (commandInput.NewVisitValue <= 0)
         {
-            return ValidationResult.Create(new NullVisitValueException(commandInput.NewVisitValue));
+            return ValidationResult.Create(
+                new WrongVisitValueException(commandInput.NewVisitValue)
+            );
         }
 
         return ValidationResult.Success;

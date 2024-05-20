@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
+using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -24,7 +24,7 @@ public class SemesterMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var res = await startNewSemesterCommand.ExecuteAsync(semesterName);

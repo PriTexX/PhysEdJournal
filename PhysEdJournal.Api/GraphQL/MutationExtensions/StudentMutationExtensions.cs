@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Core.Constants;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions;
@@ -12,9 +11,9 @@ using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 using PhysEdJournal.Infrastructure.Commands;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
+using PhysEdJournal.Infrastructure.Commands.SyncStudents;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
-using static PhysEdJournal.Core.Constants.PermissionConstants;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
@@ -53,7 +52,7 @@ public class StudentMutationExtensions
             {
                 await permissionValidator.ValidateTeacherPermissionsAndThrow(
                     callerGuid,
-                    ADD_POINTS_FOR_COMPETITIONS_PERMISSIONS
+                    TeacherPermissions.SecretaryAccess
                 );
                 break;
             }
@@ -62,7 +61,7 @@ public class StudentMutationExtensions
             {
                 await permissionValidator.ValidateTeacherPermissionsAndThrow(
                     callerGuid,
-                    ADD_POINTS_FOR_LMS_PERMISSIONS
+                    TeacherPermissions.OnlineCourseAccess
                 );
                 break;
             }
@@ -70,7 +69,7 @@ public class StudentMutationExtensions
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
+            TeacherPermissions.SecretaryAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
@@ -132,7 +131,7 @@ public class StudentMutationExtensions
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
+            TeacherPermissions.SecretaryAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
@@ -186,7 +185,7 @@ public class StudentMutationExtensions
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS | TeacherPermissions.SecretaryAccess
+            TeacherPermissions.SecretaryAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
@@ -229,7 +228,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var archiveStudentPayload = new ArchiveStudentPayload
@@ -256,7 +255,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         // We run this command in the background because it takes
@@ -307,7 +306,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var res = await activateStudentCommand.ExecuteAsync(studentGuid);
@@ -329,7 +328,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var res = await deActivateStudentCommand.ExecuteAsync(studentGuid);
@@ -353,7 +352,7 @@ public class StudentMutationExtensions
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var isAdmin = validationResult.IsOk;
@@ -386,7 +385,7 @@ public class StudentMutationExtensions
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var isAdmin = validationResult.IsOk;
@@ -419,7 +418,7 @@ public class StudentMutationExtensions
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var isAdmin = validationResult.IsOk;
@@ -477,7 +476,7 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
-            FOR_ONLY_ADMIN_USE_PERMISSIONS
+            TeacherPermissions.AdminAccess
         );
 
         var res = await clearStudentsHealthGroupCommand.ExecuteAsync(EmptyPayload.Empty);

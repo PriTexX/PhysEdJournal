@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PhysEdJournal.Core;
 using PhysEdJournal.Core.Entities.DB;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
 using Quartz;
-using static PhysEdJournal.Core.Constants.PointsConstants;
 
 namespace PhysEdJournal.Infrastructure.Jobs;
 
@@ -95,11 +95,11 @@ public sealed class ArchiveStudentJob : IJob
     {
         ArgumentNullException.ThrowIfNull(student.Group);
 
-        return CalculateTotalPoints(
+        return Constants.CalculateTotalPoints(
                 student.Visits,
                 student.ArchivedVisitValue,
                 student.AdditionalPoints,
                 student.PointsForStandards
-            ) >= REQUIRED_POINT_AMOUNT;
+            ) >= Constants.RequiredPointsAmount;
     }
 }
