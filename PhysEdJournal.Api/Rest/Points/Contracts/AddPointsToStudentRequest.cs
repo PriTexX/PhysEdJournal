@@ -33,13 +33,13 @@ file sealed class Validator : AbstractValidator<AddPointsToStudentRequest>
         RuleFor(request => request.Points)
             .GreaterThan(0)
             .WithMessage("Количество баллов должно быть больше 0")
-            .LessThan(Constants.MaxPointsAmount)
+            .LessThanOrEqualTo(Constants.MaxPointsAmount)
             .WithMessage($"Количество баллов должно быть меньше {Constants.MaxPointsAmount}");
 
         RuleFor(request => request.Date).NotEmpty().WithMessage("Обязательно нужно указать дату");
 
         RuleFor(request => request.WorkType)
-            .NotEmpty()
+            .NotNull()
             .WithMessage("Обязательно нужно передать тип работы, за которую выставляются баллы");
     }
 }

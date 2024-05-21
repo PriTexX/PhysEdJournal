@@ -1,5 +1,6 @@
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
+using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
@@ -106,6 +107,15 @@ public static class ErrorHandler
                     Type = "order-by-query",
                     Detail =
                         "Запрос на сортировку это список параметров через запятую. Параметр на сортировку состоит из единого слова, а так же может иметь модификатор asc или desc.",
+                }
+            },
+            {
+                nameof(LoweringTheScoreException),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "lowering-score",
+                    Detail = "Нельзя занизить количество баллов студенту",
                 }
             },
         };

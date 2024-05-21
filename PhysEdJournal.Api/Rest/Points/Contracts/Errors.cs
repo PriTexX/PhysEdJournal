@@ -84,5 +84,14 @@ public static class PointsErrors
                     Detail = "Не удалось найти норматив в системе",
                 }
             },
+            {
+                nameof(StandardAlreadyExistsException),
+                _ => new ErrorResponse()
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "standard-duplicate",
+                    Detail = "Нельзя сдать один и тот же норматив дважды",
+                }
+            },
         };
 }

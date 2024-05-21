@@ -19,5 +19,23 @@ public static class StudentErrors
                         "Для перевода в следующий семестр студенту необходимо набрать более 50 баллов",
                 }
             },
+            {
+                nameof(NotCuratorError),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Type = "not-curator",
+                    Detail = "Учитель, который архивирует, должен быть куратором группы",
+                }
+            },
+            {
+                nameof(SemesterMismatchError),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "semester-mismatch",
+                    Detail = "Нельзя перевести студента на семестр, на котором он уже обучается",
+                }
+            },
         };
 }

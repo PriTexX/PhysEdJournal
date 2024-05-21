@@ -18,5 +18,14 @@ public static class GroupErrors
                         "Количество баллов за посещение должно быть одним из 2; 2.5; 3; 3.5; 4",
                 }
             },
+            {
+                nameof(GroupNotFoundException),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Type = "group-not-found",
+                    Detail = "Группа не найдена",
+                }
+            },
         };
 }

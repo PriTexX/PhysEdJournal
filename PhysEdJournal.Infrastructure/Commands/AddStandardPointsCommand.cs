@@ -178,7 +178,7 @@ public sealed class AddStandardPointsCommand : ICommand<AddStandardPointsCommand
                 )
                 .OrderByDescending(s => s.Points)
                 .Select(s => s.Points)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             student.PointsForStandards -= points;
         }
