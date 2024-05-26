@@ -1,0 +1,11 @@
+html[data-theme='dark'] {
+  --form-error-color: var(--chakra-colors-red-300);
+}
+
+html[data-theme='light'] {
+  --form-error-color: var(--chakra-colors-red-500);
+}
+
+*:disabled {
+  cursor: default !important;
+}

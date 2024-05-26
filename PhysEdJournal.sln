@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Tests", "PhysEdJournal.Tests\PhysEdJournal.Tests.csproj", "{B8791C2E-5725-48C9-B32D-05C34B97E6B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Api", "Admin.Api\Admin.Api.csproj", "{D410B76F-C9FC-45A2-9A4E-4A24363A851C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{B8791C2E-5725-48C9-B32D-05C34B97E6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8791C2E-5725-48C9-B32D-05C34B97E6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8791C2E-5725-48C9-B32D-05C34B97E6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D410B76F-C9FC-45A2-9A4E-4A24363A851C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D410B76F-C9FC-45A2-9A4E-4A24363A851C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D410B76F-C9FC-45A2-9A4E-4A24363A851C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D410B76F-C9FC-45A2-9A4E-4A24363A851C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
