@@ -1,0 +1,11 @@
+.react-json-view {
+  border: 1px solid var(--chakra-colors-chakra-border-color);
+  background-color: var(--chakra-colors-chakra-body-bg) !important;
+  border-radius: var(--chakra-radii-md);
+  padding: var(--chakra-space-2);
+}
+
+.edit-check.detected svg {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
