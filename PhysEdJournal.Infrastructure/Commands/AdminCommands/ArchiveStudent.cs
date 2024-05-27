@@ -12,6 +12,7 @@ public sealed class ArchiveStudentPayload
 {
     public required string StudentGuid { get; init; }
     public string? TeacherGuid { get; init; }
+    public required bool IsAdmin { get; init; }
 }
 
 file sealed class ArchiveStudentCommandValidator : ICommandValidator<ArchiveStudentPayload>
@@ -44,7 +45,11 @@ file sealed class ArchiveStudentCommandValidator : ICommandValidator<ArchiveStud
             return new SemesterMismatchError();
         }
 
-        if (input.TeacherGuid is not null && student.Group.CuratorGuid != input.TeacherGuid)
+        if (
+            input.TeacherGuid is not null
+            && !input.IsAdmin
+            && student.Group.CuratorGuid != input.TeacherGuid
+        )
         {
             return new NotCuratorError();
         }

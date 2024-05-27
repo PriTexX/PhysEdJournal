@@ -228,6 +228,11 @@ public class StudentMutationExtensions
 
         await permissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
+            TeacherPermissions.DefaultAccess
+        );
+
+        var validationRes = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
             TeacherPermissions.AdminAccess
         );
 
@@ -235,6 +240,7 @@ public class StudentMutationExtensions
         {
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
+            IsAdmin = validationRes.IsOk,
         };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
