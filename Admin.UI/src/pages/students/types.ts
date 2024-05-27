@@ -11,6 +11,11 @@ export type Student = {
   visits: number;
   course: number;
   currentSemesterName: string;
-  healthGroup: 'None' | 'Basic';
+  healthGroup:
+    | 'None'
+    | 'Basic'
+    | 'Preparatory'
+    | 'Special'
+    | 'HealthLimitations';
   department: string | null;
 };
