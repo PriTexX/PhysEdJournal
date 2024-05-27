@@ -11,6 +11,7 @@ public sealed class LoginRequest
 {
     public required string Username { get; init; }
     public required string Password { get; init; }
+    public required bool Remember { get; init; }
 }
 
 public static class AuthenticationHandler
@@ -72,8 +73,8 @@ public static class AuthenticationHandler
             new ClaimsPrincipal(claimsIdentity),
             new AuthenticationProperties
             {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1),
+                IsPersistent = req.Remember,
+                ExpiresUtc = req.Remember ? DateTimeOffset.UtcNow.AddDays(1) : null,
             }
         );
 

@@ -65,7 +65,6 @@ const cardProps: BoxProps = {
 export const LoginPage: React.FC<LoginProps> = ({
   providers,
   registerLink,
-  forgotPasswordLink,
   rememberMe,
   contentProps,
   wrapperProps,
@@ -203,42 +202,6 @@ export const LoginPage: React.FC<LoginProps> = ({
           <Button mt="6" type="submit" width="full" colorScheme="brand">
             Вход
           </Button>
-
-          <Box mt="6">
-            <HStack justifyContent="space-between" fontSize="12px">
-              {forgotPasswordLink ?? (
-                <ChakraLink
-                  as={Link}
-                  color={importantTextColor}
-                  to="/forgot-password"
-                >
-                  {translate(
-                    'pages.login.buttons.forgotPassword',
-                    'Forgot password?',
-                  )}
-                </ChakraLink>
-              )}
-              {registerLink ?? (
-                <Box>
-                  <span>
-                    {translate(
-                      'pages.login.buttons.noAccount',
-                      'Don’t have an account?',
-                    )}
-                  </span>
-                  <ChakraLink
-                    color={importantTextColor}
-                    ml="1"
-                    as={Link}
-                    fontWeight="bold"
-                    to="/register"
-                  >
-                    {translate('pages.login.register', 'Sign up')}
-                  </ChakraLink>
-                </Box>
-              )}
-            </HStack>
-          </Box>
         </form>
       )}
 

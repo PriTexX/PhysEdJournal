@@ -29,9 +29,13 @@ import { ThemedTitleV2 } from './app/layout/refine-layout/title';
 import { CurrentTimezoneProvider } from './app/utils/current-timezone-provider/current-timezone-provider';
 import { handleDocumentTitle } from './app/utils/handle-document-title';
 import { TableSchemasProvider } from './features/modify-table/utils/table-schemas-provider';
+import {
+  CompetitionCreatePage,
+  CompetitionListPage,
+} from './pages/competitions';
+import { GroupListPage } from './pages/groups';
 import { LoginPage } from './pages/login';
-import { StudentEdit } from './pages/students/edit';
-import { StudentList } from './pages/students/list';
+import { StudentEditPage, StudentListPage } from './pages/students';
 
 import type { ResourceProps } from '@refinedev/core';
 
@@ -54,10 +58,26 @@ const theme = extendTheme(RefineThemes.Blue, {
 const resources: ResourceProps[] = [
   {
     name: 'student',
-    list: '/student',
-    edit: '/student/:id',
+    list: '/students',
+    edit: '/students/:id',
     meta: {
       label: 'Студенты',
+    },
+  },
+  {
+    name: 'competition',
+    list: '/competitions',
+    create: '/competitions/create',
+    meta: {
+      canDelete: true,
+      label: 'Соревнования',
+    },
+  },
+  {
+    name: 'group',
+    list: '/groups',
+    meta: {
+      label: 'Группы',
     },
   },
 ];
@@ -103,7 +123,7 @@ function App() {
                             Title={({ collapsed }) => (
                               <ThemedTitleV2
                                 collapsed={collapsed}
-                                text="PhysEdJournal Admin"
+                                text="Журнал | Админ"
                                 // icon={<AppIcon />}
                               />
                             )}
@@ -117,9 +137,19 @@ function App() {
                         index
                         element={<NavigateToResource resource="student" />}
                       />
-                      <Route path="/student">
-                        <Route index element={<StudentList />} />
-                        <Route path=":id" element={<StudentEdit />} />
+                      <Route path="/students">
+                        <Route index element={<StudentListPage />} />
+                        <Route path=":id" element={<StudentEditPage />} />
+                      </Route>
+                      <Route path="/competitions">
+                        <Route index element={<CompetitionListPage />} />
+                        <Route
+                          path="create"
+                          element={<CompetitionCreatePage />}
+                        />
+                      </Route>
+                      <Route path="/groups">
+                        <Route index element={<GroupListPage />} />
                       </Route>
                       <Route path="*" element={<ErrorComponent />} />
                     </Route>
