@@ -23,6 +23,10 @@ builder
     });
 builder.Services.AddAuthorization();
 
+builder.Services.AddHttpClient<LkAuthClient>(c =>
+    c.BaseAddress = new Uri("https://e.mospolytech.ru/")
+);
+
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();

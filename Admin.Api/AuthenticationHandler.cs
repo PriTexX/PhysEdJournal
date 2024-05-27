@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using PhysEdJournal.Core.Entities.Types;
+using PhysEdJournal.Infrastructure.Database;
 
 namespace Admin.Api;
 
@@ -20,17 +22,44 @@ public static class AuthenticationHandler
         router.MapGet("/session", GetSession).RequireAuthorization();
     }
 
-    private static async Task<IResult> Login([FromBody] LoginRequest req, HttpContext ctx)
+    private static async Task<IResult> Login(
+        [FromBody] LoginRequest req,
+        HttpContext ctx,
+        [FromServices] LkAuthClient authClient,
+        [FromServices] ApplicationContext dbCtx
+    )
     {
-        if (req is not { Username: "test@mail.ru", Password: "123" })
+        var authResult = await authClient.Authenticate(req.Username, req.Password);
+
+        if (authResult.IsErr)
         {
-            return Results.BadRequest();
+            return Results.Unauthorized();
+        }
+
+        var authData = authResult.UnsafeValue;
+
+        var teacher = await dbCtx.Teachers.FindAsync(authData.PersonGuid);
+
+        if (teacher is null)
+        {
+            return Results.Unauthorized();
+        }
+
+        if (
+            !(
+                teacher.Permissions.HasFlag(TeacherPermissions.AdminAccess)
+                || teacher.Permissions.HasFlag(TeacherPermissions.SuperUser)
+            )
+        )
+        {
+            return Results.StatusCode(403);
         }
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, "Test Testovich"),
-            new(ClaimTypes.Role, "admin")
+            new(ClaimTypes.Name, authData.FullName),
+            new(ClaimTypes.Role, "admin"),
+            new("avatar", authData.PictureUrl),
         };
 
         var claimsIdentity = new ClaimsIdentity(
@@ -60,12 +89,21 @@ public static class AuthenticationHandler
     private static async Task<IResult> GetSession(HttpContext ctx)
     {
         var name = ctx.User.FindFirstValue(ClaimTypes.Name);
+        var avatar = ctx.User.FindFirstValue("avatar");
+        var role = ctx.User.FindFirstValue(ClaimTypes.Role);
 
-        if (name is null)
+        if (name is null || avatar is null || role is null)
         {
             return Results.Unauthorized();
         }
 
-        return Results.Json(new { name });
+        return Results.Json(
+            new
+            {
+                name,
+                avatar,
+                role
+            }
+        );
     }
 }

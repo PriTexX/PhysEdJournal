@@ -5,6 +5,7 @@ import type { AuthProvider } from '@refinedev/core';
 export type Session = {
   name: string;
   pictureUrl?: string;
+  role: 'admin';
 };
 
 export function getAuthProvider(apiUrl: string) {
@@ -61,9 +62,15 @@ export function getAuthProvider(apiUrl: string) {
 
     async getIdentity() {
       try {
-        const { name } = await client.get('session').json<{ name: string }>();
+        const {
+          name,
+          avatar: pictureUrl,
+          role,
+        } = await client
+          .get('session')
+          .json<{ name: string; avatar: string; role: 'admin' }>();
 
-        return { session: { name } };
+        return { session: { name, pictureUrl, role } };
       } catch (error) {
         return null;
       }
