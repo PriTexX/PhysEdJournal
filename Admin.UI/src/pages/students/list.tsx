@@ -79,7 +79,7 @@ const columns = [
   }),
 ];
 
-export const StudentList: React.FC<IResourceComponentsProps> = () => {
+export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
   return (
     <DataGrid
       recordId="studentGuid"

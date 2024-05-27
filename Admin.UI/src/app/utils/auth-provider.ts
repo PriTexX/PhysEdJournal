@@ -1,4 +1,4 @@
-import ky from 'ky';
+import ky, { HTTPError } from 'ky';
 
 import type { AuthProvider } from '@refinedev/core';
 
@@ -16,17 +16,40 @@ export function getAuthProvider(apiUrl: string) {
   });
 
   return {
-    async login({ email, password }) {
+    async login({ email, password, remember }) {
       try {
-        await client.post('login', { json: { username: email, password } });
+        await client.post('login', {
+          json: { username: email, password, remember },
+        });
 
         return { success: true, redirectTo: '/' };
-      } catch (error) {
+      } catch (err) {
+        if (err instanceof HTTPError) {
+          switch (err.response.status) {
+            case 401:
+              return {
+                success: false,
+                error: {
+                  name: 'Ошибка в данных',
+                  message: 'Неверный логин или пароль',
+                },
+              };
+            case 403:
+              return {
+                success: false,
+                error: {
+                  name: 'Ошибка доступа',
+                  message: 'Для доступа необходимы права администратора',
+                },
+              };
+          }
+        }
+
         return {
           success: false,
           error: {
-            name: 'LoginError',
-            message: 'Invalid username or password',
+            name: 'Неизвестно',
+            message: 'Неизвестная ошибка',
           },
         };
       }

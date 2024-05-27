@@ -127,6 +127,6 @@ const fields = [
   }),
 ];
 
-export const StudentEdit: React.FC<IResourceComponentsProps> = () => {
+export const StudentEditPage: React.FC<IResourceComponentsProps> = () => {
   return <Form fields={fields} type="edit" />;
 };
