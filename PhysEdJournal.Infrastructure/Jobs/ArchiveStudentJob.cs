@@ -46,7 +46,11 @@ public sealed class ArchiveStudentJob : IJob
                     continue;
                 }
 
-                var archivePayload = new ArchiveStudentPayload { StudentGuid = stud.StudentGuid, };
+                var archivePayload = new ArchiveStudentPayload
+                {
+                    StudentGuid = stud.StudentGuid,
+                    IsAdmin = true,
+                };
 
                 try
                 {

@@ -132,6 +132,7 @@ public static class StudentController
         {
             StudentGuid = request.StudentGuid,
             TeacherGuid = userGuid,
+            IsAdmin = false,
         };
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
