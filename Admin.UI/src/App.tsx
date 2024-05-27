@@ -29,7 +29,7 @@ import { ThemedTitleV2 } from './app/layout/refine-layout/title';
 import { CurrentTimezoneProvider } from './app/utils/current-timezone-provider/current-timezone-provider';
 import { handleDocumentTitle } from './app/utils/handle-document-title';
 import { TableSchemasProvider } from './features/modify-table/utils/table-schemas-provider';
-import { Login } from './pages/login';
+import { LoginPage } from './pages/login';
 import { StudentEdit } from './pages/students/edit';
 import { StudentList } from './pages/students/list';
 
@@ -133,7 +133,7 @@ function App() {
                         </Authenticated>
                       }
                     >
-                      <Route path="/login" element={<Login />} />
+                      <Route path="/login" element={<LoginPage />} />
                     </Route>
                   </Routes>
                 </TableSchemasProvider>

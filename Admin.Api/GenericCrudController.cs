@@ -29,9 +29,12 @@ public sealed class GenericCrudController<TModel, TPrimaryKey>
 
     public static void MapEndpoints(IEndpointRouteBuilder router, ResourceOptions<TModel> options)
     {
-        var resourceRouter = router.MapGroup($"/{options.Name}").WithTags(options.Name);
+        var resourceRouter = router
+            .MapGroup($"/{options.Name}")
+            .WithTags(options.Name)
+            .RequireAuthorization();
 
-        resourceRouter.MapGet("/{id}", GetOne).RequireAuthorization();
+        resourceRouter.MapGet("/{id}", GetOne);
 
         resourceRouter
             .MapPost("/many", GetMany)
