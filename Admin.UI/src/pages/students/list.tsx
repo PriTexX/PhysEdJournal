@@ -46,11 +46,17 @@ const columns = [
   columnHelper.accessor('hasDebtFromPreviousSemester', {
     header: 'Долг за семестр',
     enableSorting: true,
+    cell(v) {
+      return v.getValue() ? 'Есть' : 'Нет';
+    },
   }),
 
   columnHelper.accessor('hadDebtInSemester', {
     header: 'Был ли долг',
     enableSorting: true,
+    cell(v) {
+      return v.getValue() ? 'Есть' : 'Нет';
+    },
   }),
 
   columnHelper.accessor('archivedVisitValue', {

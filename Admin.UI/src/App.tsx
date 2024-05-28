@@ -35,6 +35,7 @@ import {
 } from './pages/competitions';
 import { GroupListPage } from './pages/groups';
 import { LoginPage } from './pages/login';
+import { PointsListPage } from './pages/points';
 import { StudentEditPage, StudentListPage } from './pages/students';
 
 import type { ResourceProps } from '@refinedev/core';
@@ -78,6 +79,13 @@ const resources: ResourceProps[] = [
     list: '/groups',
     meta: {
       label: 'Группы',
+    },
+  },
+  {
+    name: 'points',
+    list: '/points',
+    meta: {
+      label: 'Доп. баллы',
     },
   },
 ];
@@ -150,6 +158,9 @@ function App() {
                       </Route>
                       <Route path="/groups">
                         <Route index element={<GroupListPage />} />
+                      </Route>
+                      <Route path="/points">
+                        <Route index element={<PointsListPage />} />
                       </Route>
                       <Route path="*" element={<ErrorComponent />} />
                     </Route>
