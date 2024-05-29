@@ -12,6 +12,20 @@ services:
     depends_on: 
       loki:
         condition: service_healthy
+        
+  admin-api:
+    image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}-admin-api"
+    restart: always
+    container_name: phys-admin-api
+    env_file:
+      - .env.secret
+        
+  admin-ui:
+    image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}-admin-ui"
+    restart: always
+    container_name: phys-admin-ui
+    env_file:
+      - .env.secret
   
   prometheus:
     image: prom/prometheus:v2.47.0
