@@ -1,4 +1,4 @@
-export type Visit = {
+export type VisitHistory = {
   id: number;
   date: Date;
   teacherGuid: string;
