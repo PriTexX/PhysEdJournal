@@ -73,8 +73,10 @@ public static class AuthenticationHandler
             new ClaimsPrincipal(claimsIdentity),
             new AuthenticationProperties
             {
-                IsPersistent = req.Remember,
-                ExpiresUtc = req.Remember ? DateTimeOffset.UtcNow.AddDays(1) : null,
+                IsPersistent = true,
+                ExpiresUtc = req.Remember
+                    ? DateTimeOffset.UtcNow.AddDays(1)
+                    : DateTimeOffset.UtcNow.AddMinutes(20),
             }
         );
 
