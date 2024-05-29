@@ -31,9 +31,7 @@ jobs:
       - name: Extract tags for image
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
-          VERSIONS=(${TAG//./ })
-          SHORT_TAG=${VERSIONS[0]}.${VERSIONS[1]}
-          echo "IMAGE_TAGS='\"${TAG};${SHORT_TAG};latest\"'" >> $GITHUB_ENV
+          echo "IMAGE_TAGS='\"${TAG};latest\"'" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         run: dotnet publish ./PhysEdJournal.Api/PhysEdJournal.Api.csproj --os linux --arch x64 -c Release -p PublishProfile=DefaultContainer -p ContainerRegistry=${{ env.REGISTRY }} -p ContainerRepository=${{ env.IMAGE_NAME }} -p ContainerImageTags=${{ env.IMAGE_TAGS }}
@@ -59,9 +57,7 @@ jobs:
       - name: Extract tags for image
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
-          VERSIONS=(${TAG//./ })
-          SHORT_TAG=${VERSIONS[0]}.${VERSIONS[1]}
-          echo "IMAGE_TAGS='\"${TAG}-admin-api;${SHORT_TAG}-admin-api\"'" >> $GITHUB_ENV
+          echo "IMAGE_TAGS='\"${TAG}-admin-api\"'" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         run: dotnet publish ./Admin.Api/Admin.Api.csproj --os linux --arch x64 -c Release -p PublishProfile=DefaultContainer -p ContainerRegistry=${{ env.REGISTRY }} -p ContainerRepository=${{ env.IMAGE_NAME }} -p ContainerImageTags=${{ env.IMAGE_TAGS }}
@@ -87,9 +83,7 @@ jobs:
       - name: Extract tags for image
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
-          VERSIONS=(${TAG//./ })
-          SHORT_TAG=${VERSIONS[0]}.${VERSIONS[1]}
-          echo "IMAGE_TAGS='\"${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${TAG}-admin-ui;${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${SHORT_TAG}-admin-ui\"'" >> $GITHUB_ENV
+          echo "IMAGE_TAGS='\"${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${TAG}-admin-ui\"'" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
