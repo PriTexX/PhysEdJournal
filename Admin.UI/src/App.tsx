@@ -21,8 +21,6 @@ import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
 import { getAuthProvider } from '@/app/utils/auth-provider';
 import { getDataProvider } from '@/app/utils/data-provider';
 
-// import AppIcon from '@/assets/app-icon.svg';
-
 import { ThemedLayoutV2 } from './app/layout/refine-layout';
 import { Header } from './app/layout/refine-layout/header';
 import { ThemedTitleV2 } from './app/layout/refine-layout/title';
@@ -36,7 +34,12 @@ import {
 import { GroupListPage } from './pages/groups';
 import { LoginPage } from './pages/login';
 import { PointsListPage } from './pages/points';
+import { SemesterCreatePage, SemesterListPage } from './pages/semesters';
+import { StandardsListPage } from './pages/standards';
 import { StudentEditPage, StudentListPage } from './pages/students';
+import { TeacherListPage } from './pages/teachers';
+import { TeacherEditPage } from './pages/teachers/edit';
+import { VisitsListPage } from './pages/visits';
 
 import type { ResourceProps } from '@refinedev/core';
 
@@ -88,11 +91,40 @@ const resources: ResourceProps[] = [
       label: 'Доп. баллы',
     },
   },
+  {
+    name: 'semester',
+    list: '/semesters',
+    meta: {
+      label: 'Семестры',
+    },
+  },
+  {
+    name: 'standard',
+    list: '/standards',
+    meta: {
+      label: 'Нормативы',
+    },
+  },
+  {
+    name: 'teacher',
+    list: '/teachers',
+    edit: '/teachers/:id',
+    meta: {
+      label: 'Преподаватели',
+    },
+  },
+  {
+    name: 'visit',
+    list: '/visits',
+    meta: {
+      label: 'Посещения',
+    },
+  },
 ];
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="physedjournal/admin">
       <RefineKbarProvider>
         <ChakraProvider theme={theme}>
           <Refine
@@ -161,6 +193,20 @@ function App() {
                       </Route>
                       <Route path="/points">
                         <Route index element={<PointsListPage />} />
+                      </Route>
+                      <Route path="/semesters">
+                        <Route index element={<SemesterListPage />} />
+                        <Route path="create" element={<SemesterCreatePage />} />
+                      </Route>
+                      <Route path="/standards">
+                        <Route index element={<StandardsListPage />} />
+                      </Route>
+                      <Route path="/teachers">
+                        <Route index element={<TeacherListPage />} />
+                        <Route path=":id" element={<TeacherEditPage />} />
+                      </Route>
+                      <Route path="/visits">
+                        <Route index element={<VisitsListPage />} />
                       </Route>
                       <Route path="*" element={<ErrorComponent />} />
                     </Route>
