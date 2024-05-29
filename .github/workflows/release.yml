@@ -83,7 +83,7 @@ jobs:
       - name: Extract tags for image
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
-          echo "IMAGE_TAGS='\"${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${TAG}-admin-ui\"'" >> $GITHUB_ENV
+          echo "IMAGE_TAGS=${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${TAG}-admin-ui" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
