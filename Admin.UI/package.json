@@ -1,0 +1,78 @@
+{
+  "name": "Admin.UI",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@casl/ability": "^6.7.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@hookform/resolvers": "^3.4.2",
+    "@mui/material": "^5.15.18",
+    "@mui/x-date-pickers": "^6.20.0",
+    "@refinedev/chakra-ui": "^2.29.1",
+    "@refinedev/cli": "^2.16.21",
+    "@refinedev/core": "^4.47.1",
+    "@refinedev/devtools": "^1.1.32",
+    "@refinedev/kbar": "^1.3.6",
+    "@refinedev/react-hook-form": "^4.8.14",
+    "@refinedev/react-router-v6": "^4.5.5",
+    "@refinedev/react-table": "^5.6.10",
+    "@refinedev/ui-types": "^1.22.7",
+    "@tabler/icons-react": "^3.5.0",
+    "@tanstack/react-query": "^5.39.0",
+    "@tanstack/react-table": "^8.17.3",
+    "dayjs": "^1.11.11",
+    "dayjs-plugin-utc": "^0.1.2",
+    "framer-motion": "^11.2.6",
+    "ky": "^1.2.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.51.5",
+    "react-json-view": "^1.21.3",
+    "react-router-dom": "^6.23.1",
+    "usehooks-ts": "^3.1.0",
+    "vite-plugin-svgr": "^4.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+    "@types/node": "^18.16.2",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "eslint-plugin-security": "^3.0.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
+    "vite": "^4.3.1"
+  },
+  "scripts": {
+    "dev": "refine dev",
+    "build": "tsc && refine build",
+    "preview": "refine start",
+    "refine": "refine"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "refine": {
+    "projectId": "EWSQPN-0nAkMj-YGOR9L"
+  }
+}
