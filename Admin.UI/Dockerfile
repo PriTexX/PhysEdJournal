@@ -30,7 +30,7 @@ ENV NODE_ENV production
 
 RUN npm install -g serve
 
-COPY --from=builder /app/refine/dist ./
+COPY --from=builder /app/refine/dist ./physedjournal/admin/
 
 USER refine
 
