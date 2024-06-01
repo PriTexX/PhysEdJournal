@@ -86,7 +86,7 @@ export const ModifyTableModal: FC<ModifyTableModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Edit table structure</ModalHeader>
+        <ModalHeader>Настройка структуры таблицы</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form

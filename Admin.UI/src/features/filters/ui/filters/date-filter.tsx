@@ -1,9 +1,7 @@
 import { Select, VStack } from '@chakra-ui/react';
-import { DateTimeField } from '@mui/x-date-pickers';
+import { DateField } from '@mui/x-date-pickers';
 
 import { MuiThemeProvider } from '@/app/utils/mui-theme-provider';
-import { applyTimezone, clearTimezone } from '@/shared/utils/dates';
-import { useCurrentTimezone } from '@/shared/utils/timezones/use-current-timezone';
 
 import { filterOptionToOperatorMap } from '../../utils/date/date-operators';
 import { getValueAndOperator } from '../../utils/date/get-value-and-operator';
@@ -17,18 +15,10 @@ export const DateFilter: React.FC<XFilterProps> = ({
   logicalFilter,
   onChange,
 }) => {
-  const { timezone } = useCurrentTimezone();
-
-  const values = useValues(logicalFilter.value);
-
-  const [firstValue, secondValue] = values.map((v) =>
-    applyTimezone(v, timezone),
-  );
+  const [firstValue, secondValue] = useValues(logicalFilter.value);
 
   const { selectedOption, setSelectedOption } =
     useSelectedOption(logicalFilter);
-
-  const inputLabel = timezone === '+00:00' ? 'UTC' : `UTC${timezone}`;
 
   return (
     <VStack w="full">
@@ -40,10 +30,7 @@ export const DateFilter: React.FC<XFilterProps> = ({
           const option = e.target.value as DateFilterOption;
 
           const { value, operator } = getValueAndOperator(
-            [
-              clearTimezone(firstValue, timezone),
-              clearTimezone(secondValue, timezone),
-            ],
+            [firstValue, secondValue],
             option,
           );
 
@@ -64,9 +51,8 @@ export const DateFilter: React.FC<XFilterProps> = ({
       </Select>
 
       <MuiThemeProvider>
-        <DateTimeField
+        <DateField
           sx={{ width: '100%' }}
-          label={inputLabel}
           value={firstValue}
           onChange={(v) => {
             if (!v?.isValid()) {
@@ -74,10 +60,7 @@ export const DateFilter: React.FC<XFilterProps> = ({
             }
 
             const { value, operator } = getValueAndOperator(
-              [
-                clearTimezone(v, timezone),
-                clearTimezone(secondValue, timezone),
-              ],
+              [v, secondValue],
               selectedOption,
             );
 
@@ -89,10 +72,9 @@ export const DateFilter: React.FC<XFilterProps> = ({
           }}
         />
 
-        {selectedOption === 'Between' && (
-          <DateTimeField
+        {selectedOption === 'Между' && (
+          <DateField
             sx={{ width: '100%' }}
-            label={inputLabel}
             value={secondValue}
             onChange={(v) => {
               if (!v?.isValid()) {
@@ -100,10 +82,7 @@ export const DateFilter: React.FC<XFilterProps> = ({
               }
 
               const { value, operator } = getValueAndOperator(
-                [
-                  clearTimezone(firstValue, timezone),
-                  clearTimezone(v, timezone),
-                ],
+                [firstValue, v],
                 selectedOption,
               );
 

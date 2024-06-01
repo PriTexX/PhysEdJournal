@@ -6,6 +6,11 @@ public static class UnpackJsonElement
 {
     public static object? Unpack(JsonElement json)
     {
+        if (json.ValueKind == JsonValueKind.Array)
+        {
+            return json.EnumerateArray().Select(Unpack).ToArray();
+        }
+
         if (json.ValueKind == JsonValueKind.Number && json.TryGetInt32(out var value))
         {
             return value;

@@ -4,6 +4,8 @@ import { Checkbox } from '@/shared/components/checkbox';
 import { NumberInput } from '@/shared/components/number-input';
 import { createFormHelper, Form } from '@/widgets/form';
 
+import { healthGroupRus, healthGroups } from './types';
+
 import type { Student } from './types';
 import type { IResourceComponentsProps } from '@refinedev/core';
 
@@ -92,21 +94,11 @@ const fields = [
     render({ register }) {
       return (
         <Select {...register({ required: true })}>
-          <option key="None" value="None">
-            Нет
-          </option>
-          <option key="Basic" value="Basic">
-            Базовая
-          </option>
-          <option key="Preparatory" value="Preparatory">
-            Подготовительная
-          </option>
-          <option key="Special" value="Special">
-            Специальная
-          </option>
-          <option key="HealthLimitations" value="HealthLimitations">
-            Ограниченная
-          </option>
+          {healthGroups.map((g) => (
+            <option key={g} value={g}>
+              {healthGroupRus[g]}
+            </option>
+          ))}
         </Select>
       );
     },
@@ -127,6 +119,6 @@ const fields = [
   }),
 ];
 
-export const StudentEditPage: React.FC<IResourceComponentsProps> = () => {
+export const StudentEditPage = () => {
   return <Form fields={fields} type="edit" />;
 };

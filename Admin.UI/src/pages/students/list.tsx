@@ -2,6 +2,8 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
+import { healthGroupRus, healthGroups } from './types';
+
 import type { Student } from './types';
 import type { IResourceComponentsProps } from '@refinedev/core';
 
@@ -67,11 +69,17 @@ const columns = [
   columnHelper.accessor('isActive', {
     header: 'Активный',
     enableSorting: false,
+    cell(v) {
+      return v.getValue() ? 'Да' : 'Нет';
+    },
   }),
 
   columnHelper.accessor('healthGroup', {
     header: 'Группа здоровья',
     enableSorting: false,
+    cell(v) {
+      return healthGroupRus[v.getValue()];
+    },
   }),
 
   columnHelper.accessor('department', {
@@ -117,13 +125,10 @@ export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
           column: 'healthGroup',
           name: 'Группа здоровья',
           type: 'select',
-          options: [
-            'None',
-            'Basic',
-            'Preparatory',
-            'Special',
-            'HealthLimitations',
-          ],
+          options: healthGroups.map((g) => ({
+            value: g,
+            label: healthGroupRus[g],
+          })),
         },
       ]}
       refineCoreProps={{

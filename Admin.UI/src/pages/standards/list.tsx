@@ -76,7 +76,10 @@ export const StandardsListPage = () => {
           column: 'standardType',
           type: 'select',
           name: 'Вид работ',
-          options: standardTypes,
+          options: standardTypes.map((t) => ({
+            value: t,
+            label: standardTypeRus[t],
+          })),
         },
       ]}
       refineCoreProps={{

@@ -5,6 +5,7 @@ import { combineFilterWithNullFilter } from '../utils/combine-with-null-filter';
 import {
   BooleanFilter,
   DateFilter,
+  DateTimeFilter,
   NullFilter,
   NumberFilter,
   SelectFilter,
@@ -26,6 +27,7 @@ const filterComponentMap: Record<
   boolean: BooleanFilter,
   text: TextFilter,
   date: DateFilter,
+  datetime: DateTimeFilter,
   number: NumberFilter,
   select: SelectFilter,
   null: NullFilter,

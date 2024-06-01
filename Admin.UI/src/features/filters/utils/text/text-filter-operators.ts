@@ -12,8 +12,8 @@ export const DEFAULT_OPERATOR: TextFilterOperation = 'contains';
 export type TextFilterOperation = (typeof textFilterOperations)[number];
 
 export const readableFilterOperations: Record<TextFilterOperation, string> = {
-  contains: 'Contains',
-  eq: 'Equals',
-  ne: 'Not equals',
-  in: 'In',
+  contains: 'Содержит',
+  eq: 'Равно',
+  ne: 'Не равно',
+  in: 'В',
 };
