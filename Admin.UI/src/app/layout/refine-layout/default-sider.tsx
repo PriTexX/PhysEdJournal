@@ -234,7 +234,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
   };
 
   const logout = isExistAuthentication && (
-    <Tooltip label={t('buttons.logout', 'Logout')} {...commonTooltipProps}>
+    <Tooltip label={'Выйти'} {...commonTooltipProps}>
       <Box p={0}>
         <Button
           borderRadius={0}
@@ -252,8 +252,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           }}
           onClick={handleLogout}
         >
-          {(mobileSiderOpen || !siderCollapsed) &&
-            t('buttons.logout', 'Logout')}
+          {(mobileSiderOpen || !siderCollapsed) && 'Выйти'}
         </Button>
       </Box>
     </Tooltip>

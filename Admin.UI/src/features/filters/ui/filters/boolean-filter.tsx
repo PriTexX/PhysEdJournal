@@ -19,8 +19,8 @@ export const BooleanFilter: React.FC<XFilterProps> = ({
       }
     >
       <HStack gap="6">
-        <Radio value="true">True</Radio>
-        <Radio value="false">False</Radio>
+        <Radio value="true">Да</Radio>
+        <Radio value="false">Нет</Radio>
       </HStack>
     </RadioGroup>
   );

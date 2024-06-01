@@ -29,7 +29,7 @@ export const ModifyTableButton: FC<ModifyTableButtonProps> = ({
     <>
       <IconButton
         onClick={show}
-        aria-label="Edit table structure"
+        aria-label="Настроить стуктуру таблицы"
         variant={isSchemaAltered ? 'solid' : 'outline'}
       >
         <IconSettings size={20} />

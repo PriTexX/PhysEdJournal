@@ -16,7 +16,7 @@ export const FilterPopoverHeader = <D,>({
   return (
     <>
       {selectedFilter != null && (
-        <Tooltip label="Go Back">
+        <Tooltip label="Назад">
           <IconButton
             aria-label="Go Back"
             variant="ghost"
@@ -32,7 +32,7 @@ export const FilterPopoverHeader = <D,>({
           />
         </Tooltip>
       )}
-      {selectedFilter ? selectedFilter.name ?? selectedFilter.column : 'Filter'}
+      {selectedFilter ? selectedFilter.name ?? selectedFilter.column : 'Фильтр'}
     </>
   );
 };

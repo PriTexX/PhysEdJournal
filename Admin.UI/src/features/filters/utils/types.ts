@@ -5,12 +5,13 @@ export type DataGridFilterType =
   | 'number'
   | 'text'
   | 'date'
+  | 'datetime'
   | 'select'
   | 'null';
 
 export type DataGridSelectFilter = {
   type: 'select';
-  options: Readonly<string[]>;
+  options: Readonly<{ value: string; label?: string }[]>;
 };
 
 export type DataGridSimpleFilter = {

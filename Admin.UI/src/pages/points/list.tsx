@@ -76,7 +76,10 @@ export const PointsListPage = () => {
           column: 'workType',
           type: 'select',
           name: 'Вид работ',
-          options: workTypes,
+          options: workTypes.map((t) => ({
+            value: t,
+            label: workTypeRus[t],
+          })),
         },
       ]}
       refineCoreProps={{

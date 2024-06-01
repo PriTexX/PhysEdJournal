@@ -41,6 +41,8 @@ import { TeacherListPage } from './pages/teachers';
 import { TeacherEditPage } from './pages/teachers/edit';
 import { VisitsListPage } from './pages/visits';
 
+import 'dayjs/locale/en-gb';
+
 import type { ResourceProps } from '@refinedev/core';
 
 dayjs.extend(utc);

@@ -157,7 +157,7 @@ export function DataGrid<D extends BaseRecord>({
           <>
             <Card variant="filled" size="sm" mt={4}>
               <CardBody>
-                Found <b>{data?.total ?? 0}</b> records
+                Найдено <b>{data?.total ?? 0}</b> записей
               </CardBody>
             </Card>
 

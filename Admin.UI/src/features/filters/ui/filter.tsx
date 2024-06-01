@@ -69,7 +69,7 @@ function Filter<D extends BaseRecord>({
           alignItems="center"
           gap="0.5rem"
         >
-          Filter
+          Фильтры
           {appliedFiltersAmount > 0 ? (
             <Badge colorScheme="blue">{appliedFiltersAmount}</Badge>
           ) : null}
@@ -111,7 +111,7 @@ function Filter<D extends BaseRecord>({
                   }}
                   mt="3"
                 >
-                  Reset all
+                  Сбросить
                 </Button>
               )}
             </>

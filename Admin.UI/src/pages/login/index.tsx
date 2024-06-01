@@ -63,8 +63,6 @@ const cardProps: BoxProps = {
 };
 
 export const LoginPage: React.FC<LoginProps> = ({
-  providers,
-  registerLink,
   rememberMe,
   contentProps,
   wrapperProps,
@@ -79,11 +77,7 @@ export const LoginPage: React.FC<LoginProps> = ({
   const { mutate: login } = useLogin<LoginFormTypes>({
     v3LegacyAuthProviderCompatible: Boolean(authProvider?.isLegacy),
   });
-  const translate = useTranslate();
-  const routerType = useRouterType();
-  const NewLink = useLink();
-  const { Link: LegacyLink } = useRouterContext();
-  const Link = routerType === 'legacy' ? LegacyLink : NewLink;
+
   const methods = useForm<BaseRecord, HttpError, LoginFormTypes>({
     ...useFormProps,
   });
@@ -92,35 +86,6 @@ export const LoginPage: React.FC<LoginProps> = ({
     handleSubmit,
     formState: { errors },
   } = methods;
-
-  const renderProviders = () => {
-    if (providers && providers.length > 0) {
-      return (
-        <>
-          <VStack>
-            {providers.map((provider) => (
-              <Button
-                key={provider.name}
-                variant="outline"
-                width="full"
-                leftIcon={<>{provider?.icon}</>}
-                fontSize="sm"
-                onClick={() =>
-                  login({
-                    providerName: provider.name,
-                  })
-                }
-              >
-                {provider.label ?? <label>{provider.label}</label>}
-              </Button>
-            ))}
-          </VStack>
-          {!hideForm && <Divider my="6" />}
-        </>
-      );
-    }
-    return null;
-  };
 
   const importantTextColor = useColorModeValue('brand.500', 'brand.200');
 
@@ -155,7 +120,7 @@ export const LoginPage: React.FC<LoginProps> = ({
       >
         Войти в аккаунт
       </Heading>
-      {renderProviders()}
+
       {!hideForm && (
         <form
           onSubmit={handleSubmit((data) => {
@@ -203,26 +168,6 @@ export const LoginPage: React.FC<LoginProps> = ({
             Вход
           </Button>
         </form>
-      )}
-
-      {hideForm && registerLink !== false && (
-        <Box mt={6} textAlign="center">
-          <span>
-            {translate(
-              'pages.login.buttons.noAccount',
-              'Don’t have an account?',
-            )}
-          </span>
-          <ChakraLink
-            color={importantTextColor}
-            ml="1"
-            as={Link}
-            fontWeight="bold"
-            to="/register"
-          >
-            {translate('pages.login.register', 'Sign up')}
-          </ChakraLink>
-        </Box>
       )}
     </Box>
   );

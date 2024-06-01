@@ -1,3 +1,5 @@
+import { number } from 'zod';
+
 export type Student = {
   studentGuid: string;
   fullName: string;
@@ -11,11 +13,24 @@ export type Student = {
   visits: number;
   course: number;
   currentSemesterName: string;
-  healthGroup:
-    | 'None'
-    | 'Basic'
-    | 'Preparatory'
-    | 'Special'
-    | 'HealthLimitations';
+  healthGroup: HealthGroup;
   department: string | null;
+};
+
+export const healthGroups = [
+  'None',
+  'Basic',
+  'Preparatory',
+  'Special',
+  'HealthLimitations',
+];
+
+export type HealthGroup = (typeof healthGroups)[number];
+
+export const healthGroupRus: Record<string, string> = {
+  None: 'Нет',
+  Basic: 'Базовая',
+  Preparatory: 'Подготовительная',
+  Special: 'Специальная',
+  HealthLimitations: 'Ограниченная',
 };
