@@ -18,6 +18,7 @@ export const CompetitionListPage: React.FC<IResourceComponentsProps> = () => {
   return (
     <DataGrid
       recordId="competitionName"
+      canExportCsv
       allColumns={columns}
       defaultColumnsKeys={['competitionName']}
       quickFilters={[{ field: 'competitionName', label: 'Соревнование' }]}

@@ -47,6 +47,7 @@ export const StandardsListPage = () => {
   return (
     <DataGrid
       recordId="id"
+      canExportCsv
       allColumns={columns}
       defaultColumnsKeys={[
         'studentGuid',

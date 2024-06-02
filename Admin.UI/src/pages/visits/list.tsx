@@ -27,6 +27,7 @@ export const VisitsListPage = () => {
   return (
     <DataGrid
       recordId="id"
+      canExportCsv
       allColumns={columns}
       defaultColumnsKeys={['studentGuid', 'teacherGuid', 'date']}
       quickFilters={[

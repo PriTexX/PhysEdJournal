@@ -43,6 +43,8 @@ import { VisitsListPage } from './pages/visits';
 
 import 'dayjs/locale/en-gb';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import type { ResourceProps } from '@refinedev/core';
 
 dayjs.extend(utc);
@@ -124,115 +126,140 @@ const resources: ResourceProps[] = [
   },
 ];
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 0,
+    },
+  },
+});
+
 function App() {
   return (
     <BrowserRouter basename="/physedjournal/admin">
       <RefineKbarProvider>
         <ChakraProvider theme={theme}>
-          <Refine
-            dataProvider={dataProvider}
-            notificationProvider={useNotificationProvider}
-            routerProvider={routerBindings}
-            authProvider={authProvider}
-            resources={resources}
-            options={{
-              syncWithLocation: true,
-              warnWhenUnsavedChanges: true,
-              useNewQueryKeys: true,
-              disableTelemetry: true,
-            }}
-          >
-            <LocalizationProvider
-              dateAdapter={AdapterDayjs}
-              adapterLocale="en-gb"
+          <QueryClientProvider client={queryClient}>
+            <Refine
+              dataProvider={dataProvider}
+              notificationProvider={useNotificationProvider}
+              routerProvider={routerBindings}
+              authProvider={authProvider}
+              resources={resources}
+              options={{
+                syncWithLocation: true,
+                warnWhenUnsavedChanges: true,
+                useNewQueryKeys: true,
+                disableTelemetry: true,
+                reactQuery: {
+                  clientConfig: {
+                    defaultOptions: {
+                      queries: {
+                        refetchOnWindowFocus: false,
+                        keepPreviousData: true,
+                        retry: 0,
+                      },
+                    },
+                  },
+                },
+              }}
             >
-              <CurrentTimezoneProvider>
-                <TableSchemasProvider>
-                  <Routes>
-                    <Route
-                      element={
-                        <Authenticated
-                          key="authenticated-inner"
-                          fallback={<CatchAllNavigate to="/login" />}
-                          loading={
-                            <Center h="100vh">
-                              <Spinner />
-                            </Center>
-                          }
-                        >
-                          <ThemedLayoutV2
-                            Header={() => <Header sticky />}
-                            Title={({ collapsed }) => (
-                              <ThemedTitleV2
-                                collapsed={collapsed}
-                                text="Журнал | Админ"
-                                // icon={<AppIcon />}
-                              />
-                            )}
-                          >
-                            <Outlet />
-                          </ThemedLayoutV2>
-                        </Authenticated>
-                      }
-                    >
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="en-gb"
+              >
+                <CurrentTimezoneProvider>
+                  <TableSchemasProvider>
+                    <Routes>
                       <Route
-                        index
-                        element={<NavigateToResource resource="student" />}
-                      />
-                      <Route path="/students">
-                        <Route index element={<StudentListPage />} />
-                        <Route path=":id" element={<StudentEditPage />} />
-                      </Route>
-                      <Route path="/competitions">
-                        <Route index element={<CompetitionListPage />} />
+                        element={
+                          <Authenticated
+                            key="authenticated-inner"
+                            fallback={<CatchAllNavigate to="/login" />}
+                            loading={
+                              <Center h="100vh">
+                                <Spinner />
+                              </Center>
+                            }
+                          >
+                            <ThemedLayoutV2
+                              Header={() => <Header sticky />}
+                              Title={({ collapsed }) => (
+                                <ThemedTitleV2
+                                  collapsed={collapsed}
+                                  text="Журнал | Админ"
+                                  // icon={<AppIcon />}
+                                />
+                              )}
+                            >
+                              <Outlet />
+                            </ThemedLayoutV2>
+                          </Authenticated>
+                        }
+                      >
                         <Route
-                          path="create"
-                          element={<CompetitionCreatePage />}
+                          index
+                          element={<NavigateToResource resource="student" />}
                         />
+                        <Route path="/students">
+                          <Route index element={<StudentListPage />} />
+                          <Route path=":id" element={<StudentEditPage />} />
+                        </Route>
+                        <Route path="/competitions">
+                          <Route index element={<CompetitionListPage />} />
+                          <Route
+                            path="create"
+                            element={<CompetitionCreatePage />}
+                          />
+                        </Route>
+                        <Route path="/groups">
+                          <Route index element={<GroupListPage />} />
+                        </Route>
+                        <Route path="/points">
+                          <Route index element={<PointsListPage />} />
+                        </Route>
+                        <Route path="/semesters">
+                          <Route index element={<SemesterListPage />} />
+                          <Route
+                            path="create"
+                            element={<SemesterCreatePage />}
+                          />
+                        </Route>
+                        <Route path="/standards">
+                          <Route index element={<StandardsListPage />} />
+                        </Route>
+                        <Route path="/teachers">
+                          <Route index element={<TeacherListPage />} />
+                          <Route path=":id" element={<TeacherEditPage />} />
+                        </Route>
+                        <Route path="/visits">
+                          <Route index element={<VisitsListPage />} />
+                        </Route>
+                        <Route path="*" element={<ErrorComponent />} />
                       </Route>
-                      <Route path="/groups">
-                        <Route index element={<GroupListPage />} />
+                      <Route
+                        element={
+                          <Authenticated
+                            key="authenticated-outer"
+                            fallback={<Outlet />}
+                          >
+                            <NavigateToResource />
+                          </Authenticated>
+                        }
+                      >
+                        <Route path="/login" element={<LoginPage />} />
                       </Route>
-                      <Route path="/points">
-                        <Route index element={<PointsListPage />} />
-                      </Route>
-                      <Route path="/semesters">
-                        <Route index element={<SemesterListPage />} />
-                        <Route path="create" element={<SemesterCreatePage />} />
-                      </Route>
-                      <Route path="/standards">
-                        <Route index element={<StandardsListPage />} />
-                      </Route>
-                      <Route path="/teachers">
-                        <Route index element={<TeacherListPage />} />
-                        <Route path=":id" element={<TeacherEditPage />} />
-                      </Route>
-                      <Route path="/visits">
-                        <Route index element={<VisitsListPage />} />
-                      </Route>
-                      <Route path="*" element={<ErrorComponent />} />
-                    </Route>
-                    <Route
-                      element={
-                        <Authenticated
-                          key="authenticated-outer"
-                          fallback={<Outlet />}
-                        >
-                          <NavigateToResource />
-                        </Authenticated>
-                      }
-                    >
-                      <Route path="/login" element={<LoginPage />} />
-                    </Route>
-                  </Routes>
-                </TableSchemasProvider>
-              </CurrentTimezoneProvider>
-            </LocalizationProvider>
+                    </Routes>
+                  </TableSchemasProvider>
+                </CurrentTimezoneProvider>
+              </LocalizationProvider>
 
-            <RefineKbar />
-            <UnsavedChangesNotifier />
-            <DocumentTitleHandler handler={handleDocumentTitle} />
-          </Refine>
+              <RefineKbar />
+              <UnsavedChangesNotifier />
+              <DocumentTitleHandler handler={handleDocumentTitle} />
+            </Refine>
+          </QueryClientProvider>
         </ChakraProvider>
       </RefineKbarProvider>
     </BrowserRouter>

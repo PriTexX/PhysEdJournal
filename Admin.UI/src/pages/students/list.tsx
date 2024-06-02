@@ -98,6 +98,7 @@ export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
     <DataGrid
       recordId="studentGuid"
       allColumns={columns}
+      canExportCsv
       defaultColumnsKeys={[
         'fullName',
         'groupNumber',

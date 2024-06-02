@@ -27,6 +27,7 @@ export const GroupListPage = () => {
   return (
     <DataGrid
       recordId="groupName"
+      canExportCsv
       allColumns={columns}
       defaultColumnsKeys={['groupName', 'visitValue', 'curatorGuid']}
       quickFilters={[

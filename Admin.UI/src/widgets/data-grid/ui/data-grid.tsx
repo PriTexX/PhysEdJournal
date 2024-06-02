@@ -23,6 +23,7 @@ import { flexRender } from '@tanstack/react-table';
 import * as React from 'react';
 import { Navigate } from 'react-router-dom';
 
+import { ExportCsvModal } from '@/features/export-csv';
 import Filter from '@/features/filters/ui/filter';
 import { QuickFilter } from '@/features/filters/ui/quick-filter';
 import { ModifyTableButton } from '@/features/modify-table';
@@ -141,7 +142,7 @@ export function DataGrid<D extends BaseRecord>({
                 onClick={openConfirmLoadCsvModal}
                 variant="outline"
               >
-                Export
+                Экспорт
               </Button>
             ) : null}
             {isFetching && !isLoading && <Spinner />}
@@ -155,6 +156,16 @@ export function DataGrid<D extends BaseRecord>({
         )}
         {!isLoading && (
           <>
+            <ExportCsvModal
+              isOpen={isConfirmLoadCsvModalOpen}
+              onClose={closeConfirmLoadCsvModal}
+              allColumns={allColumns}
+              defaultColumnsKeys={defaultColumnsKeys}
+              rowsAmount={data?.total ?? 0}
+              filters={coreFilters}
+              sorters={refineCoreProps?.sorters?.initial}
+            />
+
             <Card variant="filled" size="sm" mt={4}>
               <CardBody>
                 Найдено <b>{data?.total ?? 0}</b> записей
