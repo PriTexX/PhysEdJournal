@@ -10,6 +10,7 @@ const columns = [
   columnHelper.accessor('groupName', {
     header: 'Группа',
     enableSorting: true,
+    meta: { canCopy: true },
   }),
 
   columnHelper.accessor('visitValue', {

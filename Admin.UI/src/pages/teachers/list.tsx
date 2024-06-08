@@ -15,6 +15,7 @@ const columns = [
   columnHelper.accessor('teacherGuid', {
     header: 'Гуид',
     enableSorting: false,
+    meta: { canCopy: true },
   }),
 
   columnHelper.accessor('permissions', {

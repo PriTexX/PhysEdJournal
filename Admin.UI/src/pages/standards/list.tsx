@@ -57,6 +57,10 @@ export const StandardsListPage = () => {
         'standardType',
         'comment',
       ]}
+      quickFilters={[
+        { field: 'studentGuid', label: 'Гуид студента' },
+        { field: 'teacherGuid', label: 'Гуид преподавателя' },
+      ]}
       filters={[
         {
           column: 'date',

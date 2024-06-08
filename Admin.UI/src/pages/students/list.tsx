@@ -13,6 +13,7 @@ const columns = [
   columnHelper.accessor('studentGuid', {
     header: 'Гуид студента',
     enableSorting: false,
+    meta: { canCopy: true },
   }),
 
   columnHelper.accessor('fullName', {
@@ -100,6 +101,7 @@ export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
       allColumns={columns}
       canExportCsv
       defaultColumnsKeys={[
+        'studentGuid',
         'fullName',
         'groupNumber',
         'visits',

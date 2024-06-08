@@ -10,6 +10,7 @@ const columns = [
   columnHelper.accessor('name', {
     header: 'Название',
     enableSorting: false,
+    meta: { canCopy: true },
   }),
 
   columnHelper.accessor('isCurrent', {

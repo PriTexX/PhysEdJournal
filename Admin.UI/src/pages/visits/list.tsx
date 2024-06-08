@@ -33,7 +33,6 @@ export const VisitsListPage = () => {
       quickFilters={[
         { field: 'studentGuid', label: 'Гуид студента' },
         { field: 'teacherGuid', label: 'Гуид преподавателя' },
-        { field: 'date', label: 'Дата' },
       ]}
       filters={[
         {
