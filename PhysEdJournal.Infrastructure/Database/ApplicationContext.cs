@@ -22,10 +22,9 @@ public sealed class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .Entity<ArchivedStudentEntity>()
-            .HasKey(s => new { s.StudentGuid, s.SemesterName });
-
+        modelBuilder.Entity<ArchivedStudentEntity>(e =>
+            e.HasIndex(a => new { a.StudentGuid, a.SemesterName }).IsUnique()
+        );
         base.OnModelCreating(modelBuilder);
     }
 

@@ -27,6 +27,10 @@ public sealed class ArchivedStandardsHistory : ArchivedHistory
 
 public sealed class ArchivedStudentEntity
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
     [StringLength(36)]
     [Required(AllowEmptyStrings = false)]
     public required string StudentGuid { get; set; }
