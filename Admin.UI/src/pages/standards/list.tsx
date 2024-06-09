@@ -1,6 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { DateCell } from '@/shared/components/date-cell';
+import { TeacherCell } from '@/shared/components/teacher-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
 import { standardTypeRus, standardTypes } from './types';
@@ -18,6 +19,9 @@ const columns = [
   columnHelper.accessor('teacherGuid', {
     header: 'Преподаватель',
     enableSorting: false,
+    cell(v) {
+      return <TeacherCell guid={v.getValue()} />;
+    },
   }),
 
   columnHelper.accessor('points', {
