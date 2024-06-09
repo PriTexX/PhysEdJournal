@@ -57,7 +57,7 @@ GenericCrudController<CompetitionEntity, string>.MapEndpoints(
     app,
     new ResourceOptions<CompetitionEntity>
     {
-        Name = "competition",
+        Name = "competitions",
         IsCreatable = true,
         IsDeletable = true,
         Validator = Competition.Validator
@@ -68,7 +68,7 @@ GenericCrudController<GroupEntity, string>.MapEndpoints(
     app,
     new ResourceOptions<GroupEntity>
     {
-        Name = "group",
+        Name = "groups",
         Validator = Group.Validator,
         IsEditable = true
     }
@@ -88,7 +88,7 @@ GenericCrudController<SemesterEntity, string>.MapEndpoints(
     app,
     new ResourceOptions<SemesterEntity>
     {
-        Name = "semester",
+        Name = "semesters",
         Validator = Semester.Validator,
         IsCreatable = true,
     }
@@ -98,7 +98,7 @@ GenericCrudController<StandardsStudentHistoryEntity, int>.MapEndpoints(
     app,
     new ResourceOptions<StandardsStudentHistoryEntity>
     {
-        Name = "standard",
+        Name = "standards",
         Validator = StandardsHistory.Validator,
         IsDeletable = true,
     }
@@ -108,7 +108,7 @@ GenericCrudController<StudentEntity, string>.MapEndpoints(
     app,
     new ResourceOptions<StudentEntity>
     {
-        Name = "student",
+        Name = "students",
         Validator = Student.Validator,
         SortFields = Student.SortFields,
         IsEditable = true,
@@ -119,7 +119,7 @@ GenericCrudController<TeacherEntity, string>.MapEndpoints(
     app,
     new ResourceOptions<TeacherEntity>
     {
-        Name = "teacher",
+        Name = "teachers",
         Validator = Teacher.Validator,
         IsEditable = true
     }
@@ -129,7 +129,7 @@ GenericCrudController<VisitStudentHistoryEntity, int>.MapEndpoints(
     app,
     new ResourceOptions<VisitStudentHistoryEntity>
     {
-        Name = "visit",
+        Name = "visits",
         Validator = VisitsHistory.Validator,
         IsDeletable = true,
     }

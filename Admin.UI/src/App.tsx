@@ -45,10 +45,7 @@ import 'dayjs/locale/en-gb';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import {
-  ArchivedStudentEditPage,
-  ArchivedStudentListPage,
-} from './pages/archived-students';
+import { ArchivedStudentListPage } from './pages/archived-students';
 
 import type { ResourceProps } from '@refinedev/core';
 
@@ -70,7 +67,7 @@ const theme = extendTheme(RefineThemes.Blue, {
 
 const resources: ResourceProps[] = [
   {
-    name: 'student',
+    name: 'students',
     list: '/students',
     edit: '/students/:id',
     meta: {
@@ -78,7 +75,7 @@ const resources: ResourceProps[] = [
     },
   },
   {
-    name: 'competition',
+    name: 'competitions',
     list: '/competitions',
     create: '/competitions/create',
     meta: {
@@ -87,7 +84,7 @@ const resources: ResourceProps[] = [
     },
   },
   {
-    name: 'group',
+    name: 'groups',
     list: '/groups',
     meta: {
       label: 'Группы',
@@ -101,21 +98,21 @@ const resources: ResourceProps[] = [
     },
   },
   {
-    name: 'semester',
+    name: 'semesters',
     list: '/semesters',
     meta: {
       label: 'Семестры',
     },
   },
   {
-    name: 'standard',
+    name: 'standards',
     list: '/standards',
     meta: {
       label: 'Нормативы',
     },
   },
   {
-    name: 'teacher',
+    name: 'teachers',
     list: '/teachers',
     edit: '/teachers/:id',
     meta: {
@@ -123,7 +120,7 @@ const resources: ResourceProps[] = [
     },
   },
   {
-    name: 'visit',
+    name: 'visits',
     list: '/visits',
     meta: {
       label: 'Посещения',
@@ -201,7 +198,6 @@ function App() {
                                 <ThemedTitleV2
                                   collapsed={collapsed}
                                   text="Журнал | Админ"
-                                  // icon={<AppIcon />}
                                 />
                               )}
                             >

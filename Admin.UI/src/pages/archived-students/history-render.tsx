@@ -1,6 +1,8 @@
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 
+import { TeacherCell } from '@/shared/components/teacher-cell';
+
 import { workTypeRus } from '../points/types';
 import { standardTypeRus } from '../standards/types';
 
@@ -43,7 +45,9 @@ const VisitRender: FC<{ data: VisitsHistory }> = ({ data }) => {
     <>
       <Td>{dayjs(data.date).format('DD-MM-YYYY')}</Td>
       <Td>{data.points}</Td>
-      <Td>{data.teacherGuid}</Td>
+      <Td>
+        <TeacherCell guid={data.teacherGuid} />
+      </Td>
     </>
   );
 };
@@ -54,7 +58,7 @@ export const VisitsHistoryRender: FC<{ data: VisitsHistory[] }> = ({
   return (
     <HistoryRenderer
       data={data}
-      headers={['Дата', 'Баллы', 'Гуид преподавателя']}
+      headers={['Дата', 'Баллы', 'Преподаватель']}
       renderItem={VisitRender}
     />
   );
@@ -66,7 +70,9 @@ const StandardRender: FC<{ data: StandardsHistory }> = ({ data }) => {
       <Td>{dayjs(data.date).format('DD-MM-YYYY')}</Td>
       <Td>{data.points}</Td>
       <Td>{standardTypeRus[data.standardType]}</Td>
-      <Td>{data.teacherGuid}</Td>
+      <Td>
+        <TeacherCell guid={data.teacherGuid} />
+      </Td>
       <Td>{data.comment ?? ''}</Td>
     </>
   );
@@ -78,13 +84,7 @@ export const StandarsHistoryRender: FC<{ data: StandardsHistory[] }> = ({
   return (
     <HistoryRenderer
       data={data}
-      headers={[
-        'Дата',
-        'Баллы',
-        'Норматив',
-        'Гуид преподавателя',
-        'Комментарий',
-      ]}
+      headers={['Дата', 'Баллы', 'Норматив', 'Преподаватель', 'Комментарий']}
       renderItem={StandardRender}
     />
   );
@@ -96,7 +96,9 @@ const PointRender: FC<{ data: PointsHistory }> = ({ data }) => {
       <Td>{dayjs(data.date).format('DD-MM-YYYY')}</Td>
       <Td>{data.points}</Td>
       <Td>{workTypeRus[data.workType]}</Td>
-      <Td>{data.teacherGuid}</Td>
+      <Td>
+        <TeacherCell guid={data.teacherGuid} />
+      </Td>
       <Td>{data.comment ?? ''}</Td>
     </>
   );
@@ -108,13 +110,7 @@ export const PointsHistoryRender: FC<{ data: PointsHistory[] }> = ({
   return (
     <HistoryRenderer
       data={data}
-      headers={[
-        'Дата',
-        'Баллы',
-        'Тип работ',
-        'Гуид преподавателя',
-        'Комментарий',
-      ]}
+      headers={['Дата', 'Баллы', 'Тип работ', 'Преподаватель', 'Комментарий']}
       renderItem={PointRender}
     />
   );

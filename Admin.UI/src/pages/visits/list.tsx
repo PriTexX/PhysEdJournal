@@ -1,6 +1,8 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
+import { useTeachersMap } from '@/features/use-teachers-map';
 import { DateCell } from '@/shared/components/date-cell';
+import { TeacherCell } from '@/shared/components/teacher-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
 import type { VisitHistory } from './types';
@@ -14,8 +16,11 @@ const columns = [
   }),
 
   columnHelper.accessor('teacherGuid', {
-    header: 'Гуид преподавателя',
+    header: 'Преподаватель',
     enableSorting: false,
+    cell(v) {
+      return <TeacherCell guid={v.getValue()} />;
+    },
   }),
 
   columnHelper.accessor('date', {
@@ -33,7 +38,7 @@ export const VisitsListPage = () => {
       recordId="id"
       canExportCsv
       allColumns={columns}
-      defaultColumnsKeys={['studentGuid', 'teacherGuid', 'date']}
+      defaultColumnsKeys={['teacherGuid', 'date', 'studentGuid']}
       quickFilters={[
         { field: 'studentGuid', label: 'Гуид студента' },
         { field: 'teacherGuid', label: 'Гуид преподавателя' },
