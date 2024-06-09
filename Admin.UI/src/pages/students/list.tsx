@@ -19,6 +19,7 @@ const columns = [
   columnHelper.accessor('fullName', {
     header: 'ФИО',
     enableSorting: true,
+    meta: { canCopy: true },
   }),
 
   columnHelper.accessor('groupNumber', {

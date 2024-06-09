@@ -1,7 +1,5 @@
 import { Input, Select } from '@chakra-ui/react';
 
-import { Checkbox } from '@/shared/components/checkbox';
-import { NumberInput } from '@/shared/components/number-input';
 import { createFormHelper, Form } from '@/widgets/form';
 
 import type { Teacher } from './types';
