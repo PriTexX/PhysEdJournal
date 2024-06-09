@@ -44,6 +44,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+GenericCrudController<ArchivedStudentEntity, int>.MapEndpoints(
+    app,
+    new ResourceOptions<ArchivedStudentEntity>
+    {
+        Name = "archived-students",
+        Validator = ArchivedStudents.Validator
+    }
+);
+
 GenericCrudController<CompetitionEntity, string>.MapEndpoints(
     app,
     new ResourceOptions<CompetitionEntity>
@@ -57,7 +66,12 @@ GenericCrudController<CompetitionEntity, string>.MapEndpoints(
 
 GenericCrudController<GroupEntity, string>.MapEndpoints(
     app,
-    new ResourceOptions<GroupEntity> { Name = "group", Validator = Group.Validator }
+    new ResourceOptions<GroupEntity>
+    {
+        Name = "group",
+        Validator = Group.Validator,
+        IsEditable = true
+    }
 );
 
 GenericCrudController<PointsStudentHistoryEntity, int>.MapEndpoints(
@@ -97,12 +111,18 @@ GenericCrudController<StudentEntity, string>.MapEndpoints(
         Name = "student",
         Validator = Student.Validator,
         SortFields = Student.SortFields,
+        IsEditable = true,
     }
 );
 
 GenericCrudController<TeacherEntity, string>.MapEndpoints(
     app,
-    new ResourceOptions<TeacherEntity> { Name = "teacher", Validator = Teacher.Validator }
+    new ResourceOptions<TeacherEntity>
+    {
+        Name = "teacher",
+        Validator = Teacher.Validator,
+        IsEditable = true
+    }
 );
 
 GenericCrudController<VisitStudentHistoryEntity, int>.MapEndpoints(

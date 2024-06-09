@@ -7,7 +7,6 @@ import { createFormHelper, Form } from '@/widgets/form';
 import { healthGroupRus, healthGroups } from './types';
 
 import type { Student } from './types';
-import type { IResourceComponentsProps } from '@refinedev/core';
 
 const formHelper = createFormHelper<Student>();
 
@@ -29,7 +28,7 @@ const fields = [
   formHelper.createField('groupNumber', {
     name: 'Группа',
     render({ register }) {
-      return <Input {...register()} />;
+      return <Input disabled {...register()} />;
     },
   }),
 

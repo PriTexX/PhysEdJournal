@@ -13,8 +13,9 @@ public sealed class ResourceOptions<T>
 {
     public required string Name { get; init; }
 
-    public bool IsDeletable { get; init; } = false;
-    public bool IsCreatable { get; init; } = false;
+    public bool IsDeletable { get; init; }
+    public bool IsCreatable { get; init; }
+    public bool IsEditable { get; init; }
 
     public string[]? SortFields { get; init; }
     public string[]? FilterFields { get; init; }
@@ -50,15 +51,18 @@ public sealed class GenericCrudController<TModel, TPrimaryKey>
             resourceRouter.MapPost("/", Create).AddValidation(options.Validator);
         }
 
-        // Validation filter won't work for Update endpoint.
-        // Filter requires validated object to be 1st argument,
-        // but Update endpoint cannot allow this as it uses JsonPatchDocument
-        // and has to deserialize it by itself through the use of HttpContext.
-        //
-        // So we set validator to static property that will be used later
-        // by Update to validate object.
-        _validator = options.Validator;
-        resourceRouter.MapPatch("/{id}", Update);
+        if (options.IsEditable)
+        {
+            // Validation filter won't work for Update endpoint.
+            // Filter requires validated object to be 1st argument,
+            // but Update endpoint cannot allow this as it uses JsonPatchDocument
+            // and has to deserialize it by itself through the use of HttpContext.
+            //
+            // So we set validator to static property that will be used later
+            // by Update to validate object.
+            _validator = options.Validator;
+            resourceRouter.MapPatch("/{id}", Update);
+        }
     }
 
     private static async Task<IResult> GetOne(

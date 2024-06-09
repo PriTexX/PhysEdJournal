@@ -45,6 +45,11 @@ import 'dayjs/locale/en-gb';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import {
+  ArchivedStudentEditPage,
+  ArchivedStudentListPage,
+} from './pages/archived-students';
+
 import type { ResourceProps } from '@refinedev/core';
 
 dayjs.extend(utc);
@@ -122,6 +127,13 @@ const resources: ResourceProps[] = [
     list: '/visits',
     meta: {
       label: 'Посещения',
+    },
+  },
+  {
+    name: 'archived-students',
+    list: '/archived-students',
+    meta: {
+      label: 'Архив',
     },
   },
 ];
@@ -235,6 +247,9 @@ function App() {
                         </Route>
                         <Route path="/visits">
                           <Route index element={<VisitsListPage />} />
+                        </Route>
+                        <Route path="/archived-students">
+                          <Route index element={<ArchivedStudentListPage />} />
                         </Route>
                         <Route path="*" element={<ErrorComponent />} />
                       </Route>

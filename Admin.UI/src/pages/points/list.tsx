@@ -1,5 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
+import { DateCell } from '@/shared/components/date-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
 import { workTypeRus, workTypes } from './types';
@@ -27,6 +28,9 @@ const columns = [
   columnHelper.accessor('date', {
     header: 'Дата',
     enableSorting: true,
+    cell(v) {
+      return <DateCell date={v.getValue()} />;
+    },
   }),
 
   columnHelper.accessor('workType', {
