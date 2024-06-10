@@ -50,6 +50,7 @@ export type DataGridProps<D extends BaseRecord> = {
   filters?: DataGridFilter<D>[];
   quickFilters?: Array<{ field: keyof D; label: string }>;
   canExportCsv?: boolean;
+  customCsvMapper?: (items: D, teachersMap: Map<string, string>) => object;
   refineCoreProps?: UseTableProps<D>['refineCoreProps'];
 };
 
@@ -61,6 +62,7 @@ export function DataGrid<D extends BaseRecord>({
   canExportCsv,
   quickFilters,
   defaultColumnsKeys,
+  customCsvMapper,
 }: DataGridProps<D>) {
   const { resource } = useResource();
 
@@ -164,6 +166,7 @@ export function DataGrid<D extends BaseRecord>({
               rowsAmount={data?.total ?? 0}
               filters={coreFilters}
               sorters={refineCoreProps?.sorters?.initial}
+              customCsvMapper={customCsvMapper}
             />
 
             <Card variant="filled" size="sm" mt={4}>

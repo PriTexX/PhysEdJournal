@@ -2,6 +2,8 @@ import { useDataProvider, useResource } from '@refinedev/core';
 import { useQueries } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { useTeachersMap } from '@/features/use-teachers-map';
+
 import type {
   BaseRecord,
   CrudFilters,
@@ -50,6 +52,11 @@ export const useFetchList = (props: UseFetchListProps) => {
     sorters: props.sorters,
   });
 
+  // It's a very stupid hack to be able to map teachers guids
+  // to their names in csv export. Every time we download any csv
+  // we load teachers and then pass it to custom csvMap function (if provided)
+  const teachersMap = useTeachersMap();
+
   const results = useQueries({
     queries: Array.from({ length: pagesAmount }).map<
       UseQueryOptions<GetListResponse<BaseRecord>>
@@ -84,5 +91,5 @@ export const useFetchList = (props: UseFetchListProps) => {
     }, []);
   }, [isFetched, results]);
 
-  return { data: extractedData, isFetching, isFetchError };
+  return { data: extractedData, isFetching, isFetchError, teachersMap };
 };

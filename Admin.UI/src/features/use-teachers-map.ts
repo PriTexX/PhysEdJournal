@@ -10,7 +10,11 @@ export const useTeachersMap = (): Map<string, string> => {
 
   const { data, status } = useQuery({
     queryKey: ['teachers-map'],
-    queryFn: () => dataProvider.getList<Teacher>({ resource: 'teachers' }),
+    queryFn: () =>
+      dataProvider.getList<Teacher>({
+        resource: 'teachers',
+        pagination: { pageSize: 200 },
+      }),
   });
 
   const value = useMemo(() => {

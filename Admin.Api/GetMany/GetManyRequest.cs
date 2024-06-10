@@ -14,7 +14,7 @@ public sealed class GetManyRequestValidator : AbstractValidator<GetManyRequest>
 {
     public GetManyRequestValidator(string[]? sortFields, string[]? filterFields)
     {
-        RuleFor(x => x.Limit).GreaterThan(0).LessThan(200);
+        RuleFor(x => x.Limit).GreaterThan(0).LessThanOrEqualTo(200);
         RuleFor(x => x.Offset).GreaterThanOrEqualTo(0);
 
         RuleForEach(x => x.Filters).SetValidator(new FilterValidator(filterFields));

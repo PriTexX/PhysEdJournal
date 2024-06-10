@@ -31,7 +31,7 @@ import {
   CompetitionCreatePage,
   CompetitionListPage,
 } from './pages/competitions';
-import { GroupListPage } from './pages/groups';
+import { GroupEditPage, GroupListPage } from './pages/groups';
 import { LoginPage } from './pages/login';
 import { PointsListPage } from './pages/points';
 import { SemesterCreatePage, SemesterListPage } from './pages/semesters';
@@ -86,6 +86,7 @@ const resources: ResourceProps[] = [
   {
     name: 'groups',
     list: '/groups',
+    edit: '/groups/:id',
     meta: {
       label: 'Группы',
     },
@@ -223,6 +224,7 @@ function App() {
                         </Route>
                         <Route path="/groups">
                           <Route index element={<GroupListPage />} />
+                          <Route path=":id" element={<GroupEditPage />} />
                         </Route>
                         <Route path="/points">
                           <Route index element={<PointsListPage />} />

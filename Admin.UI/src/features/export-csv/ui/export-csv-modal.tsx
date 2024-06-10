@@ -17,7 +17,6 @@ import { useFetchList } from '../utils/use-load-data';
 
 import type { BaseRecord, CrudFilters, CrudSorting } from '@refinedev/core';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { FC } from 'react';
 
 const useErrorNotification = (show: boolean) => {
   const toast = useToast();
@@ -54,6 +53,7 @@ export interface ExportCsvModalProps<D extends BaseRecord> {
   defaultColumnsKeys: (keyof D)[];
   filters: CrudFilters;
   sorters?: CrudSorting;
+  customCsvMapper?: (items: D, teachersMap: Map<string, string>) => object;
 }
 
 export const ExportCsvModal = <D extends BaseRecord>({
@@ -62,12 +62,13 @@ export const ExportCsvModal = <D extends BaseRecord>({
   rowsAmount,
   allColumns,
   defaultColumnsKeys,
+  customCsvMapper,
   filters,
   sorters,
 }: ExportCsvModalProps<D>) => {
   const [loadingEnabled, setLoadingEnabled] = useState(false);
 
-  const { data, isFetchError, isFetching } = useFetchList({
+  const { data, isFetchError, isFetching, teachersMap } = useFetchList({
     enabled: loadingEnabled,
     amountToLoad: rowsAmount,
     filters,
@@ -78,6 +79,7 @@ export const ExportCsvModal = <D extends BaseRecord>({
     enabled: loadingEnabled,
     allColumns,
     defaultColumnsKeys,
+    customCsvMapper,
   });
 
   const handleClose = useCallback(() => {
@@ -94,9 +96,9 @@ export const ExportCsvModal = <D extends BaseRecord>({
     const alreadyDownloaded = downloadStatus === 'success';
 
     if (data && !alreadyDownloaded) {
-      downloadCsv(data as object[]);
+      downloadCsv(data as object[], teachersMap);
     }
-  }, [data, downloadCsv, downloadStatus]);
+  }, [data, downloadCsv, downloadStatus, teachersMap]);
 
   const exportCsv = () => {
     setLoadingEnabled(true);
