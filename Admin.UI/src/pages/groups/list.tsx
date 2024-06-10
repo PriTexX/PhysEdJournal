@@ -1,5 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
+import { TeacherCell } from '@/shared/components/teacher-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
 import type { Group } from './types';
@@ -21,6 +22,10 @@ const columns = [
   columnHelper.accessor('curatorGuid', {
     header: 'Куратор',
     enableSorting: false,
+    cell(v) {
+      const guid = v.getValue();
+      return guid && <TeacherCell guid={guid} />;
+    },
   }),
 ];
 

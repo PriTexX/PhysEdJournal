@@ -12,6 +12,7 @@ export type UseDownloadCsvProps<D extends BaseRecord> = {
   enabled: boolean;
   allColumns: ColumnDef<D, any>[];
   defaultColumnsKeys: (keyof D)[];
+  customCsvMapper?: (items: D, teachersMap: Map<string, string>) => object;
 };
 
 const mapColumnHeadersToAccessors = <D extends BaseRecord>(
@@ -31,6 +32,7 @@ export const useDownloadCsv = <D extends BaseRecord>({
   enabled,
   allColumns,
   defaultColumnsKeys,
+  customCsvMapper,
 }: UseDownloadCsvProps<D>) => {
   const { resource } = useResource();
 
@@ -53,13 +55,17 @@ export const useDownloadCsv = <D extends BaseRecord>({
   }, [enabled]);
 
   const downloadCsv = useCallback(
-    (data: object[]) => {
+    (data: object[], teachersMap: Map<string, string>) => {
       if (!enabled) {
         return;
       }
 
       try {
-        const csv = json2csv(data, { keys: csvKeys });
+        const exportedData = customCsvMapper
+          ? data.map((i) => customCsvMapper(i as never, teachersMap))
+          : data;
+
+        const csv = json2csv(exportedData, { keys: csvKeys });
 
         const blob = new Blob([csv], {
           type: 'text/csv;charset=utf-8;',

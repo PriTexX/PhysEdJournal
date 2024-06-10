@@ -12,7 +12,7 @@ const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const POSTFIX = 'StealthEX Admin';
+const POSTFIX = 'Журнал Админ';
 
 const getTitle = (options: Options) => {
   const action = options.action ? capitalize(options.action) : '';

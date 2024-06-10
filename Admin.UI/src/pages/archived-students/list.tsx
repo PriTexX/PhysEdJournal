@@ -1,8 +1,11 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
+import { useTeachersMap } from '@/features/use-teachers-map';
 import { JsonCell } from '@/shared/components/json-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
+import { workTypeRus } from '../points/types';
+import { standardTypeRus } from '../standards/types';
 import {
   PointsHistoryRender,
   StandarsHistoryRender,
@@ -79,12 +82,40 @@ const columns = [
   }),
 ];
 
+function archivedStudentsMapper(
+  item: ArchivedStudent,
+  teachersMap: Map<string, string>,
+) {
+  const visitsHistory = item.visitsHistory.map((h) => ({
+    date: h.date,
+    points: h.points,
+    teacher: teachersMap.get(h.teacherGuid) ?? h.teacherGuid,
+  }));
+
+  const standardsHistory = item.standardsHistory.map((h) => ({
+    date: h.date,
+    points: h.points,
+    standardType: standardTypeRus[h.standardType],
+    teacher: teachersMap.get(h.teacherGuid) ?? h.teacherGuid,
+  }));
+
+  const pointsHistory = item.pointsHistory.map((h) => ({
+    date: h.date,
+    points: h.points,
+    workType: workTypeRus[h.workType],
+    teacher: teachersMap.get(h.teacherGuid) ?? h.teacherGuid,
+  }));
+
+  return { ...item, visitsHistory, standardsHistory, pointsHistory };
+}
+
 export const ArchivedStudentListPage = () => {
   return (
     <DataGrid
       recordId="id"
       canExportCsv
       allColumns={columns}
+      customCsvMapper={archivedStudentsMapper}
       defaultColumnsKeys={[
         'studentGuid',
         'fullName',
