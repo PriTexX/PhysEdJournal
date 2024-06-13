@@ -52,6 +52,7 @@ export type DataGridProps<D extends BaseRecord> = {
   canExportCsv?: boolean;
   customCsvMapper?: (items: D, teachersMap: Map<string, string>) => object;
   refineCoreProps?: UseTableProps<D>['refineCoreProps'];
+  additionalButtons?: React.ReactElement[];
 };
 
 export function DataGrid<D extends BaseRecord>({
@@ -63,6 +64,7 @@ export function DataGrid<D extends BaseRecord>({
   quickFilters,
   defaultColumnsKeys,
   customCsvMapper,
+  additionalButtons,
 }: DataGridProps<D>) {
   const { resource } = useResource();
 
@@ -147,6 +149,14 @@ export function DataGrid<D extends BaseRecord>({
                 Экспорт
               </Button>
             ) : null}
+
+            {additionalButtons &&
+              additionalButtons.map((b, i) => (
+                <Box display="inline-block" key={i}>
+                  {b}
+                </Box>
+              ))}
+
             {isFetching && !isLoading && <Spinner />}
           </Flex>
         }

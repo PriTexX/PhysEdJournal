@@ -4,7 +4,10 @@ import { useMemo } from 'react';
 
 import type { Teacher } from '@/pages/teachers/types';
 
-export const useTeachersMap = (): Map<string, string> => {
+export const useTeachersMap = (): {
+  teacherNamesMap: Map<string, string>;
+  teacherGuidsMap: Map<string, string>;
+} => {
   const getDataProvider = useDataProvider();
   const dataProvider = getDataProvider();
 
@@ -19,14 +22,18 @@ export const useTeachersMap = (): Map<string, string> => {
 
   const value = useMemo(() => {
     if (status != 'success') {
-      return new Map();
+      return { teacherNamesMap: new Map(), teacherGuidsMap: new Map() };
     }
 
-    const teachersMap = new Map<string, string>();
+    const teacherNamesMap = new Map<string, string>();
+    const teacherGuidsMap = new Map<string, string>();
 
-    data.data.forEach((t) => teachersMap.set(t.teacherGuid, t.fullName));
+    data.data.forEach((t) => {
+      teacherNamesMap.set(t.teacherGuid, t.fullName);
+      teacherGuidsMap.set(t.fullName, t.teacherGuid);
+    });
 
-    return teachersMap;
+    return { teacherNamesMap, teacherGuidsMap };
   }, [data?.data]);
 
   return value;
