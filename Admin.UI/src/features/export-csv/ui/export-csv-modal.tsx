@@ -68,7 +68,12 @@ export const ExportCsvModal = <D extends BaseRecord>({
 }: ExportCsvModalProps<D>) => {
   const [loadingEnabled, setLoadingEnabled] = useState(false);
 
-  const { data, isFetchError, isFetching, teachersMap } = useFetchList({
+  const {
+    data,
+    isFetchError,
+    isFetching,
+    teachersMap: { teacherNamesMap },
+  } = useFetchList({
     enabled: loadingEnabled,
     amountToLoad: rowsAmount,
     filters,
@@ -96,9 +101,9 @@ export const ExportCsvModal = <D extends BaseRecord>({
     const alreadyDownloaded = downloadStatus === 'success';
 
     if (data && !alreadyDownloaded) {
-      downloadCsv(data as object[], teachersMap);
+      downloadCsv(data as object[], teacherNamesMap);
     }
-  }, [data, downloadCsv, downloadStatus, teachersMap]);
+  }, [data, downloadCsv, downloadStatus, teacherNamesMap]);
 
   const exportCsv = () => {
     setLoadingEnabled(true);

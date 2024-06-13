@@ -3,16 +3,20 @@ import { usePagination } from '@refinedev/chakra-ui';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import * as React from 'react';
 
+import type { ResponsiveValue } from '@chakra-ui/react';
+
 type PaginationProps = {
   current: number;
   pageCount: number;
   setCurrent: (page: number) => void;
+  justifyContent?: 'flex-end' | 'center';
 };
 
 export const Pagination: React.FC<PaginationProps> = ({
   current,
   pageCount,
   setCurrent,
+  justifyContent = 'flex-end',
 }) => {
   const pagination = usePagination({
     current,
@@ -24,7 +28,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   }, [current]);
 
   return (
-    <Box display="flex" justifyContent="flex-end">
+    <Box display="flex" justifyContent={justifyContent}>
       <HStack my="3" spacing="1">
         {pagination?.prev && (
           <Tooltip label="Previous">

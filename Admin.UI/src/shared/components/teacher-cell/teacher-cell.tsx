@@ -11,9 +11,9 @@ export type TeacherCellProps = {
 };
 
 export const TeacherCell: FC<TeacherCellProps> = ({ guid }) => {
-  const teachersMap = useTeachersMap();
+  const { teacherNamesMap } = useTeachersMap();
 
-  const displayTeacherName = teachersMap.get(guid) ?? guid;
+  const displayTeacherName = teacherNamesMap.get(guid) ?? guid;
 
   return (
     <HStack>

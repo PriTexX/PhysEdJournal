@@ -3,6 +3,8 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { TeacherCell } from '@/shared/components/teacher-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
+import { SyncGroupsButton } from './sync-csv-groups';
+
 import type { Group } from './types';
 
 const columnHelper = createColumnHelper<Group>();
@@ -29,6 +31,12 @@ const columns = [
   }),
 ];
 
+function groupCsvMapper(item: Group, teachersMap: Map<string, string>) {
+  const curatorGuid =
+    item.curatorGuid && (teachersMap.get(item.curatorGuid) ?? item.curatorGuid);
+  return { ...item, curatorGuid };
+}
+
 export const GroupListPage = () => {
   return (
     <DataGrid
@@ -50,6 +58,13 @@ export const GroupListPage = () => {
           withNullChecking: true,
         },
       ]}
+      refineCoreProps={{
+        sorters: {
+          initial: [{ field: 'groupName', order: 'asc' }],
+        },
+      }}
+      customCsvMapper={groupCsvMapper}
+      additionalButtons={[<SyncGroupsButton />]}
     />
   );
 };

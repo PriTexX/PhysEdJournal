@@ -82,7 +82,7 @@ const columns = [
   }),
 ];
 
-function archivedStudentsMapper(
+function archivedStudentsCsvMapper(
   item: ArchivedStudent,
   teachersMap: Map<string, string>,
 ) {
@@ -115,7 +115,7 @@ export const ArchivedStudentListPage = () => {
       recordId="id"
       canExportCsv
       allColumns={columns}
-      customCsvMapper={archivedStudentsMapper}
+      customCsvMapper={archivedStudentsCsvMapper}
       defaultColumnsKeys={[
         'studentGuid',
         'fullName',
