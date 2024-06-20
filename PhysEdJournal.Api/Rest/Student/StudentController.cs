@@ -9,6 +9,7 @@ using PhysEdJournal.Core.Entities.Types;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Infrastructure.Commands.AdminCommands;
 using PhysEdJournal.Infrastructure.Database;
+using PResult;
 
 namespace PhysEdJournal.Api.Rest.Student;
 
@@ -122,8 +123,8 @@ public static class StudentController
 
     private static async Task<IResult> ArchiveStudent(
         [FromBody] ArchiveStudentRequest request,
-        HttpContext ctx,
-        [FromServices] ArchiveStudentCommand archiveStudentCommand
+        [FromServices] ArchiveStudentCommand archiveStudentCommand,
+        HttpContext ctx
     )
     {
         var userGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
@@ -137,6 +138,6 @@ public static class StudentController
 
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
 
-        return res.Match(Response.Ok, Response.Error);
+        return res.Match(_ => Response.Ok(Unit.Default), Response.Error);
     }
 }

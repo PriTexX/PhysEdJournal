@@ -35,7 +35,7 @@ file sealed class Validator : AbstractValidator<AddPointsForStandardToStudentReq
         RuleFor(request => request.Points)
             .GreaterThan(0)
             .WithMessage("Количество баллов должно быть больше 0")
-            .LessThan(Constants.MaxPointsForOneStandard)
+            .LessThanOrEqualTo(Constants.MaxPointsForOneStandard)
             .WithMessage(
                 $"Количество баллов не должно быть больше {Constants.MaxPointsForOneStandard}"
             );
@@ -43,11 +43,11 @@ file sealed class Validator : AbstractValidator<AddPointsForStandardToStudentReq
         RuleFor(request => request.Date).NotEmpty().WithMessage("Обязательно нужно указать дату");
 
         RuleFor(request => request.StandardType)
-            .NotEmpty()
+            .NotNull()
             .WithMessage("Обязательно нужно указать тип норматива");
 
         RuleFor(request => request.IsOverride)
-            .NotEmpty()
+            .NotNull()
             .WithMessage("Обязательно нужно указать пересдается ли норматив");
     }
 }

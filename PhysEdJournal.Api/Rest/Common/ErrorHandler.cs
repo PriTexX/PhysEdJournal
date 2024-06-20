@@ -1,5 +1,6 @@
 using PhysEdJournal.Core.Exceptions;
 using PhysEdJournal.Core.Exceptions.DateExceptions;
+using PhysEdJournal.Core.Exceptions.StandardExceptions;
 using PhysEdJournal.Core.Exceptions.StudentExceptions;
 using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 

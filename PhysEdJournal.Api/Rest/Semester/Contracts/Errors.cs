@@ -17,5 +17,14 @@ public static class SemesterErrors
                     Detail = "Название семестра должно соответствовать шаблону: 2022-2023/весна",
                 }
             },
+            {
+                nameof(SemesterAlreadyExistsException),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "semester-duplicate",
+                    Detail = "Название семестра должно быть уникальным",
+                }
+            },
         };
 }

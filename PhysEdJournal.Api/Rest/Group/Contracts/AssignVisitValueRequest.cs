@@ -25,7 +25,7 @@ file sealed class Validator : AbstractValidator<AssignVisitValueRequest>
         RuleFor(request => request.NewVisitValue)
             .NotEmpty()
             .WithMessage("Обязательно должна быть передана стоимость посещений")
-            .LessThanOrEqualTo(4)
-            .WithMessage("Новое значение для стоимости посещения не может быть больше 4");
+            .Must(value => new[] { 2, 2.5, 3, 3.5, 4 }.Contains(value))
+            .WithMessage("Новое значение для стоимости посещения должно быть 2, 2.5, 3, 3.5 или 4");
     }
 }

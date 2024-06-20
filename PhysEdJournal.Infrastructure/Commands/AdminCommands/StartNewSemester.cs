@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Core.Entities.DB;
+using PhysEdJournal.Core.Exceptions.SemesterExceptions;
 using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
 using PhysEdJournal.Infrastructure.Database;
 using PResult;
@@ -17,6 +18,13 @@ public sealed class StartNewSemesterCommand : ICommand<string, Unit>
 
     public async Task<Result<Unit>> ExecuteAsync(string semesterName)
     {
+        var isDuplicate = await _applicationContext.Semesters.AnyAsync(s => s.Name == semesterName);
+
+        if (isDuplicate)
+        {
+            return new SemesterAlreadyExistsException(semesterName);
+        }
+
         var currentSemester = await _applicationContext
             .Semesters.Where(s => s.IsCurrent == true)
             .SingleOrDefaultAsync();
