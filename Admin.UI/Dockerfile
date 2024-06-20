@@ -19,18 +19,16 @@ RUN \
 FROM base as builder
 
 ENV NODE_ENV production
-ENV MODE=$MODE
 
 COPY --from=deps /app/refine/node_modules ./node_modules
 
 COPY . .
 
-RUN npm run build
+RUN npm run build -m $MODE
 
 FROM base as runner
 
 ENV NODE_ENV production
-ENV MODE=$MODE
 
 RUN npm install -g serve
 
