@@ -89,7 +89,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_TAGS }}
           build-args: |
-            NODE_ENV=staging
+            MODE=staging
           
   deploy:
     runs-on: ubuntu-latest
