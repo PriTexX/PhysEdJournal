@@ -1,0 +1,27 @@
+version: "2.2"
+
+services:
+  physedjournal:
+    image: "ghcr.io/pritexx/physedjournal:stage"
+    restart: always
+    container_name: physedjournal-stage
+    ports:
+      - '5200:8080'
+    env_file:
+      - .env.stage.secret
+  
+  admin-api:
+    image: "ghcr.io/pritexx/physedjournal:stage-admin-api"
+    restart: always
+    container_name: phys-admin-api-stage
+    ports:
+      - '5199:8080'
+    env_file:
+      - .env.stage.secret
+  
+  admin-ui:
+    image: "ghcr.io/pritexx/physedjournal:stage-admin-ui"
+    restart: always
+    container_name: phys-admin-ui-stage
+    ports:
+      - '5000:3000'

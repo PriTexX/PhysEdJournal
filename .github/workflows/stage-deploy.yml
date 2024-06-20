@@ -1,0 +1,156 @@
+name: Stage deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  USERNAME: admin2
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tags for image
+        run: |
+          echo "IMAGE_TAGS='\"stage\"'" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        run: dotnet publish ./PhysEdJournal.Api/PhysEdJournal.Api.csproj --os linux --arch x64 -c Release -p PublishProfile=DefaultContainer -p ContainerRegistry=${{ env.REGISTRY }} -p ContainerRepository=${{ env.IMAGE_NAME }} -p ContainerImageTags=${{ env.IMAGE_TAGS }}
+
+  build-admin-api:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tags for image
+        run: |
+          echo "IMAGE_TAGS='\"stage-admin-api\"'" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        run: dotnet publish ./Admin.Api/Admin.Api.csproj --os linux --arch x64 -c Release -p PublishProfile=DefaultContainer -p ContainerRegistry=${{ env.REGISTRY }} -p ContainerRepository=${{ env.IMAGE_NAME }} -p ContainerImageTags=${{ env.IMAGE_TAGS }}
+
+  build-admin-ui:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tags for image
+        run: |
+          REPO_NAME=${{env.IMAGE_NAME}}
+          echo "IMAGE_TAGS=${{env.REGISTRY}}/${REPO_NAME,,}:stage-admin-ui" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./Admin.UI
+          push: true
+          tags: ${{ env.IMAGE_TAGS }}
+          build-args: |
+            NODE_ENV=staging
+          
+  deploy:
+    runs-on: ubuntu-latest
+    needs: 
+      - build-app
+      - build-admin-api
+      - build-admin-ui
+    
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Put secrets in env
+        uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{toJson(secrets)}}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create secret env file
+        run: envsubst < deploy/.env.stage.template > deploy/.env.stage.secret
+
+      - name: Tar deploy folder
+        run: tar -cvf deploy.tar deploy/
+
+      - name: Install OpenVPN
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved     
+
+      - name: Setup VPN config
+        run: echo "${{ secrets.OVPN_FILE }}" > config.ovpn
+
+      - name: Connect to VPN
+        uses: "kota65535/github-openvpn-connect-action@v2"
+        with:
+          config_file: config.ovpn
+          username: ${{secrets.OVPN_USERNAME}}
+          password: ${{secrets.OVPN_PASSWORD}}
+
+      - name: Copy deploy.tar
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{env.USERNAME}}
+          password: ${{ secrets.HOST_PASSWORD }}
+          source: "deploy.tar"
+          target: "/home/${{env.USERNAME}}/physedjournal-stage"
+
+      - name: Pull and run containers
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.HOST_PASSWORD }}
+          script: |
+            cd /home/${{env.USERNAME}}/physedjournal-stage
+            tar -xf deploy.tar -C /home/${{env.USERNAME}}/physedjournal-stage
+            cd deploy
+            docker-compose -f docker-compose.stage.yml pull
+            docker-compose -f docker-compose.stage.yml -p physedjournal-stage restart
+            docker-compose -f docker-compose.stage.yml -p physedjournal-stage up -d
+            rm -r /home/${{env.USERNAME}}/physedjournal-stage

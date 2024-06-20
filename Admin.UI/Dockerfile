@@ -3,6 +3,8 @@
 # https://github.com/refinedev/dockerfiles/blob/main/vite/Dockerfile.nginx
 FROM refinedev/node:18 AS base
 
+ARG NODE_ENV=production
+
 FROM base as deps
 
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
@@ -16,7 +18,7 @@ RUN \
 
 FROM base as builder
 
-ENV NODE_ENV production
+ENV NODE_ENV=$NODE_ENV
 
 COPY --from=deps /app/refine/node_modules ./node_modules
 
@@ -26,7 +28,7 @@ RUN npm run build
 
 FROM base as runner
 
-ENV NODE_ENV production
+ENV NODE_ENV=$NODE_ENV
 
 RUN npm install -g serve
 
