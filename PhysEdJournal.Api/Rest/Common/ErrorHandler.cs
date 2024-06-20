@@ -109,15 +109,6 @@ public static class ErrorHandler
                         "Запрос на сортировку это список параметров через запятую. Параметр на сортировку состоит из единого слова, а так же может иметь модификатор asc или desc.",
                 }
             },
-            {
-                nameof(LoweringTheScoreException),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "lowering-score",
-                    Detail = "Нельзя занизить количество баллов студенту",
-                }
-            },
         };
 
     private static readonly ErrorResponse DefaultErrorResponse =

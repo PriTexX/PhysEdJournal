@@ -93,5 +93,14 @@ public static class PointsErrors
                     Detail = "Нельзя сдать один и тот же норматив дважды",
                 }
             },
+            {
+                nameof(LoweringTheScoreException),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "lowering-score",
+                    Detail = "Нельзя занизить количество баллов студенту",
+                }
+            },
         };
 }
