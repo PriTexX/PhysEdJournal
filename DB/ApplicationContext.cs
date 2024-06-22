@@ -33,7 +33,7 @@ public sealed class ApplicationContext : DbContext
 
 public static class DbExtensions
 {
-    public static void AddDB(this IServiceCollection services, string connectionString)
+    public static void AddCoreDB(this IServiceCollection services, string connectionString)
     {
         var dataSource = new NpgsqlDataSourceBuilder(connectionString).EnableDynamicJson().Build();
 

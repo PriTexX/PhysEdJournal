@@ -1,11 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
-using PhysEdJournal.Infrastructure.Database;
+﻿using DB;
+using DB.Tables;
+using Microsoft.EntityFrameworkCore;
 using PResult;
 
-namespace PhysEdJournal.Infrastructure.Commands.AdminCommands;
+namespace Core.Commands.OldCommands;
 
 public sealed class CreateTeacherCommandPayload
 {

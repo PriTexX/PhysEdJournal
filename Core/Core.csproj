@@ -9,10 +9,24 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Coravel" Version="5.0.4" />
+      <PackageReference Include="GraphQL.Client" Version="6.1.0" />
+      <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />
+      <PackageReference Include="PResult" Version="1.1.0" />
+      <PackageReference Include="Serilog" Version="3.1.1" />
+      <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
       <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DB\DB.csproj" />
     </ItemGroup>
 
 </Project>

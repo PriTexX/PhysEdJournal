@@ -14,12 +14,6 @@ using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Middlewares;
-using PhysEdJournal.Api.Rest.Competition;
-using PhysEdJournal.Api.Rest.Group;
-using PhysEdJournal.Api.Rest.Points;
-using PhysEdJournal.Api.Rest.Semester;
-using PhysEdJournal.Api.Rest.Student;
-using PhysEdJournal.Api.Rest.Teacher;
 using PhysEdJournal.Infrastructure;
 using PhysEdJournal.Infrastructure.Database;
 using Serilog;
@@ -229,7 +223,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PhysEdJournal API V1");
     });
 }
 
@@ -243,6 +237,7 @@ app.MapControllers();
 app.MapGraphQL();
 
 await app.RunAsync();
+return;
 
 static RsaSecurityKey GetSecurityKey(string publicKey)
 {
