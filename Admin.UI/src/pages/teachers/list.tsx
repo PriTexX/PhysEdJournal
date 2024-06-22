@@ -2,6 +2,8 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
+import { CreateTeacherButton } from './create';
+
 import type { Teacher } from './types';
 
 const columnHelper = createColumnHelper<Teacher>();
@@ -47,6 +49,7 @@ export const TeacherListPage = () => {
           initial: [{ field: 'fullName', order: 'asc' }],
         },
       }}
+      additionalButtons={[<CreateTeacherButton />]}
     />
   );
 };

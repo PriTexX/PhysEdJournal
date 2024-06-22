@@ -22,6 +22,7 @@
     "@tabler/icons-react": "^3.5.0",
     "@tanstack/react-query": "^5.39.0",
     "@tanstack/react-table": "^8.17.3",
+    "chakra-react-select": "^4.8.0",
     "dayjs": "^1.11.11",
     "dayjs-plugin-utc": "^0.1.2",
     "file-saver": "^2.0.5",

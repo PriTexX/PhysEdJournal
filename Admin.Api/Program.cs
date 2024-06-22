@@ -1,5 +1,6 @@
 using Admin.Api;
 using Admin.Api.Resources;
+using Admin.Api.StaffSearch;
 using Core.Cfg;
 using Core.Commands;
 using DB;
@@ -34,6 +35,8 @@ builder.Services.AddHttpClient<LkAuthClient>(c =>
 builder.Services.AddCoreDB(Config.ConnectionString);
 builder.Services.AddCommands();
 
+builder.Services.AddSingleton<StaffHttpClient>();
+
 var app = builder.Build();
 
 app.UseCors(o =>
@@ -54,7 +57,7 @@ GenericCrudController<ArchivedStudentEntity, int>.MapEndpoints(
     new ResourceOptions<ArchivedStudentEntity>
     {
         Name = "archived-students",
-        Validator = ArchivedStudents.Validator
+        Validator = ArchivedStudents.Validator,
     }
 );
 
@@ -65,7 +68,7 @@ GenericCrudController<CompetitionEntity, string>.MapEndpoints(
         Name = "competitions",
         IsCreatable = true,
         IsDeletable = true,
-        Validator = Competition.Validator
+        Validator = Competition.Validator,
     }
 );
 
@@ -75,7 +78,7 @@ GenericCrudController<GroupEntity, string>.MapEndpoints(
     {
         Name = "groups",
         Validator = Group.Validator,
-        IsEditable = true
+        IsEditable = true,
     }
 );
 
@@ -126,7 +129,9 @@ GenericCrudController<TeacherEntity, string>.MapEndpoints(
     {
         Name = "teachers",
         Validator = Teacher.Validator,
-        IsEditable = true
+        IsEditable = true,
+        IsCreatable = true,
+        IsDeletable = true,
     }
 );
 
@@ -139,6 +144,8 @@ GenericCrudController<VisitStudentHistoryEntity, int>.MapEndpoints(
         IsDeletable = true,
     }
 );
+
+app.MapStaffSearchEndpoint();
 
 AuthenticationHandler.MapAuthentication(app);
 
