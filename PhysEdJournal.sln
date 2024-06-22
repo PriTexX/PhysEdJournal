@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Api", "PhysEdJournal.Api\PhysEdJournal.Api.csproj", "{3CDF5C88-E924-4213-8452-47E88475250E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{3CDF5C88-E924-4213-8452-47E88475250E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Tests", "PhysEdJournal.Tests\PhysEdJournal.Tests.csproj", "{B8791C2E-5725-48C9-B32D-05C34B97E6B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{B8791C2E-5725-48C9-B32D-05C34B97E6B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Api", "Admin.Api\Admin.Api.csproj", "{D410B76F-C9FC-45A2-9A4E-4A24363A851C}"
 EndProject
