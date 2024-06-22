@@ -1,14 +1,12 @@
+using Core.Commands;
+using DB;
+using DB.Tables;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Api.Rest.Common.Filters;
 using PhysEdJournal.Api.Rest.Student.Contracts;
 using PhysEdJournal.Api.Rest.Student.Contracts.Responses;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
-using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Database;
 using PResult;
 
 namespace PhysEdJournal.Api.Rest.Student;
@@ -46,7 +44,7 @@ public static class StudentController
 
         if (student is null)
         {
-            return Response.Error(new StudentNotFoundException(guid));
+            return Response.Error(new StudentNotFoundError());
         }
 
         var response = new GetStudentResponse

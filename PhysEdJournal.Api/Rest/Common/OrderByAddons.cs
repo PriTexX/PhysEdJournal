@@ -1,9 +1,10 @@
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Text;
-using PhysEdJournal.Core.Exceptions;
 
 namespace PhysEdJournal.Api.Rest.Common;
+
+public sealed class OrderByQueryStructureError() : Exception("Wrong format") { }
 
 public static class OrderByAddons
 {
@@ -37,7 +38,7 @@ public static class OrderByAddons
             switch (kvp.Length)
             {
                 case > 2:
-                    throw new OrderByQueryStructureException();
+                    throw new OrderByQueryStructureError();
                 case > 1 when kvp[1] == "asc":
                     break;
                 case > 1 when kvp[1] == "desc":

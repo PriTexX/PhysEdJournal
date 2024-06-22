@@ -34,7 +34,7 @@ file sealed class AddHealthGroupValidator : ICommandValidator<AddHealthGroupPayl
 
         if (studentCuratorGuid != commandInput.TeacherGuid)
         {
-            return new CuratorGuidMismatchError();
+            return new CuratorMismatchError();
         }
 
         return ValidationResult.Success;

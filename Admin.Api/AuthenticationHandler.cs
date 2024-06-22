@@ -1,9 +1,9 @@
 using System.Security.Claims;
+using DB;
+using DB.Tables;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Infrastructure.Database;
 
 namespace Admin.Api;
 

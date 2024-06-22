@@ -1,5 +1,3 @@
-using Core.Commands.DeleteStandard;
-using Core.Commands.DeleteVisit;
 using Core.Commands.OldCommands;
 using Microsoft.Extensions.DependencyInjection;
 

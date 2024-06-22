@@ -1,4 +1,9 @@
 using System.Security.Cryptography;
+using Core.Cfg;
+using Core.Commands;
+using Core.Jobs;
+using Core.Logging;
+using DB;
 using HotChocolate.Data.Filters;
 using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Types.Pagination;
@@ -14,11 +19,7 @@ using PhysEdJournal.Api.GraphQL.MutationExtensions;
 using PhysEdJournal.Api.GraphQL.QueryExtensions;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
 using PhysEdJournal.Api.Middlewares;
-using PhysEdJournal.Infrastructure;
-using PhysEdJournal.Infrastructure.Database;
 using Serilog;
-using Serilog.Events;
-using Serilog.Formatting.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,46 +27,13 @@ var builder = WebApplication.CreateBuilder(args);
     Application options
  */
 
-builder
-    .Services.AddOptions<ApplicationOptions>()
-    .BindConfiguration(ApplicationOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-var applicationOptions = new ApplicationOptions();
-builder.Configuration.GetSection(ApplicationOptions.SectionName).Bind(applicationOptions);
+Config.InitCoreCfg(builder);
 
 /*
     Logging
  */
 
-builder.Host.UseSerilog(
-    (context, configuration) =>
-    {
-        configuration
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
-            .MinimumLevel.Override(
-                "Microsoft.AspNetCore.Hosting.Diagnostics",
-                LogEventLevel.Warning
-            )
-            .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Query", LogEventLevel.Error)
-            .Enrich.FromLogContext();
-
-        if (context.HostingEnvironment.IsProduction())
-        {
-            configuration.WriteTo.Console(new JsonFormatter());
-        }
-        else
-        {
-            configuration.WriteTo.Console();
-        }
-    }
-);
+builder.AddLogging("Journal");
 
 /*
     Authentication & Authorization
@@ -76,7 +44,7 @@ builder
     .AddJwtBearer(options =>
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = GetSecurityKey(applicationOptions.RsaPublicKey),
+            IssuerSigningKey = GetSecurityKey(Config.RsaPublicKey),
             ValidIssuer = "humanresourcesdepartmentapi.mospolytech.ru",
             ValidAudience = "HumanResourcesDepartment",
             ValidateIssuerSigningKey = true,
@@ -90,13 +58,17 @@ builder.Services.AddAuthorization();
     Services
  */
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddWorker();
+
+builder.Services.AddCoreDB(Config.ConnectionString);
+
+builder.Services.AddCommands();
 
 builder.Services.AddSingleton<IStaffInfoClient, StaffInfoHttpClient>();
 builder.Services.AddScoped<PermissionValidator>();
 builder.Services.AddScoped<MeInfoService>();
 
-if (builder.Environment.IsDevelopment())
+if (Config.IsDevelopment())
 {
     builder.Services.AddSwaggerGen(swagger =>
     {
@@ -162,9 +134,6 @@ builder
     .BindRuntimeType<Success, SuccessType>()
     .BindRuntimeType<DateOnly, DateOnlyType>()
     .AddMutationType<Mutation>()
-    .AddTypeExtension<TeacherMutationExtensions>()
-    .AddTypeExtension<GroupMutationExtensions>()
-    .AddTypeExtension<SemesterMutationExtensions>()
     .AddTypeExtension<StudentMutationExtensions>()
     .AddProjections()
     .AddFiltering()

@@ -1,12 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
-using PhysEdJournal.Infrastructure.Database;
+﻿using Core.Commands;
+using DB;
+using DB.Tables;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace PhysEdJournal.Api;
 
-public class PermissionValidator
+public sealed class NotEnoughPermissionsError()
+    : Exception("Teacher does not have enough permissions to do this") { }
+
+public sealed class PermissionValidator
 {
     private readonly ApplicationContext _applicationContext;
     private readonly IMemoryCache _memoryCache;
@@ -30,7 +32,7 @@ public class PermissionValidator
 
             if (teacher is null)
             {
-                return new TeacherNotFoundException(teacherGuid);
+                return new TeacherNotFoundError();
             }
 
             _memoryCache.Set(
@@ -47,11 +49,7 @@ public class PermissionValidator
 
         if (!hasEnough)
         {
-            return new NotEnoughPermissionsException(
-                teacherGuid,
-                teacher.Permissions,
-                requiredPermissions
-            );
+            return new NotEnoughPermissionsError();
         }
 
         return hasEnough;

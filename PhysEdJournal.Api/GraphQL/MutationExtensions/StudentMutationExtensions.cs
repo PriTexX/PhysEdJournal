@@ -1,34 +1,22 @@
 ﻿using System.Security.Claims;
+using Core.Commands;
+using DB;
+using DB.Tables;
 using PhysEdJournal.Api.GraphQL.ScalarTypes;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Core.Exceptions;
-using PhysEdJournal.Core.Exceptions.DateExceptions;
-using PhysEdJournal.Core.Exceptions.PointsExceptions;
-using PhysEdJournal.Core.Exceptions.StandardExceptions;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
-using PhysEdJournal.Core.Exceptions.VisitsExceptions;
-using PhysEdJournal.Infrastructure.Commands;
-using PhysEdJournal.Infrastructure.Commands.AdminCommands;
-using PhysEdJournal.Infrastructure.Commands.SyncStudents;
-using PhysEdJournal.Infrastructure.Commands.ValidationAndCommandAbstractions;
-using PhysEdJournal.Infrastructure.Database;
 
 namespace PhysEdJournal.Api.GraphQL.MutationExtensions;
 
 [ExtendObjectType(OperationTypeNames.Mutation)]
 public class StudentMutationExtensions
 {
-    [Error(typeof(StudentNotFoundException))]
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(ActionFromFutureException))]
-    [Error(typeof(FitnessAlreadyExistsException))]
-    [Error(typeof(DateExpiredException))]
-    [Error(typeof(PointsExceededLimit))]
-    [Error(typeof(NegativePointAmount))]
-    [Error(typeof(NonWorkingDayException))]
+    [Error(typeof(StudentNotFoundError))]
+    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(ActionFromFutureError))]
+    [Error(typeof(FitnessExistsError))]
+    [Error(typeof(DateExpiredError))]
+    [Error(typeof(PointsOutOfLimitError))]
+    [Error(typeof(NonWorkingDayError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> AddPointsToStudent(
         [Service] AddPointsCommand addPointsCommand,
@@ -74,14 +62,14 @@ public class StudentMutationExtensions
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
-        var addPointsPayload = new AddPointsCommandPayload
+        var addPointsPayload = new AddPointsPayload
         {
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
             Points = pointsAmount,
             Date = date,
             WorkType = workType,
-            IsAdmin = isAdminOrSecretary,
+            IsAdminOrSecretary = isAdminOrSecretary,
             Comment = comment,
         };
 
@@ -97,17 +85,15 @@ public class StudentMutationExtensions
         );
     }
 
-    [Error(typeof(StudentNotFoundException))]
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(StandardAlreadyExistsException))]
-    [Error(typeof(ActionFromFutureException))]
-    [Error(typeof(LoweringTheScoreException))]
-    [Error(typeof(NotEnoughPointsForStandardException))]
-    [Error(typeof(DateExpiredException))]
-    [Error(typeof(NonWorkingDayException))]
-    [Error(typeof(PointsOverflowException))]
-    [Error(typeof(NegativePointAmount))]
+    [Error(typeof(StudentNotFoundError))]
+    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(StandardExistsError))]
+    [Error(typeof(ActionFromFutureError))]
+    [Error(typeof(NotEnoughPointsForStandardsError))]
+    [Error(typeof(DateExpiredError))]
+    [Error(typeof(NonWorkingDayError))]
+    [Error(typeof(PointsOutOfLimitError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> AddPointsForStandardToStudent(
         string studentGuid,
@@ -115,7 +101,7 @@ public class StudentMutationExtensions
         DateOnly date,
         StandardType standardType,
         bool isOverride,
-        [Service] AddStandardPointsCommand addStandardPointsCommand,
+        [Service] AddStandardCommand addStandardPointsCommand,
         [Service] PermissionValidator permissionValidator,
         [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal,
@@ -136,15 +122,14 @@ public class StudentMutationExtensions
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
-        var addPointsForStandardPayload = new AddStandardPointsCommandPayload
+        var addPointsForStandardPayload = new AddStandardPayload
         {
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
             Points = pointsAmount,
             Date = date,
             StandardType = standardType,
-            IsOverride = isOverride,
-            IsAdmin = isAdminOrSecretary,
+            IsAdminOrSecretary = isAdminOrSecretary,
             Comment = comment,
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
@@ -159,17 +144,17 @@ public class StudentMutationExtensions
         );
     }
 
-    [Error(typeof(StudentNotFoundException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(VisitExpiredException))]
-    [Error(typeof(VisitAlreadyExistsException))]
-    [Error(typeof(ActionFromFutureException))]
+    [Error(typeof(StudentNotFoundError))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(DateExpiredError))]
+    [Error(typeof(VisitExistsError))]
+    [Error(typeof(ActionFromFutureError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> IncreaseStudentVisits(
         string studentGuid,
         DateOnly date,
-        [Service] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
+        [Service] AddVisitCommand increaseStudentVisitsCommand,
         [Service] PermissionValidator permissionValidator,
         [Service] ApplicationContext applicationContext,
         [Service] ILogger<StudentMutationExtensions> logger,
@@ -190,12 +175,12 @@ public class StudentMutationExtensions
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
-        var increaseStudentVisitsPayload = new IncreaseStudentVisitsCommandPayload
+        var increaseStudentVisitsPayload = new AddVisitPayload
         {
             Date = date,
             StudentGuid = studentGuid,
             TeacherGuid = callerGuid,
-            IsAdmin = isAdminOrSecretary,
+            IsAdminOrSecretary = isAdminOrSecretary,
         };
 
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
@@ -210,12 +195,12 @@ public class StudentMutationExtensions
         );
     }
 
-    [Error(typeof(StudentNotFoundException))]
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(NotEnoughPointsException))]
+    [Error(typeof(StudentNotFoundError))]
+    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(NotEnoughPointsError))]
     [Error(typeof(NotCuratorError))]
-    [Error(typeof(SemesterMismatchError))]
+    [Error(typeof(SameSemesterError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<ArchivedStudentEntity> ArchiveStudent(
         [Service] ArchiveStudentCommand archiveStudentCommand,
@@ -248,108 +233,14 @@ public class StudentMutationExtensions
         return res.Match(archivedStudent => archivedStudent, exception => throw exception);
     }
 
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> UpdateStudentsInfo(
-        [Service] SyncStudentsCommand syncStudentCommand,
-        [Service] ILogger<SyncStudentsCommand> logger,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
-    )
-    {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
-
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
-            callerGuid,
-            TeacherPermissions.AdminAccess
-        );
-
-        // We run this command in the background because it takes
-        // to much time so client closes connection before command ends
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        Task.Run(async () =>
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        {
-            try
-            {
-                logger.LogInformation(
-                    "Teacher: {teacherGuid} started {commandName}",
-                    callerGuid,
-                    nameof(SyncStudentsCommand)
-                );
-
-                await syncStudentCommand.ExecuteAsync(EmptyPayload.Empty);
-
-                logger.LogInformation(
-                    "{commandName} has successfully finished",
-                    nameof(SyncStudentsCommand)
-                );
-            }
-            catch (Exception e)
-            {
-                logger.LogError(
-                    e,
-                    "Unhandled exception happened in {commandName}",
-                    nameof(SyncStudentsCommand)
-                );
-            }
-        });
-
-        return true;
-    }
-
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(StudentNotFoundException))]
-    public async Task<Success> ActivateStudent(
-        string studentGuid,
-        [Service] ActivateStudentCommand activateStudentCommand,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
-    )
-    {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
-
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
-            callerGuid,
-            TeacherPermissions.AdminAccess
-        );
-
-        var res = await activateStudentCommand.ExecuteAsync(studentGuid);
-
-        return res.Match(_ => true, exception => throw exception);
-    }
-
-    [Error(typeof(NotEnoughPermissionsException))]
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(StudentNotFoundException))]
-    public async Task<Success> DeActivateStudent(
-        string studentGuid,
-        [Service] DeActivateStudentCommand deActivateStudentCommand,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
-    )
-    {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
-
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
-            callerGuid,
-            TeacherPermissions.AdminAccess
-        );
-
-        var res = await deActivateStudentCommand.ExecuteAsync(studentGuid);
-
-        return res.Match(_ => true, exception => throw exception);
-    }
-
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(VisitsStudentHistoryNotFoundException))]
-    [Error(typeof(TeacherGuidMismatchException))]
-    [Error(typeof(VisitOutdatedException))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(HistoryDeleteExpiredError))]
+    [Error(typeof(TeacherMismatchError))]
+    [Error(typeof(HistoryNotFoundError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> DeleteStudentVisit(
         int historyId,
-        [Service] DeleteStudentVisitCommand deleteStudentVisitCommand,
+        [Service] DeleteVisitCommand deleteStudentVisitCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
@@ -364,10 +255,10 @@ public class StudentMutationExtensions
         var isAdmin = validationResult.IsOk;
 
         var res = await deleteStudentVisitCommand.ExecuteAsync(
-            new DeleteStudentVisitCommandPayload
+            new DeleteVisitPayload
             {
                 HistoryId = historyId,
-                IsAdmin = isAdmin,
+                IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
         );
@@ -375,10 +266,10 @@ public class StudentMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(PointsStudentHistoryNotFoundException))]
-    [Error(typeof(TeacherGuidMismatchException))]
-    [Error(typeof(PointsOutdatedException))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(HistoryNotFoundError))]
+    [Error(typeof(TeacherMismatchError))]
+    [Error(typeof(HistoryDeleteExpiredError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> DeletePoints(
         int historyId,
@@ -397,10 +288,10 @@ public class StudentMutationExtensions
         var isAdmin = validationResult.IsOk;
 
         var res = await deletePointsCommand.ExecuteAsync(
-            new DeletePointsCommandPayload
+            new DeletePointsPayload
             {
                 HistoryId = historyId,
-                IsAdmin = isAdmin,
+                IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
         );
@@ -408,14 +299,14 @@ public class StudentMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(StandardsStudentHistoryNotFoundException))]
-    [Error(typeof(TeacherGuidMismatchException))]
-    [Error(typeof(PointsOutdatedException))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(HistoryNotFoundError))]
+    [Error(typeof(TeacherMismatchError))]
+    [Error(typeof(HistoryDeleteExpiredError))]
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> DeleteStandardPoints(
         int historyId,
-        [Service] DeleteStandardPointsCommand deleteStandardPointsCommand,
+        [Service] DeleteStandardCommand deleteStandardPointsCommand,
         [Service] PermissionValidator permissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
@@ -430,10 +321,10 @@ public class StudentMutationExtensions
         var isAdmin = validationResult.IsOk;
 
         var res = await deleteStandardPointsCommand.ExecuteAsync(
-            new DeleteStandardPointsCommandPayload()
+            new DeleteStandardPayload
             {
                 HistoryId = historyId,
-                IsAdmin = isAdmin,
+                IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
         );
@@ -441,9 +332,9 @@ public class StudentMutationExtensions
         return res.Match(_ => true, exception => throw exception);
     }
 
-    [Error(typeof(TeacherNotFoundException))]
-    [Error(typeof(StudentNotFoundException))]
-    [Error(typeof(CuratorGuidMismatch))]
+    [Error(typeof(TeacherNotFoundError))]
+    [Error(typeof(StudentNotFoundError))]
+    [Error(typeof(CuratorMismatchError))]
     public async Task<Success> AddStudentHealthGroup(
         string studentGuid,
         HealthGroupType healthGroup,
@@ -467,25 +358,6 @@ public class StudentMutationExtensions
                 TeacherGuid = callerGuid,
             }
         );
-
-        return res.Match(_ => true, exception => throw exception);
-    }
-
-    [Error(typeof(TeacherNotFoundException))]
-    public async Task<Success> ClearStudentsHealthGroup(
-        [Service] ClearStudentsHealthGroupCommand clearStudentsHealthGroupCommand,
-        [Service] PermissionValidator permissionValidator,
-        ClaimsPrincipal claimsPrincipal
-    )
-    {
-        var callerGuid = GetCallerGuid(claimsPrincipal);
-
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
-            callerGuid,
-            TeacherPermissions.AdminAccess
-        );
-
-        var res = await clearStudentsHealthGroupCommand.ExecuteAsync(EmptyPayload.Empty);
 
         return res.Match(_ => true, exception => throw exception);
     }

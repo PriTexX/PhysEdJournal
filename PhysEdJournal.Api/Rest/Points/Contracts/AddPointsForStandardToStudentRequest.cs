@@ -1,6 +1,6 @@
+using Core.Cfg;
+using DB.Tables;
 using FluentValidation;
-using PhysEdJournal.Core;
-using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Api.Rest.Points.Contracts;
 
@@ -13,8 +13,6 @@ public class AddPointsForStandardToStudentRequest
     public required DateOnly Date { get; init; }
 
     public required StandardType StandardType { get; init; }
-
-    public required bool IsOverride { get; init; }
 
     public string? Comment { get; init; } = null;
 
@@ -35,9 +33,9 @@ file sealed class Validator : AbstractValidator<AddPointsForStandardToStudentReq
         RuleFor(request => request.Points)
             .GreaterThan(0)
             .WithMessage("Количество баллов должно быть больше 0")
-            .LessThanOrEqualTo(Constants.MaxPointsForOneStandard)
+            .LessThanOrEqualTo(Config.MaxPointsForOneStandard)
             .WithMessage(
-                $"Количество баллов не должно быть больше {Constants.MaxPointsForOneStandard}"
+                $"Количество баллов не должно быть больше {Config.MaxPointsForOneStandard}"
             );
 
         RuleFor(request => request.Date).NotEmpty().WithMessage("Обязательно нужно указать дату");
@@ -45,9 +43,5 @@ file sealed class Validator : AbstractValidator<AddPointsForStandardToStudentReq
         RuleFor(request => request.StandardType)
             .NotNull()
             .WithMessage("Обязательно нужно указать тип норматива");
-
-        RuleFor(request => request.IsOverride)
-            .NotNull()
-            .WithMessage("Обязательно нужно указать пересдается ли норматив");
     }
 }

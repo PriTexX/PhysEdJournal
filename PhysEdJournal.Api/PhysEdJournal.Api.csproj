@@ -38,11 +38,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PhysEdJournal.Core\PhysEdJournal.Core.csproj" />
-        <ProjectReference Include="..\PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Rest\System\Contracts\" />
+      <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 </Project>

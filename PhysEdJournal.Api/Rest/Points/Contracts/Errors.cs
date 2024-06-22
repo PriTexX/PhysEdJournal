@@ -1,9 +1,6 @@
+using Core.Cfg;
+using Core.Commands;
 using PhysEdJournal.Api.Rest.Common;
-using PhysEdJournal.Core;
-using PhysEdJournal.Core.Exceptions.PointsExceptions;
-using PhysEdJournal.Core.Exceptions.StandardExceptions;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
-using PhysEdJournal.Core.Exceptions.VisitsExceptions;
 
 namespace PhysEdJournal.Api.Rest.Points.Contracts;
 
@@ -13,7 +10,7 @@ public static class PointsErrors
         new()
         {
             {
-                nameof(FitnessAlreadyExistsException),
+                nameof(FitnessExistsError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -22,25 +19,16 @@ public static class PointsErrors
                 }
             },
             {
-                nameof(PointsExceededLimit),
+                nameof(PointsOutOfLimitError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "points-out-of-limit",
-                    Detail = $"Максимальный балл за данную активность {Constants.MaxPointsAmount}",
+                    Detail = $"Максимальный балл за данную активность {Config.MaxPointsAmount}",
                 }
             },
             {
-                nameof(VisitExpiredException),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "visit-expired",
-                    Detail = "Нельзя поставить посещение за дату старше 7 дней",
-                }
-            },
-            {
-                nameof(VisitAlreadyExistsException),
+                nameof(VisitExistsError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -49,25 +37,7 @@ public static class PointsErrors
                 }
             },
             {
-                nameof(VisitsStudentHistoryNotFoundException),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Type = "visit-not-found",
-                    Detail = "Не удалось найти посещение в системе",
-                }
-            },
-            {
-                nameof(VisitOutdatedException),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "visit-outdated",
-                    Detail = "Нельзя удалить посещения старше 7 дней",
-                }
-            },
-            {
-                nameof(PointsStudentHistoryNotFoundException),
+                nameof(HistoryNotFoundError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status404NotFound,
@@ -76,30 +46,12 @@ public static class PointsErrors
                 }
             },
             {
-                nameof(StandardsStudentHistoryNotFoundException),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Type = "standards-history-not-found",
-                    Detail = "Не удалось найти норматив в системе",
-                }
-            },
-            {
-                nameof(StandardAlreadyExistsException),
+                nameof(StandardExistsError),
                 _ => new ErrorResponse()
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "standard-duplicate",
                     Detail = "Нельзя сдать один и тот же норматив дважды",
-                }
-            },
-            {
-                nameof(LoweringTheScoreException),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "lowering-score",
-                    Detail = "Нельзя занизить количество баллов студенту",
                 }
             },
         };

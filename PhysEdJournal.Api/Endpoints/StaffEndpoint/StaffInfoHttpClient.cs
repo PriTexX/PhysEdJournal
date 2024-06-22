@@ -1,8 +1,7 @@
-﻿using GraphQL;
+﻿using Core.Cfg;
+using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
-using Microsoft.Extensions.Options;
-using PhysEdJournal.Infrastructure;
 
 namespace PhysEdJournal.Api.Endpoints.StaffEndpoint;
 
@@ -10,10 +9,10 @@ public sealed class StaffInfoHttpClient : IStaffInfoClient
 {
     private readonly GraphQLHttpClient _graphQlClient;
 
-    public StaffInfoHttpClient(IOptions<ApplicationOptions> settings)
+    public StaffInfoHttpClient()
     {
         _graphQlClient = new GraphQLHttpClient(
-            settings.Value.UserInfoServerURL,
+            Config.UserInfoServerURL,
             new NewtonsoftJsonSerializer()
         );
     }

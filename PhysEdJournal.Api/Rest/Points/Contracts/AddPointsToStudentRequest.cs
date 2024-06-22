@@ -1,6 +1,6 @@
+using Core.Cfg;
+using DB.Tables;
 using FluentValidation;
-using PhysEdJournal.Core;
-using PhysEdJournal.Core.Entities.Types;
 
 namespace PhysEdJournal.Api.Rest.Points.Contracts;
 
@@ -33,8 +33,8 @@ file sealed class Validator : AbstractValidator<AddPointsToStudentRequest>
         RuleFor(request => request.Points)
             .GreaterThan(0)
             .WithMessage("Количество баллов должно быть больше 0")
-            .LessThanOrEqualTo(Constants.MaxPointsAmount)
-            .WithMessage($"Количество баллов должно быть меньше {Constants.MaxPointsAmount}");
+            .LessThanOrEqualTo(Config.MaxPointsAmount)
+            .WithMessage($"Количество баллов должно быть меньше {Config.MaxPointsAmount}");
 
         RuleFor(request => request.Date).NotEmpty().WithMessage("Обязательно нужно указать дату");
 

@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
-using PhysEdJournal.Infrastructure.Database;
+﻿using Core.Commands;
+using DB;
+using Microsoft.EntityFrameworkCore;
 
 namespace PhysEdJournal.Api.Endpoints.MeEndpoint;
 
@@ -29,7 +28,7 @@ public sealed class MeInfoService
 
         if (studentActivity is null)
         {
-            return new StudentNotFoundException(studentGuid);
+            return new StudentNotFoundError();
         }
 
         var studentPoints =
@@ -49,7 +48,7 @@ public sealed class MeInfoService
 
         if (teacherPermissions is null)
         {
-            return new TeacherNotFoundException(professorGuid);
+            return new TeacherNotFoundError();
         }
 
         var textTeacherPermissions = teacherPermissions

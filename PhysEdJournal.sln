@@ -1,10 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Core", "PhysEdJournal.Core\PhysEdJournal.Core.csproj", "{A6726F06-E95D-4CA5-BDE1-4064AC1464C8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Api", "PhysEdJournal.Api\PhysEdJournal.Api.csproj", "{3CDF5C88-E924-4213-8452-47E88475250E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Infrastructure", "PhysEdJournal.Infrastructure\PhysEdJournal.Infrastructure.csproj", "{458C6A11-0800-41B1-90F2-69E9C9A2F4E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEdJournal.Tests", "PhysEdJournal.Tests\PhysEdJournal.Tests.csproj", "{B8791C2E-5725-48C9-B32D-05C34B97E6B3}"
 EndProject
@@ -20,18 +16,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A6726F06-E95D-4CA5-BDE1-4064AC1464C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6726F06-E95D-4CA5-BDE1-4064AC1464C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6726F06-E95D-4CA5-BDE1-4064AC1464C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6726F06-E95D-4CA5-BDE1-4064AC1464C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3CDF5C88-E924-4213-8452-47E88475250E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3CDF5C88-E924-4213-8452-47E88475250E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CDF5C88-E924-4213-8452-47E88475250E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CDF5C88-E924-4213-8452-47E88475250E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{458C6A11-0800-41B1-90F2-69E9C9A2F4E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{458C6A11-0800-41B1-90F2-69E9C9A2F4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{458C6A11-0800-41B1-90F2-69E9C9A2F4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{458C6A11-0800-41B1-90F2-69E9C9A2F4E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B8791C2E-5725-48C9-B32D-05C34B97E6B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B8791C2E-5725-48C9-B32D-05C34B97E6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8791C2E-5725-48C9-B32D-05C34B97E6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU

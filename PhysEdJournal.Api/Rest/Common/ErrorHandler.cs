@@ -1,8 +1,4 @@
-using PhysEdJournal.Core.Exceptions;
-using PhysEdJournal.Core.Exceptions.DateExceptions;
-using PhysEdJournal.Core.Exceptions.StandardExceptions;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
+using Core.Commands;
 
 namespace PhysEdJournal.Api.Rest.Common;
 
@@ -28,7 +24,7 @@ public static class ErrorHandler
         new()
         {
             {
-                nameof(NotEnoughPermissionsException),
+                nameof(NotEnoughPermissionsError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
@@ -37,7 +33,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(TeacherNotFoundException),
+                nameof(TeacherNotFoundError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status404NotFound,
@@ -46,7 +42,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(StudentNotFoundException),
+                nameof(StudentNotFoundError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status404NotFound,
@@ -55,7 +51,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(ActionFromFutureException),
+                nameof(ActionFromFutureError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -64,7 +60,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(DateExpiredException),
+                nameof(DateExpiredError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -73,16 +69,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(NegativePointAmount),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "negative-points",
-                    Detail = "Количество баллов должно быть положительным",
-                }
-            },
-            {
-                nameof(NonWorkingDayException),
+                nameof(NonWorkingDayError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -91,7 +78,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(TeacherGuidMismatchException),
+                nameof(TeacherMismatchError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
@@ -100,7 +87,7 @@ public static class ErrorHandler
                 }
             },
             {
-                nameof(OrderByQueryStructureException),
+                nameof(OrderByQueryStructureError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,

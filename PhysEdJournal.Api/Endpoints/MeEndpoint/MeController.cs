@@ -1,8 +1,7 @@
-﻿using HotChocolate.AspNetCore.Authorization;
+﻿using Core.Commands;
+using HotChocolate.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Endpoints.MeEndpoint;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
-using PhysEdJournal.Core.Exceptions.TeacherExceptions;
 
 [ApiController]
 [Route("[controller]")]
@@ -38,7 +37,7 @@ public sealed class MeController : ControllerBase
                     info => new OkObjectResult(info),
                     exception =>
                     {
-                        if (exception is StudentNotFoundException)
+                        if (exception is StudentNotFoundError)
                         {
                             return NotFound();
                         }
@@ -55,7 +54,7 @@ public sealed class MeController : ControllerBase
                     info => new OkObjectResult(info),
                     exception =>
                     {
-                        if (exception is TeacherNotFoundException)
+                        if (exception is TeacherNotFoundError)
                         {
                             return NotFound();
                         }

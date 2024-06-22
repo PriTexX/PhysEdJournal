@@ -1,6 +1,5 @@
+using Core.Commands;
 using PhysEdJournal.Api.Rest.Common;
-using PhysEdJournal.Core.Exceptions.GroupExceptions;
-using PhysEdJournal.Core.Exceptions.StudentExceptions;
 
 namespace PhysEdJournal.Api.Rest.Student.Contracts;
 
@@ -10,7 +9,7 @@ public static class StudentErrors
         new()
         {
             {
-                nameof(NotEnoughPointsException),
+                nameof(NotEnoughPointsError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
@@ -29,11 +28,11 @@ public static class StudentErrors
                 }
             },
             {
-                nameof(SemesterMismatchError),
+                nameof(SameSemesterError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "semester-mismatch",
+                    Type = "same-semester",
                     Detail = "Нельзя перевести студента на семестр, на котором он уже обучается",
                 }
             },

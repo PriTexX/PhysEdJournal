@@ -1,5 +1,4 @@
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Core.Entities.Types;
+using DB.Tables;
 
 namespace PhysEdJournal.Api.Rest.Student.Contracts.Responses;
 

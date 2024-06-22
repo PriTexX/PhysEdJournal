@@ -1,5 +1,5 @@
+using DB.Tables;
 using FluentValidation;
-using PhysEdJournal.Core.Entities.DB;
 
 namespace Admin.Api.Resources;
 

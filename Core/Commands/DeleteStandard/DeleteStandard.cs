@@ -3,7 +3,7 @@ using DB;
 using Microsoft.EntityFrameworkCore;
 using PResult;
 
-namespace Core.Commands.DeleteStandard;
+namespace Core.Commands;
 
 public sealed class DeleteStandardPayload
 {

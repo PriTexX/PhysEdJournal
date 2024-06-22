@@ -3,7 +3,7 @@ using DB;
 using Microsoft.EntityFrameworkCore;
 using PResult;
 
-namespace Core.Commands.DeleteVisit;
+namespace Core.Commands;
 
 public sealed class DeleteVisitPayload
 {
@@ -11,7 +11,7 @@ public sealed class DeleteVisitPayload
 
     public required string TeacherGuid { get; init; }
 
-    public required bool IsAdminOrSecretary { get; init; } = false;
+    public required bool IsAdminOrSecretary { get; init; }
 }
 
 public sealed class DeleteVisitCommand : ICommand<DeleteVisitPayload, Unit>
@@ -53,6 +53,7 @@ public sealed class DeleteVisitCommand : ICommand<DeleteVisitPayload, Unit>
         }
 
         student.Visits--;
+
         _applicationContext.VisitsStudentsHistory.Remove(history);
         _applicationContext.Students.Update(student);
 

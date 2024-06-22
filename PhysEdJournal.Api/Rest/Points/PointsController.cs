@@ -1,9 +1,10 @@
+using Core.Commands;
+using Core.Commands.DeleteStandard;
+using DB.Tables;
 using Microsoft.AspNetCore.Mvc;
 using PhysEdJournal.Api.Rest.Common;
 using PhysEdJournal.Api.Rest.Common.Filters;
 using PhysEdJournal.Api.Rest.Points.Contracts;
-using PhysEdJournal.Core.Entities.Types;
-using PhysEdJournal.Infrastructure.Commands;
 
 namespace PhysEdJournal.Api.Rest.Points;
 
@@ -88,14 +89,14 @@ public static class PointsController
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
-        var addPointsPayload = new AddPointsCommandPayload
+        var addPointsPayload = new AddPointsPayload
         {
             StudentGuid = request.StudentGuid,
             TeacherGuid = callerGuid,
             Points = request.Points,
             Date = request.Date,
             WorkType = request.WorkType,
-            IsAdmin = isAdminOrSecretary,
+            IsAdminOrSecretary = isAdminOrSecretary,
             Comment = request.Comment,
         };
 
@@ -106,7 +107,7 @@ public static class PointsController
 
     private static async Task<IResult> AddPointsForStandardToStudent(
         [FromBody] AddPointsForStandardToStudentRequest request,
-        [FromServices] AddStandardPointsCommand addStandardPointsCommand,
+        [FromServices] AddStandardCommand addStandardPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
@@ -120,15 +121,14 @@ public static class PointsController
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
-        var addPointsForStandardPayload = new AddStandardPointsCommandPayload
+        var addPointsForStandardPayload = new AddStandardPayload
         {
             StudentGuid = request.StudentGuid,
             TeacherGuid = callerGuid,
             Points = request.Points,
             Date = request.Date,
             StandardType = request.StandardType,
-            IsOverride = request.IsOverride,
-            IsAdmin = isAdminOrSecretary,
+            IsAdminOrSecretary = isAdminOrSecretary,
             Comment = request.Comment,
         };
         var res = await addStandardPointsCommand.ExecuteAsync(addPointsForStandardPayload);
@@ -138,7 +138,7 @@ public static class PointsController
 
     private static async Task<IResult> IncreaseStudentVisits(
         [FromBody] IncreaseStudentVisitsRequest request,
-        [FromServices] IncreaseStudentVisitsCommand increaseStudentVisitsCommand,
+        [FromServices] AddVisitCommand increaseStudentVisitsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
@@ -152,12 +152,12 @@ public static class PointsController
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
-        var increaseStudentVisitsPayload = new IncreaseStudentVisitsCommandPayload
+        var increaseStudentVisitsPayload = new AddVisitPayload
         {
             Date = request.Date,
             StudentGuid = request.StudentGuid,
             TeacherGuid = callerGuid,
-            IsAdmin = isAdminOrSecretary,
+            IsAdminOrSecretary = isAdminOrSecretary,
         };
 
         var res = await increaseStudentVisitsCommand.ExecuteAsync(increaseStudentVisitsPayload);
@@ -167,7 +167,7 @@ public static class PointsController
 
     private static async Task<IResult> DeleteStudentVisit(
         int historyId,
-        [FromServices] DeleteStudentVisitCommand deleteStudentVisitCommand,
+        [FromServices] DeleteVisitCommand deleteStudentVisitCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
@@ -182,10 +182,10 @@ public static class PointsController
         var isAdmin = validationResult.IsOk;
 
         var res = await deleteStudentVisitCommand.ExecuteAsync(
-            new DeleteStudentVisitCommandPayload
+            new DeleteVisitPayload
             {
                 HistoryId = historyId,
-                IsAdmin = isAdmin,
+                IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
         );
@@ -210,10 +210,10 @@ public static class PointsController
         var isAdmin = validationResult.IsOk;
 
         var res = await deletePointsCommand.ExecuteAsync(
-            new DeletePointsCommandPayload
+            new DeletePointsPayload
             {
                 HistoryId = historyId,
-                IsAdmin = isAdmin,
+                IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
         );
@@ -223,7 +223,7 @@ public static class PointsController
 
     private static async Task<IResult> DeleteStandardPoints(
         int historyId,
-        [FromServices] DeleteStandardPointsCommand deleteStandardPointsCommand,
+        [FromServices] DeleteStandardCommand deleteStandardPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
@@ -238,10 +238,10 @@ public static class PointsController
         var isAdmin = validationResult.IsOk;
 
         var res = await deleteStandardPointsCommand.ExecuteAsync(
-            new DeleteStandardPointsCommandPayload
+            new DeleteStandardPayload
             {
                 HistoryId = historyId,
-                IsAdmin = isAdmin,
+                IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
         );

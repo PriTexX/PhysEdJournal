@@ -1,4 +1,4 @@
-﻿using PhysEdJournal.Core.Entities.DB;
+﻿using DB.Tables;
 
 namespace PhysEdJournal.Api.GraphQL.QueryExtensions;
 

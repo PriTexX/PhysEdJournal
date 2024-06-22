@@ -1,10 +1,14 @@
 using Admin.Api;
 using Admin.Api.Resources;
+using Core.Cfg;
+using Core.Commands;
+using DB;
+using DB.Tables;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using PhysEdJournal.Core.Entities.DB;
-using PhysEdJournal.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Config.InitCoreCfg(builder);
 
 builder.Services.AddCors();
 
@@ -27,7 +31,8 @@ builder.Services.AddHttpClient<LkAuthClient>(c =>
     c.BaseAddress = new Uri("https://e.mospolytech.ru/")
 );
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCoreDB(Config.ConnectionString);
+builder.Services.AddCommands();
 
 var app = builder.Build();
 
