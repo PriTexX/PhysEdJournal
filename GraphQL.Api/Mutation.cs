@@ -1,6 +1,6 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 
-namespace Api.GraphQL;
+namespace GraphQL.Api;
 
 [Authorize(Roles = new[] { "staff", "admin" })]
 public class Mutation

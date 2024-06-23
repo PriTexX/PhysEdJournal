@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB", "DB\DB.csproj", "{59286A62-57F2-4BD9-AB95-E2DC5E66E070}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Api", "GraphQL.Api\GraphQL.Api.csproj", "{B1873A84-120C-425B-AB1A-388AA9565950}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{59286A62-57F2-4BD9-AB95-E2DC5E66E070}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59286A62-57F2-4BD9-AB95-E2DC5E66E070}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59286A62-57F2-4BD9-AB95-E2DC5E66E070}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1873A84-120C-425B-AB1A-388AA9565950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1873A84-120C-425B-AB1A-388AA9565950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1873A84-120C-425B-AB1A-388AA9565950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1873A84-120C-425B-AB1A-388AA9565950}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

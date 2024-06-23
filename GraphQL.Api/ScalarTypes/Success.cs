@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Language;
 
-namespace Api.GraphQL.ScalarTypes;
+namespace GraphQL.Api.ScalarTypes;
 
 public readonly struct Success
 {

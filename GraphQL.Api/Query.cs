@@ -1,8 +1,9 @@
 ﻿using DB;
 using DB.Tables;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace Api.GraphQL;
+namespace GraphQL.Api;
 
 public class Query
 {

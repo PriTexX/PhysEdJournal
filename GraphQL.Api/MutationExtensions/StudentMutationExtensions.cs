@@ -1,16 +1,17 @@
 ﻿using System.Security.Claims;
-using Api.GraphQL.ScalarTypes;
 using Core.Commands;
 using DB;
 using DB.Tables;
+using GraphQL.Api.ScalarTypes;
+using Microsoft.Extensions.Logging;
 
-namespace Api.GraphQL.MutationExtensions;
+namespace GraphQL.Api.MutationExtensions;
 
 [ExtendObjectType(OperationTypeNames.Mutation)]
 public class StudentMutationExtensions
 {
     [Error(typeof(StudentNotFoundError))]
-    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(GraphQLNotEnoughPermissionsError))]
     [Error(typeof(TeacherNotFoundError))]
     [Error(typeof(ActionFromFutureError))]
     [Error(typeof(FitnessExistsError))]
@@ -20,7 +21,7 @@ public class StudentMutationExtensions
     [Error(typeof(ConcurrencyError))]
     public async Task<Success> AddPointsToStudent(
         [Service] AddPointsCommand addPointsCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal,
         string studentGuid,
@@ -38,7 +39,7 @@ public class StudentMutationExtensions
             or WorkType.Activist
             or WorkType.Competition:
             {
-                await permissionValidator.ValidateTeacherPermissionsAndThrow(
+                await graphQLPermissionValidator.ValidateTeacherPermissionsAndThrow(
                     callerGuid,
                     TeacherPermissions.SecretaryAccess
                 );
@@ -47,7 +48,7 @@ public class StudentMutationExtensions
 
             case WorkType.OnlineWork:
             {
-                await permissionValidator.ValidateTeacherPermissionsAndThrow(
+                await graphQLPermissionValidator.ValidateTeacherPermissionsAndThrow(
                     callerGuid,
                     TeacherPermissions.OnlineCourseAccess
                 );
@@ -55,10 +56,11 @@ public class StudentMutationExtensions
             }
         }
 
-        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
-            callerGuid,
-            TeacherPermissions.SecretaryAccess
-        );
+        var validateTeacherPermissionsResult =
+            await graphQLPermissionValidator.ValidateTeacherPermissions(
+                callerGuid,
+                TeacherPermissions.SecretaryAccess
+            );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
@@ -86,7 +88,7 @@ public class StudentMutationExtensions
     }
 
     [Error(typeof(StudentNotFoundError))]
-    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(GraphQLNotEnoughPermissionsError))]
     [Error(typeof(TeacherNotFoundError))]
     [Error(typeof(StandardExistsError))]
     [Error(typeof(ActionFromFutureError))]
@@ -102,7 +104,7 @@ public class StudentMutationExtensions
         StandardType standardType,
         bool isOverride,
         [Service] AddStandardCommand addStandardPointsCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal,
         string? comment = null
@@ -110,15 +112,16 @@ public class StudentMutationExtensions
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+        await graphQLPermissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
             TeacherPermissions.DefaultAccess
         );
 
-        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
-            callerGuid,
-            TeacherPermissions.SecretaryAccess
-        );
+        var validateTeacherPermissionsResult =
+            await graphQLPermissionValidator.ValidateTeacherPermissions(
+                callerGuid,
+                TeacherPermissions.SecretaryAccess
+            );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
@@ -146,7 +149,7 @@ public class StudentMutationExtensions
 
     [Error(typeof(StudentNotFoundError))]
     [Error(typeof(TeacherNotFoundError))]
-    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(GraphQLNotEnoughPermissionsError))]
     [Error(typeof(DateExpiredError))]
     [Error(typeof(VisitExistsError))]
     [Error(typeof(ActionFromFutureError))]
@@ -155,7 +158,7 @@ public class StudentMutationExtensions
         string studentGuid,
         DateOnly date,
         [Service] AddVisitCommand increaseStudentVisitsCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         [Service] ApplicationContext applicationContext,
         [Service] ILogger<StudentMutationExtensions> logger,
         ClaimsPrincipal claimsPrincipal
@@ -163,15 +166,16 @@ public class StudentMutationExtensions
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+        await graphQLPermissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
             TeacherPermissions.DefaultAccess
         );
 
-        var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
-            callerGuid,
-            TeacherPermissions.SecretaryAccess
-        );
+        var validateTeacherPermissionsResult =
+            await graphQLPermissionValidator.ValidateTeacherPermissions(
+                callerGuid,
+                TeacherPermissions.SecretaryAccess
+            );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
 
@@ -196,7 +200,7 @@ public class StudentMutationExtensions
     }
 
     [Error(typeof(StudentNotFoundError))]
-    [Error(typeof(NotEnoughPermissionsError))]
+    [Error(typeof(GraphQLNotEnoughPermissionsError))]
     [Error(typeof(TeacherNotFoundError))]
     [Error(typeof(NotEnoughPointsError))]
     [Error(typeof(NotCuratorError))]
@@ -204,19 +208,19 @@ public class StudentMutationExtensions
     [Error(typeof(ConcurrencyError))]
     public async Task<ArchivedStudentEntity> ArchiveStudent(
         [Service] ArchiveStudentCommand archiveStudentCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         ClaimsPrincipal claimsPrincipal,
         string studentGuid
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+        await graphQLPermissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
             TeacherPermissions.DefaultAccess
         );
 
-        var validationRes = await permissionValidator.ValidateTeacherPermissions(
+        var validationRes = await graphQLPermissionValidator.ValidateTeacherPermissions(
             callerGuid,
             TeacherPermissions.AdminAccess
         );
@@ -241,13 +245,13 @@ public class StudentMutationExtensions
     public async Task<Success> DeleteStudentVisit(
         int historyId,
         [Service] DeleteVisitCommand deleteStudentVisitCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        var validationResult = await permissionValidator.ValidateTeacherPermissions(
+        var validationResult = await graphQLPermissionValidator.ValidateTeacherPermissions(
             callerGuid,
             TeacherPermissions.AdminAccess
         );
@@ -274,13 +278,13 @@ public class StudentMutationExtensions
     public async Task<Success> DeletePoints(
         int historyId,
         [Service] DeletePointsCommand deletePointsCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        var validationResult = await permissionValidator.ValidateTeacherPermissions(
+        var validationResult = await graphQLPermissionValidator.ValidateTeacherPermissions(
             callerGuid,
             TeacherPermissions.AdminAccess
         );
@@ -307,13 +311,13 @@ public class StudentMutationExtensions
     public async Task<Success> DeleteStandardPoints(
         int historyId,
         [Service] DeleteStandardCommand deleteStandardPointsCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        var validationResult = await permissionValidator.ValidateTeacherPermissions(
+        var validationResult = await graphQLPermissionValidator.ValidateTeacherPermissions(
             callerGuid,
             TeacherPermissions.AdminAccess
         );
@@ -339,13 +343,13 @@ public class StudentMutationExtensions
         string studentGuid,
         HealthGroupType healthGroup,
         [Service] AddHealthGroupCommand addHealthGroupCommand,
-        [Service] PermissionValidator permissionValidator,
+        [Service] GraphQLPermissionValidator graphQLPermissionValidator,
         ClaimsPrincipal claimsPrincipal
     )
     {
         var callerGuid = GetCallerGuid(claimsPrincipal);
 
-        await permissionValidator.ValidateTeacherPermissionsAndThrow(
+        await graphQLPermissionValidator.ValidateTeacherPermissionsAndThrow(
             callerGuid,
             TeacherPermissions.DefaultAccess
         );

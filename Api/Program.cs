@@ -1,20 +1,13 @@
 using System.Security.Cryptography;
 using Api;
 using Api.Endpoints.MeEndpoint;
-using Api.FilterExtensions;
-using Api.GraphQL;
-using Api.GraphQL.MutationExtensions;
-using Api.GraphQL.QueryExtensions;
-using Api.GraphQL.ScalarTypes;
 using Api.Middlewares;
 using Core.Cfg;
 using Core.Commands;
 using Core.Jobs;
 using Core.Logging;
 using DB;
-using HotChocolate.Data.Filters;
-using HotChocolate.Data.Filters.Expressions;
-using HotChocolate.Types.Pagination;
+using GraphQL.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -56,6 +49,8 @@ builder.Services.AddAuthorization();
 /*
     Services
  */
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddWorker();
 
@@ -117,44 +112,15 @@ builder.Services.AddEndpointsApiExplorer();
     GraphQL
  */
 
-builder
-    .Services.AddGraphQLServer()
-    .InitializeOnStartup()
-    .AddDiagnosticEventListener<ErrorLoggingDiagnosticsEventListener>()
-    .AddAuthorization()
-    .AddMutationConventions(applyToAllMutations: true)
-    .RegisterDbContext<ApplicationContext>()
-    .AddQueryType<Query>()
-    .AddTypeExtension<TeacherQueryExtensions>()
-    .AddTypeExtension<StudentQueryExtensions>()
-    .AddType<SuccessType>()
-    .AddType<DateOnlyType>()
-    .BindRuntimeType<Success, SuccessType>()
-    .BindRuntimeType<DateOnly, DateOnlyType>()
-    .AddMutationType<Mutation>()
-    .AddTypeExtension<StudentMutationExtensions>()
-    .AddProjections()
-    .AddFiltering()
-    .AddConvention<IFilterConvention>(
-        new FilterConventionExtension(x =>
-            x.AddProviderExtension(
-                new QueryableFilterProviderExtension(y =>
-                    y.AddFieldHandler<QueryableStringInvariantContainsHandler>()
-                )
-            )
-        )
-    )
-    .AddSorting()
-    .SetPagingOptions(
-        new PagingOptions
-        {
-            MaxPageSize = 200,
-            DefaultPageSize = 30,
-            IncludeTotalCount = true,
-        }
-    );
+builder.Services.AddGraphQLApi();
 
 var app = builder.Build();
+
+app.UseCors(corsPolicyBuilder =>
+{
+    corsPolicyBuilder.AllowAnyOrigin();
+    corsPolicyBuilder.AllowAnyHeader();
+});
 
 app.UseRequestId();
 
@@ -177,12 +143,6 @@ app.UseRequestId();
 
 app.UseHttpsRedirection();
 
-app.UseCors(corsPolicyBuilder =>
-{
-    corsPolicyBuilder.AllowAnyOrigin();
-    corsPolicyBuilder.AllowAnyHeader();
-});
-
 app.UseRouting();
 
 if (app.Environment.IsDevelopment())
@@ -201,7 +161,8 @@ app.UseAuthorization();
 
 app.UseUserGuidLogger();
 app.MapControllers();
-app.MapGraphQL();
+
+app.UseGraphQLApi();
 
 await app.RunAsync();
 return;

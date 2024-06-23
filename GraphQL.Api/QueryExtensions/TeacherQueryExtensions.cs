@@ -1,6 +1,6 @@
 ﻿using DB.Tables;
 
-namespace Api.GraphQL.QueryExtensions;
+namespace GraphQL.Api.QueryExtensions;
 
 [ExtendObjectType(nameof(TeacherEntity))]
 public class TeacherQueryExtensions

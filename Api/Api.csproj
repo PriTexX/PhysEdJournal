@@ -15,10 +15,6 @@
 
     <ItemGroup>
         <PackageReference Include="FluentValidation" Version="11.9.1" />
-        <PackageReference Include="HotChocolate.AspNetCore" Version="12.16.0" />
-        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.16.0" />
-        <PackageReference Include="HotChocolate.Data" Version="12.16.0" />
-        <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.16.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
@@ -37,5 +33,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\GraphQL.Api\GraphQL.Api.csproj" />
     </ItemGroup>
 </Project>

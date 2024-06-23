@@ -4,7 +4,7 @@ using HotChocolate.Data.Filters;
 using HotChocolate.Data.Filters.Expressions;
 using HotChocolate.Language;
 
-namespace Api.FilterExtensions;
+namespace GraphQL.Api;
 
 public class QueryableStringInvariantContainsHandler : QueryableStringOperationHandler
 {
