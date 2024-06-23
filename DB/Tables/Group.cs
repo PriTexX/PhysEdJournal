@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DB.Tables;
 
+[Table("Groups")]
 public sealed class GroupEntity
 {
-    [StringLength(30)]
     [Key]
+    [StringLength(30)]
     public required string GroupName { get; set; }
 
     [DefaultValue(2.0)]

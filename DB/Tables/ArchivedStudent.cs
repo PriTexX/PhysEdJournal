@@ -24,6 +24,7 @@ public sealed class ArchivedStandardsHistory : ArchivedHistory
     public string? Comment { get; set; }
 }
 
+[Table("ArchivedStudents")]
 public sealed class ArchivedStudentEntity
 {
     [Key]
@@ -31,22 +32,18 @@ public sealed class ArchivedStudentEntity
     public int Id { get; set; }
 
     [StringLength(36)]
-    [Required(AllowEmptyStrings = false)]
     public required string StudentGuid { get; set; }
 
     [StringLength(32)]
-    [Required(AllowEmptyStrings = false)]
     public required string SemesterName { get; set; }
 
     [ForeignKey("SemesterName")]
     public SemesterEntity? Semester { get; set; }
 
     [StringLength(120)]
-    [Required(AllowEmptyStrings = false)]
     public required string FullName { get; set; }
 
     [StringLength(20)]
-    [Required(AllowEmptyStrings = false)]
     public required string GroupNumber { get; set; }
 
     [ForeignKey("GroupNumber")]

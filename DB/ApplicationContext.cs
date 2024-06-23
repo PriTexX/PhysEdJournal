@@ -8,9 +8,9 @@ namespace DB;
 public sealed class ApplicationContext : DbContext
 {
     public DbSet<GroupEntity> Groups { get; init; } = null!;
-    public DbSet<PointsStudentHistoryEntity> PointsStudentsHistory { get; init; } = null!;
-    public DbSet<VisitStudentHistoryEntity> VisitsStudentsHistory { get; init; } = null!;
-    public DbSet<StandardsStudentHistoryEntity> StandardsStudentsHistory { get; init; } = null!;
+    public DbSet<PointsHistoryEntity> PointsStudentsHistory { get; init; } = null!;
+    public DbSet<VisitsHistoryEntity> VisitsStudentsHistory { get; init; } = null!;
+    public DbSet<StandardsHistoryEntity> StandardsStudentsHistory { get; init; } = null!;
     public DbSet<StudentEntity> Students { get; init; } = null!;
     public DbSet<TeacherEntity> Teachers { get; init; } = null!;
     public DbSet<ArchivedStudentEntity> ArchivedStudents { get; init; } = null!;

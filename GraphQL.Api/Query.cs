@@ -37,7 +37,7 @@ public class Query
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<PointsStudentHistoryEntity?> GetPointsHistory(ApplicationContext context)
+    public IQueryable<PointsHistoryEntity?> GetPointsHistory(ApplicationContext context)
     {
         return context.PointsStudentsHistory;
     }

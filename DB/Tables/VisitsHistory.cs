@@ -1,27 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HotChocolate;
 
 namespace DB.Tables;
 
-public sealed class VisitStudentHistoryEntity
+[GraphQLName("VisitStudentHistoryEntity")]
+[Table("VisitsHistory")]
+public sealed class VisitsHistoryEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     [Column(TypeName = "date")]
-    [Required(AllowEmptyStrings = false)]
     public DateOnly Date { get; set; }
 
     [StringLength(36)]
-    [Required(AllowEmptyStrings = false)]
     public required string TeacherGuid { get; set; }
 
     [ForeignKey("TeacherGuid")]
     public TeacherEntity? Teacher { get; set; }
 
     [StringLength(36)]
-    [Required(AllowEmptyStrings = false)]
     public required string StudentGuid { get; set; }
 
     [ForeignKey("StudentGuid")]

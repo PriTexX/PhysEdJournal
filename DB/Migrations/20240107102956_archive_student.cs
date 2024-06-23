@@ -49,19 +49,19 @@ namespace DB.Migrations
                 name: "SemesterName",
                 table: "PointsStudentsHistory");
 
-            migrationBuilder.AddColumn<List<PointsStudentHistoryEntity>>(
+            migrationBuilder.AddColumn<List<PointsHistoryEntity>>(
                 name: "PointsHistory",
                 table: "ArchivedStudents",
                 type: "jsonb",
                 nullable: false);
 
-            migrationBuilder.AddColumn<List<StandardsStudentHistoryEntity>>(
+            migrationBuilder.AddColumn<List<StandardsHistoryEntity>>(
                 name: "StandardsHistory",
                 table: "ArchivedStudents",
                 type: "jsonb",
                 nullable: false);
 
-            migrationBuilder.AddColumn<List<VisitStudentHistoryEntity>>(
+            migrationBuilder.AddColumn<List<VisitsHistoryEntity>>(
                 name: "VisitsHistory",
                 table: "ArchivedStudents",
                 type: "jsonb",

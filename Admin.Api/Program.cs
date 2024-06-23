@@ -82,9 +82,9 @@ GenericCrudController<GroupEntity, string>.MapEndpoints(
     }
 );
 
-GenericCrudController<PointsStudentHistoryEntity, int>.MapEndpoints(
+GenericCrudController<PointsHistoryEntity, int>.MapEndpoints(
     app,
-    new ResourceOptions<PointsStudentHistoryEntity>
+    new ResourceOptions<PointsHistoryEntity>
     {
         Name = "points",
         Validator = PointsHistory.Validator,
@@ -102,9 +102,9 @@ GenericCrudController<SemesterEntity, string>.MapEndpoints(
     }
 );
 
-GenericCrudController<StandardsStudentHistoryEntity, int>.MapEndpoints(
+GenericCrudController<StandardsHistoryEntity, int>.MapEndpoints(
     app,
-    new ResourceOptions<StandardsStudentHistoryEntity>
+    new ResourceOptions<StandardsHistoryEntity>
     {
         Name = "standards",
         Validator = StandardsHistory.Validator,
@@ -135,9 +135,9 @@ GenericCrudController<TeacherEntity, string>.MapEndpoints(
     }
 );
 
-GenericCrudController<VisitStudentHistoryEntity, int>.MapEndpoints(
+GenericCrudController<VisitsHistoryEntity, int>.MapEndpoints(
     app,
-    new ResourceOptions<VisitStudentHistoryEntity>
+    new ResourceOptions<VisitsHistoryEntity>
     {
         Name = "visits",
         Validator = VisitsHistory.Validator,

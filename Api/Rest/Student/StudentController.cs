@@ -37,9 +37,9 @@ public static class StudentController
     {
         var student = await context
             .Students.Where(s => s.StudentGuid == guid)
-            .Include(s => s.PointsStudentHistory)
-            .Include(s => s.StandardsStudentHistory)
-            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.PointsHistory)
+            .Include(s => s.StandardsHistory)
+            .Include(s => s.VisitsHistory)
             .FirstOrDefaultAsync();
 
         if (student is null)
@@ -53,7 +53,7 @@ public static class StudentController
             FullName = student.FullName,
             GroupNumber = student.GroupNumber,
             CurrentSemesterName = student.CurrentSemesterName,
-            HasDebtFromPreviousSemester = student.HasDebtFromPreviousSemester,
+            HasDebtFromPreviousSemester = student.HasDebt,
             HadDebtInSemester = student.HadDebtInSemester,
             ArchivedVisitValue = student.ArchivedVisitValue,
             AdditionalPoints = student.AdditionalPoints,
@@ -64,9 +64,9 @@ public static class StudentController
             HealthGroup = student.HealthGroup,
             Department = student.Department,
             Version = student.Version,
-            PointsStudentHistory = student.PointsStudentHistory?.ToList(),
-            VisitsStudentHistory = student.VisitsStudentHistory?.ToList(),
-            StandardsStudentHistory = student.StandardsStudentHistory?.ToList(),
+            PointsStudentHistory = student.PointsHistory?.ToList(),
+            VisitsStudentHistory = student.VisitsHistory?.ToList(),
+            StandardsStudentHistory = student.StandardsHistory?.ToList(),
         };
 
         return Response.Ok(response);

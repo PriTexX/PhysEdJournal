@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Admin.Api.Resources;
 
-file sealed class Validator : AbstractValidator<VisitStudentHistoryEntity>
+file sealed class Validator : AbstractValidator<VisitsHistoryEntity>
 {
     public Validator()
     {
@@ -15,5 +15,5 @@ file sealed class Validator : AbstractValidator<VisitStudentHistoryEntity>
 
 public static class VisitsHistory
 {
-    public static IValidator<VisitStudentHistoryEntity> Validator => new Validator();
+    public static IValidator<VisitsHistoryEntity> Validator => new Validator();
 }

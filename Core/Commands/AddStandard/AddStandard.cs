@@ -47,9 +47,7 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
 
         ArgumentNullException.ThrowIfNull(student.Group);
 
-        var visitValue = student.HasDebtFromPreviousSemester
-            ? student.ArchivedVisitValue
-            : student.Group.VisitValue;
+        var visitValue = student.HasDebt ? student.ArchivedVisitValue : student.Group.VisitValue;
 
         var totalPoints = Config.CalculateTotalPoints(
             student.Visits,
@@ -129,7 +127,7 @@ public sealed class AddStandardCommand : ICommand<AddStandardPayload, Unit>
             return new StudentNotFoundError();
         }
 
-        var standardsStudentHistoryEntity = new StandardsStudentHistoryEntity
+        var standardsStudentHistoryEntity = new StandardsHistoryEntity
         {
             StudentGuid = commandPayload.StudentGuid,
             TeacherGuid = commandPayload.TeacherGuid,

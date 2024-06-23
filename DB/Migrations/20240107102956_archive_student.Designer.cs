@@ -47,11 +47,11 @@ namespace DB.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<List<PointsStudentHistoryEntity>>("PointsHistory")
+                    b.Property<List<PointsHistoryEntity>>("PointsHistory")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<List<StandardsStudentHistoryEntity>>("StandardsHistory")
+                    b.Property<List<StandardsHistoryEntity>>("StandardsHistory")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
@@ -61,7 +61,7 @@ namespace DB.Migrations
                     b.Property<int>("Visits")
                         .HasColumnType("integer");
 
-                    b.Property<List<VisitStudentHistoryEntity>>("VisitsHistory")
+                    b.Property<List<VisitsHistoryEntity>>("VisitsHistory")
                         .IsRequired()
                         .HasColumnType("jsonb");
 

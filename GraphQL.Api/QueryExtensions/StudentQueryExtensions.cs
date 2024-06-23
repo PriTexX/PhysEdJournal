@@ -5,29 +5,27 @@ namespace GraphQL.Api.QueryExtensions;
 [ExtendObjectType(typeof(StudentEntity))]
 public class StudentQueryExtensions
 {
-    [BindMember(nameof(StudentEntity.PointsStudentHistory))]
+    [BindMember(nameof(StudentEntity.PointsHistory))]
     [UseFiltering]
     [UseSorting]
-    public IEnumerable<PointsStudentHistoryEntity> GetPointsHistory([Parent] StudentEntity student)
+    public IEnumerable<PointsHistoryEntity> GetPointsHistory([Parent] StudentEntity student)
     {
-        return student.PointsStudentHistory!;
+        return student.PointsHistory!;
     }
 
-    [BindMember(nameof(StudentEntity.VisitsStudentHistory))]
+    [BindMember(nameof(StudentEntity.VisitsHistory))]
     [UseFiltering]
     [UseSorting]
-    public IEnumerable<VisitStudentHistoryEntity> GetVisitsHistory([Parent] StudentEntity student)
+    public IEnumerable<VisitsHistoryEntity> GetVisitsHistory([Parent] StudentEntity student)
     {
-        return student.VisitsStudentHistory!;
+        return student.VisitsHistory!;
     }
 
-    [BindMember(nameof(StudentEntity.StandardsStudentHistory))]
+    [BindMember(nameof(StudentEntity.StandardsHistory))]
     [UseFiltering]
     [UseSorting]
-    public IEnumerable<StandardsStudentHistoryEntity> GetStandardsHistory(
-        [Parent] StudentEntity student
-    )
+    public IEnumerable<StandardsHistoryEntity> GetStandardsHistory([Parent] StudentEntity student)
     {
-        return student.StandardsStudentHistory!;
+        return student.StandardsHistory!;
     }
 }

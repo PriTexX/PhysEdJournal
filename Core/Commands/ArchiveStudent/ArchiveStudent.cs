@@ -78,9 +78,9 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
 
         var student = await this
             ._applicationContext.Students.Where(s => s.StudentGuid == payload.StudentGuid)
-            .Include(s => s.PointsStudentHistory)
-            .Include(s => s.StandardsStudentHistory)
-            .Include(s => s.VisitsStudentHistory)
+            .Include(s => s.PointsHistory)
+            .Include(s => s.StandardsHistory)
+            .Include(s => s.VisitsHistory)
             .Include(s => s.Group)
             .FirstOrDefaultAsync();
 
@@ -93,9 +93,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
 
         var activeSemester = await _applicationContext.Semesters.SingleAsync(s => s.IsCurrent);
 
-        var visitValue = student.HasDebtFromPreviousSemester
-            ? student.ArchivedVisitValue
-            : student.Group.VisitValue;
+        var visitValue = student.HasDebt ? student.ArchivedVisitValue : student.Group.VisitValue;
 
         var totalPoints = Config.CalculateTotalPoints(
             student.Visits,
@@ -106,13 +104,13 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
 
         if (totalPoints < Config.RequiredPointsAmount)
         {
-            if (student.HasDebtFromPreviousSemester)
+            if (student.HasDebt)
             {
                 return new NotEnoughPointsError();
             }
 
             student.ArchivedVisitValue = student.Group.VisitValue;
-            student.HasDebtFromPreviousSemester = true;
+            student.HasDebt = true;
             student.HadDebtInSemester = true;
 
             _applicationContext.Update(student);
@@ -127,10 +125,10 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
             SemesterName = student.CurrentSemesterName,
             FullName = student.FullName,
             GroupNumber = student.GroupNumber,
-            Visits = student.VisitsStudentHistory?.Count ?? 0,
+            Visits = student.VisitsHistory?.Count ?? 0,
             VisitsHistory =
                 student
-                    .VisitsStudentHistory?.Select(h => new ArchivedHistory
+                    .VisitsHistory?.Select(h => new ArchivedHistory
                     {
                         Date = h.Date,
                         StudentGuid = h.StudentGuid,
@@ -140,7 +138,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
                     .ToList() ?? new List<ArchivedHistory>(),
             PointsHistory =
                 student
-                    .PointsStudentHistory?.Select(h => new ArchivedPointsHistory
+                    .PointsHistory?.Select(h => new ArchivedPointsHistory
                     {
                         Date = h.Date,
                         StudentGuid = h.StudentGuid,
@@ -152,7 +150,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
                     .ToList() ?? new List<ArchivedPointsHistory>(),
             StandardsHistory =
                 student
-                    .StandardsStudentHistory?.Select(h => new ArchivedStandardsHistory
+                    .StandardsHistory?.Select(h => new ArchivedStandardsHistory
                     {
                         Date = h.Date,
                         StudentGuid = h.StudentGuid,
@@ -166,11 +164,11 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
 
         _applicationContext.ArchivedStudents.Add(archivedStudent);
 
-        student.VisitsStudentHistory?.Clear();
-        student.PointsStudentHistory?.Clear();
-        student.StandardsStudentHistory?.Clear();
+        student.VisitsHistory?.Clear();
+        student.PointsHistory?.Clear();
+        student.StandardsHistory?.Clear();
 
-        if (!student.HasDebtFromPreviousSemester)
+        if (!student.HasDebt)
         {
             student.HadDebtInSemester = false;
         }
@@ -180,7 +178,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
         student.PointsForStandards = 0;
         student.CurrentSemesterName = activeSemester.Name;
         student.ArchivedVisitValue = 0;
-        student.HasDebtFromPreviousSemester = false;
+        student.HasDebt = false;
 
         _applicationContext.Update(student);
         await _applicationContext.SaveChangesAsync();

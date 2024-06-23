@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace DB.Tables;
@@ -15,18 +16,17 @@ public enum TeacherPermissions
     OnlineCourseAccess = 8,
 }
 
+[Table("Teachers")]
 public sealed class TeacherEntity
 {
-    [StringLength(36)]
     [Key]
+    [StringLength(36)]
     public required string TeacherGuid { get; set; }
 
     [StringLength(120)]
-    [Required(AllowEmptyStrings = false)]
     public required string FullName { get; set; }
 
-    [DefaultValue(TeacherPermissions.DefaultAccess)]
-    public TeacherPermissions Permissions { get; set; }
+    public required TeacherPermissions Permissions { get; set; }
 
     public ICollection<GroupEntity>? Groups { get; set; }
 }

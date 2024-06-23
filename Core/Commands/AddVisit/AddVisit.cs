@@ -90,7 +90,7 @@ public sealed class AddVisitCommand : ICommand<AddVisitPayload, Unit>
 
         student.Visits++;
 
-        var record = new VisitStudentHistoryEntity
+        var record = new VisitsHistoryEntity
         {
             Date = commandPayload.Date,
             StudentGuid = commandPayload.StudentGuid,

@@ -34,9 +34,9 @@ public sealed class GetStudentResponse
 
     public uint Version { get; set; }
 
-    public IList<PointsStudentHistoryEntity>? PointsStudentHistory { get; set; }
+    public IList<PointsHistoryEntity>? PointsStudentHistory { get; set; }
 
-    public IList<VisitStudentHistoryEntity>? VisitsStudentHistory { get; set; }
+    public IList<VisitsHistoryEntity>? VisitsStudentHistory { get; set; }
 
-    public IList<StandardsStudentHistoryEntity>? StandardsStudentHistory { get; set; }
+    public IList<StandardsHistoryEntity>? StandardsStudentHistory { get; set; }
 }

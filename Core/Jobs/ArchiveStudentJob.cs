@@ -36,7 +36,7 @@ public sealed class ArchiveStudentJob : IInvocable
 
             var students = await _applicationContext
                 .Students.Include(s => s.Group)
-                .Where(s => s.HasDebtFromPreviousSemester)
+                .Where(s => s.HasDebt)
                 .ToListAsync();
 
             totalStudents = students.Count;

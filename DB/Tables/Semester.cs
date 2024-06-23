@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DB.Tables;
 
+[Table("Semesters")]
 public sealed class SemesterEntity
 {
-    [StringLength(32)]
-    [Required(AllowEmptyStrings = false)]
     [Key]
+    [StringLength(32)]
     public required string Name { get; set; }
 
     public bool IsCurrent { get; set; }

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DB.Tables;
 
+[Table("Competitions")]
 public sealed class CompetitionEntity
 {
     [Key]

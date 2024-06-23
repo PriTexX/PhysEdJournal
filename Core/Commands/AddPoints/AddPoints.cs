@@ -127,7 +127,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsPayload, Unit>
             .Students.Include(s => s.Group)
             .FirstAsync(s => s.StudentGuid == payload.StudentGuid);
 
-        var pointsStudentHistoryEntity = new PointsStudentHistoryEntity
+        var pointsStudentHistoryEntity = new PointsHistoryEntity
         {
             StudentGuid = payload.StudentGuid,
             Comment = payload.Comment,
