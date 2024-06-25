@@ -5,6 +5,7 @@
         <Rule Id="SA1009" Action="None" />
         <Rule Id="SA1028" Action="None" />
         <Rule Id="SA1101" Action="None" />
+        <Rule Id="SA1106" Action="None" />
         <Rule Id="SA1111" Action="None" />
         <Rule Id="SA1118" Action="None" />
         <Rule Id="SA1137" Action="None" />

@@ -37,8 +37,7 @@ import { PointsListPage } from './pages/points';
 import { SemesterCreatePage, SemesterListPage } from './pages/semesters';
 import { StandardsListPage } from './pages/standards';
 import { StudentEditPage, StudentListPage } from './pages/students';
-import { TeacherListPage } from './pages/teachers';
-import { TeacherEditPage } from './pages/teachers/edit';
+import { TeacherEditPage, TeacherListPage } from './pages/teachers';
 import { VisitsListPage } from './pages/visits';
 
 import 'dayjs/locale/en-gb';
@@ -118,6 +117,7 @@ const resources: ResourceProps[] = [
     edit: '/teachers/:id',
     meta: {
       label: 'Преподаватели',
+      canDelete: true,
     },
   },
   {

@@ -1,9 +1,9 @@
+using DB.Tables;
 using FluentValidation;
-using PhysEdJournal.Core.Entities.DB;
 
 namespace Admin.Api.Resources;
 
-file sealed class Validator : AbstractValidator<PointsStudentHistoryEntity>
+file sealed class Validator : AbstractValidator<PointsHistoryEntity>
 {
     public Validator()
     {
@@ -16,5 +16,5 @@ file sealed class Validator : AbstractValidator<PointsStudentHistoryEntity>
 
 public static class PointsHistory
 {
-    public static IValidator<PointsStudentHistoryEntity> Validator => new Validator();
+    public static IValidator<PointsHistoryEntity> Validator => new Validator();
 }
