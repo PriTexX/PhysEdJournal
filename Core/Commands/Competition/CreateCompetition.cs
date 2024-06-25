@@ -2,7 +2,7 @@
 using DB.Tables;
 using PResult;
 
-namespace Core.Commands.OldCommands;
+namespace Core.Commands;
 
 public sealed class CreateCompetitionCommand : ICommand<string, Unit>
 {

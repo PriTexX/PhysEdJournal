@@ -1,7 +1,7 @@
 ﻿using DB;
 using PResult;
 
-namespace Core.Commands.OldCommands;
+namespace Core.Commands;
 
 public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
 {

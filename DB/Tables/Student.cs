@@ -29,14 +29,11 @@ public sealed class StudentEntity
     [StringLength(20)]
     public required string GroupNumber { get; set; }
 
-    [GraphQLName("HasDebtFromPreviousSemester")]
-    [DefaultValue(false)]
+    [GraphQLName("hasDebtFromPreviousSemester")]
     public bool HasDebt { get; set; } // Если студент не получил зачет из-за нехватки баллов
 
-    [DefaultValue(false)]
     public bool HadDebtInSemester { get; set; } // Если у студента был долг в семестре
 
-    [DefaultValue(0)]
     public double ArchivedVisitValue { get; set; } // Сохраняем стоимость посещения в прошлом семестре здесь, чтобы считать по ней баллы, пока не набертся 50
 
     // После набора 50 баллов и получения зачета вернуть в Null, а HasDebt в false

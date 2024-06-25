@@ -33,6 +33,7 @@ public static class DI
             .BindRuntimeType<DateOnly, DateOnlyType>()
             .AddMutationType<Mutation>()
             .AddTypeExtension<StudentMutationExtensions>()
+            .AddTypeExtension<CompetitionMutationExtensions>()
             .AddProjections()
             .AddFiltering()
             .AddConvention<IFilterConvention>(
