@@ -126,6 +126,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
             FullName = student.FullName,
             GroupNumber = student.GroupNumber,
             Visits = student.VisitsHistory?.Count ?? 0,
+            TotalPoints = totalPoints,
             VisitsHistory =
                 student
                     .VisitsHistory?.Select(h => new ArchivedHistory

@@ -49,8 +49,9 @@ public sealed class ArchivedStudentEntity
     [ForeignKey("GroupNumber")]
     public GroupEntity? Group { get; set; }
 
-    [DefaultValue(0)]
     public required int Visits { get; set; }
+
+    public required double TotalPoints { get; set; }
 
     [Column(TypeName = "jsonb")]
     public required List<ArchivedHistory> VisitsHistory { get; set; }
