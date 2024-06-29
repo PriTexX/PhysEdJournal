@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
@@ -28,7 +28,7 @@ public sealed class StaffHttpClient
     public StaffHttpClient()
     {
         _graphQlClient = new GraphQLHttpClient(
-            Config.UserInfoServerURL,
+            Cfg.UserInfoServerURL,
             new NewtonsoftJsonSerializer()
         );
     }

@@ -5,7 +5,7 @@ using Core.Commands;
 using DB.Tables;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Rest.Points;
+namespace Api.Rest;
 
 public static class PointsController
 {
@@ -13,7 +13,7 @@ public static class PointsController
     {
         ErrorHandler.AddErrors(PointsErrors.Errors);
 
-        var pointsRouter = router.MapGroup("/student/points");
+        var pointsRouter = router.MapGroup("student/points");
 
         pointsRouter
             .MapPost("/other", AddPointsToStudent)

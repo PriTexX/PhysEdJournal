@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using DB;
 using DB.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +28,7 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
 
     public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsPayload input)
     {
-        if (input.Points > Config.MaxPointsAmount)
+        if (input.Points > Cfg.MaxPointsAmount)
         {
             return new PointsOutOfLimitError();
         }
@@ -61,7 +61,7 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
                 return new FitnessExistsError();
             }
 
-            if (input.Points > Config.MaxPointsForExternalFitness)
+            if (input.Points > Cfg.MaxPointsForExternalFitness)
             {
                 return new PointsOutOfLimitError();
             }
@@ -80,14 +80,14 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
             }
         }
 
-        if (input.WorkType == WorkType.Science && input.Points > Config.MaxPointsForScience)
+        if (input.WorkType == WorkType.Science && input.Points > Cfg.MaxPointsForScience)
         {
             return new PointsOutOfLimitError();
         }
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber
-                > Config.PointsLifeDays
+                > Cfg.PointsLifeDays
             && !input.IsAdminOrSecretary
         )
         {

@@ -1,4 +1,4 @@
-using Core.Cfg;
+using Core.Config;
 using Microsoft.AspNetCore.Builder;
 using Serilog;
 using Serilog.Events;
@@ -34,11 +34,11 @@ public static class Logging
                         "Microsoft.EntityFrameworkCore.Query",
                         LogEventLevel.Error
                     )
-                    .Enrich.WithProperty("Environment", Config.Environment)
+                    .Enrich.WithProperty("Environment", Cfg.Environment)
                     .Enrich.WithProperty("App", appName)
                     .Enrich.FromLogContext();
 
-                if (Config.IsProduction())
+                if (Cfg.IsProduction())
                 {
                     loggerCfg.WriteTo.Console(new JsonFormatter());
                 }

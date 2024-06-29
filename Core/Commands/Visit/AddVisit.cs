@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using DB;
 using DB.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +37,7 @@ internal sealed class AddVisitValidator : ICommandValidator<AddVisitPayload>
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > Config.VisitLifeDays
+                > Cfg.VisitLifeDays
             && !commandInput.IsAdminOrSecretary
         )
         {

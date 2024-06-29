@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using Api;
-using Api.Endpoints.MeEndpoint;
 using Api.Middlewares;
-using Core.Cfg;
+using Api.Rest;
 using Core.Commands;
+using Core.Config;
 using Core.Jobs;
 using Core.Logging;
 using DB;
@@ -15,17 +15,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*
-    Application options
- */
-
-Config.InitCoreCfg(builder);
-
-/*
-    Logging
- */
-
+builder.InitCoreCfg();
 builder.AddLogging("Journal");
+builder.Services.AddCoreDB(Cfg.ConnectionString);
 
 /*
     Authentication & Authorization
@@ -36,7 +28,7 @@ builder
     .AddJwtBearer(options =>
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = GetSecurityKey(Config.RsaPublicKey),
+            IssuerSigningKey = GetSecurityKey(Cfg.RsaPublicKey),
             ValidIssuer = "humanresourcesdepartmentapi.mospolytech.ru",
             ValidAudience = "HumanResourcesDepartment",
             ValidateIssuerSigningKey = true,
@@ -54,14 +46,11 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddWorker();
 
-builder.Services.AddCoreDB(Config.ConnectionString);
-
 builder.Services.AddCommands();
 
 builder.Services.AddScoped<PermissionValidator>();
-builder.Services.AddScoped<MeInfoService>();
 
-if (Config.IsDevelopment())
+if (Cfg.IsDevelopment())
 {
     builder.Services.AddSwaggerGen(swagger =>
     {
@@ -114,6 +103,10 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddGraphQLApi();
 
+/*
+    App
+ */
+
 var app = builder.Build();
 
 app.UseCors(corsPolicyBuilder =>
@@ -128,14 +121,12 @@ app.UseRequestId();
     Rest
  */
 
-// var root = app.MapGroup("/api");
-//
-// PointsController.MapEndpoints(root);
-// GroupController.MapEndpoints(root);
-// CompetitionController.MapEndpoints(root);
-// SemesterController.MapEndpoints(root);
-// StudentController.MapEndpoints(root);
-// TeacherController.MapEndpoints(root);
+var root = app.MapGroup("api");
+
+PointsController.MapEndpoints(root);
+CompetitionController.MapEndpoints(root);
+StudentController.MapEndpoints(root);
+SystemController.MapEndpoints(root);
 
 /*
     Middlewares
@@ -145,7 +136,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-if (app.Environment.IsDevelopment())
+if (Cfg.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>

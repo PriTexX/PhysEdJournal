@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PResult;
 
-namespace Api.Rest.Student;
+namespace Api.Rest;
 
 public static class StudentController
 {
@@ -17,7 +17,7 @@ public static class StudentController
     {
         ErrorHandler.AddErrors(StudentErrors.Errors);
 
-        var studentRouter = router.MapGroup("/student");
+        var studentRouter = router.MapGroup("student");
 
         studentRouter
             .MapPost("/archive", ArchiveStudent)

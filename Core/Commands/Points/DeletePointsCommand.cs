@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using DB;
 using Microsoft.EntityFrameworkCore;
 using PResult;
@@ -45,7 +45,7 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsPayload, Unit>
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > Config.DaysToDeletePoints
+                > Cfg.DaysToDeletePoints
             && !payload.IsAdminOrSecretary
         )
         {

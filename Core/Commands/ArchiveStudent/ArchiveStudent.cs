@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using DB;
 using DB.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -95,14 +95,14 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
 
         var visitValue = student.HasDebt ? student.ArchivedVisitValue : student.Group.VisitValue;
 
-        var totalPoints = Config.CalculateTotalPoints(
+        var totalPoints = Cfg.CalculateTotalPoints(
             student.Visits,
             visitValue,
             student.AdditionalPoints,
             student.PointsForStandards
         );
 
-        if (totalPoints < Config.RequiredPointsAmount)
+        if (totalPoints < Cfg.RequiredPointsAmount)
         {
             if (student.HasDebt)
             {

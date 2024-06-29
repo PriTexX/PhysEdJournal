@@ -1,4 +1,4 @@
-using Core.Cfg;
+using Core.Config;
 using DB.Tables;
 using FluentValidation;
 
@@ -33,8 +33,8 @@ file sealed class Validator : AbstractValidator<AddPointsToStudentRequest>
         RuleFor(request => request.Points)
             .GreaterThan(0)
             .WithMessage("Количество баллов должно быть больше 0")
-            .LessThanOrEqualTo(Config.MaxPointsAmount)
-            .WithMessage($"Количество баллов должно быть меньше {Config.MaxPointsAmount}");
+            .LessThanOrEqualTo(Cfg.MaxPointsAmount)
+            .WithMessage($"Количество баллов должно быть меньше {Cfg.MaxPointsAmount}");
 
         RuleFor(request => request.Date).NotEmpty().WithMessage("Обязательно нужно указать дату");
 

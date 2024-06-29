@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using DB;
 using Microsoft.EntityFrameworkCore;
 using PResult;
@@ -45,7 +45,7 @@ public sealed class DeleteStandardCommand : ICommand<DeleteStandardPayload, Unit
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - history.Date.DayNumber
-                > Config.DaysToDeletePoints
+                > Cfg.DaysToDeletePoints
             && !commandPayload.IsAdminOrSecretary
         )
         {
@@ -58,8 +58,8 @@ public sealed class DeleteStandardCommand : ICommand<DeleteStandardPayload, Unit
 
         var pointsForStandard = totalPointsForStandards - history.Points;
         var limitedPoints =
-            pointsForStandard > Config.MaxPointsForStandards
-                ? Config.MaxPointsForStandards
+            pointsForStandard > Cfg.MaxPointsForStandards
+                ? Cfg.MaxPointsForStandards
                 : pointsForStandard;
 
         student.PointsForStandards = limitedPoints;

@@ -1,15 +1,15 @@
 using Admin.Api;
 using Admin.Api.Resources;
 using Admin.Api.StaffSearch;
-using Core.Cfg;
 using Core.Commands;
+using Core.Config;
 using DB;
 using DB.Tables;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Config.InitCoreCfg(builder);
+Cfg.InitCoreCfg(builder);
 
 builder.Services.AddCors();
 
@@ -32,7 +32,7 @@ builder.Services.AddHttpClient<LkAuthClient>(c =>
     c.BaseAddress = new Uri("https://e.mospolytech.ru/")
 );
 
-builder.Services.AddCoreDB(Config.ConnectionString);
+builder.Services.AddCoreDB(Cfg.ConnectionString);
 builder.Services.AddCommands();
 
 builder.Services.AddSingleton<StaffHttpClient>();

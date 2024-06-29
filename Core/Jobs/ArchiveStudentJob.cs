@@ -1,6 +1,6 @@
 using Coravel.Invocable;
-using Core.Cfg;
 using Core.Commands;
+using Core.Config;
 using DB;
 using DB.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -100,11 +100,11 @@ public sealed class ArchiveStudentJob : IInvocable
     {
         ArgumentNullException.ThrowIfNull(student.Group);
 
-        return Config.CalculateTotalPoints(
+        return Cfg.CalculateTotalPoints(
                 student.Visits,
                 student.ArchivedVisitValue,
                 student.AdditionalPoints,
                 student.PointsForStandards
-            ) >= Config.RequiredPointsAmount;
+            ) >= Cfg.RequiredPointsAmount;
     }
 }

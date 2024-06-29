@@ -1,6 +1,6 @@
 using Api.Rest.Common;
-using Core.Cfg;
 using Core.Commands;
+using Core.Config;
 
 namespace Api.Rest.Points.Contracts;
 
@@ -24,7 +24,7 @@ public static class PointsErrors
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "points-out-of-limit",
-                    Detail = $"Максимальный балл за данную активность {Config.MaxPointsAmount}",
+                    Detail = $"Максимальный балл за данную активность {Cfg.MaxPointsAmount}",
                 }
             },
             {

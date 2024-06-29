@@ -1,4 +1,4 @@
-﻿namespace Api.Endpoints.MeEndpoint;
+namespace Api.Rest.System.Contracts;
 
 public sealed class StudentInfoResponse
 {

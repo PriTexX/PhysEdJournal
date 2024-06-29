@@ -1,4 +1,4 @@
-﻿using Core.Cfg;
+﻿using Core.Config;
 using DB;
 using DB.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -49,21 +49,21 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
 
         var visitValue = student.HasDebt ? student.ArchivedVisitValue : student.Group.VisitValue;
 
-        var totalPoints = Config.CalculateTotalPoints(
+        var totalPoints = Cfg.CalculateTotalPoints(
             student.Visits,
             visitValue,
             student.AdditionalPoints,
             student.PointsForStandards
         );
 
-        if (totalPoints < Config.MinTotalPointsToAddStandards)
+        if (totalPoints < Cfg.MinTotalPointsToAddStandards)
         {
             return new NotEnoughPointsForStandardsError();
         }
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
-                > Config.PointsLifeDays
+                > Cfg.PointsLifeDays
             && !commandInput.IsAdminOrSecretary
         )
         {
@@ -75,7 +75,7 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
             return new NonWorkingDayError();
         }
 
-        if (commandInput.Points > Config.MaxPointsForOneStandard)
+        if (commandInput.Points > Cfg.MaxPointsForOneStandard)
         {
             return new OutOfStandardsPointsLimitError();
         }
@@ -162,9 +162,9 @@ public sealed class AddStandardCommand : ICommand<AddStandardPayload, Unit>
     private int AdjustStudentPointsAmount(int studentTotalPointsForStandards, int pointsToImplement)
     {
         int adjustedStudentPointsAmount;
-        if (studentTotalPointsForStandards + pointsToImplement > Config.MaxPointsForStandards)
+        if (studentTotalPointsForStandards + pointsToImplement > Cfg.MaxPointsForStandards)
         {
-            adjustedStudentPointsAmount = Config.MaxPointsForStandards;
+            adjustedStudentPointsAmount = Cfg.MaxPointsForStandards;
         }
         else
         {

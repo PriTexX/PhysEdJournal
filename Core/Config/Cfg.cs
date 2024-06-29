@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Cfg;
+namespace Core.Config;
 
 file sealed class ExternalCfgValues
 {
@@ -19,9 +19,9 @@ file sealed class ExternalCfgValues
     public string RsaPublicKey { get; init; } = null!;
 }
 
-public static class Config
+public static class Cfg
 {
-    public static void InitCoreCfg(WebApplicationBuilder builder)
+    public static void InitCoreCfg(this WebApplicationBuilder builder)
     {
         builder
             .Services.AddOptions<ExternalCfgValues>()

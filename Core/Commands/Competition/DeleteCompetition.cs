@@ -18,7 +18,7 @@ public sealed class DeleteCompetitionCommand : ICommand<string, Unit>
 
         if (comp is null)
         {
-            return new Exception("not found");
+            return new CompetitionNotFoundError();
         }
 
         _applicationContext.Competitions.Remove(comp);
