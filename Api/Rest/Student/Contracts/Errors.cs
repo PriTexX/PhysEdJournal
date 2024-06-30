@@ -15,7 +15,7 @@ public static class StudentErrors
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "not-enough-points",
                     Detail =
-                        "Для перевода в следующий семестр студенту необходимо набрать более 50 баллов",
+                        "Для перевода в следующий семестр студенту необходимо набрать 50 баллов",
                 }
             },
             {
@@ -24,7 +24,7 @@ public static class StudentErrors
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
                     Type = "not-curator",
-                    Detail = "Учитель, который архивирует, должен быть куратором группы",
+                    Detail = "Для перевода группы в следующий семестр нужно быть куратором",
                 }
             },
             {
@@ -33,7 +33,7 @@ public static class StudentErrors
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "same-semester",
-                    Detail = "Нельзя перевести студента на семестр, на котором он уже обучается",
+                    Detail = "Студент уже переведен",
                 }
             },
         };

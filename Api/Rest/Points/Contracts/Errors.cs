@@ -19,12 +19,30 @@ public static class PointsErrors
                 }
             },
             {
+                nameof(GTOExistsError),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "gto-duplicate",
+                    Detail = "Баллы за ГТО можно поставить только раз в семестр",
+                }
+            },
+            {
+                nameof(StandardExistsError),
+                _ => new ErrorResponse()
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "standard-duplicate",
+                    Detail = "Данный норматив уже проставлен",
+                }
+            },
+            {
                 nameof(PointsOutOfLimitError),
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "points-out-of-limit",
-                    Detail = $"Максимальный балл за данную активность {Cfg.MaxPointsAmount}",
+                    Detail = "Превышен максимальный балл за данную активность",
                 }
             },
             {
@@ -43,15 +61,6 @@ public static class PointsErrors
                     StatusCode = StatusCodes.Status404NotFound,
                     Type = "points-history-not-found",
                     Detail = "Не удалось найти историю баллов в системе",
-                }
-            },
-            {
-                nameof(StandardExistsError),
-                _ => new ErrorResponse()
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "standard-duplicate",
-                    Detail = "Нельзя сдать один и тот же норматив дважды",
                 }
             },
         };

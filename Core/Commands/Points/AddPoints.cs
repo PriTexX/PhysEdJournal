@@ -28,11 +28,6 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
 
     public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsPayload input)
     {
-        if (input.Points > Cfg.MaxPointsAmount)
-        {
-            return new PointsOutOfLimitError();
-        }
-
         if (input.Date > DateOnly.FromDateTime(DateTime.UtcNow))
         {
             return new ActionFromFutureError();

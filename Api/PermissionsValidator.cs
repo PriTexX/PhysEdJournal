@@ -55,16 +55,6 @@ public sealed class PermissionValidator
         return hasEnough;
     }
 
-    public async ValueTask ValidateTeacherPermissionsAndThrow(
-        string teacherGuid,
-        TeacherPermissions requiredPermissions
-    )
-    {
-        var validationResult = await ValidateTeacherPermissions(teacherGuid, requiredPermissions);
-
-        validationResult.Match(_ => true, exception => throw exception);
-    }
-
     private static bool HasEnoughPermissions(
         TeacherPermissions permissions,
         TeacherPermissions requiredPermissions
