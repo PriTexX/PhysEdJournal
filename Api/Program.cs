@@ -9,6 +9,7 @@ using Core.Logging;
 using DB;
 using GraphQL.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -97,6 +98,11 @@ builder.Services.AddControllers();
 builder.Services.AddCors();
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new DateOnlyConverter());
+});
+
 /*
     GraphQL
  */
@@ -111,6 +117,7 @@ var app = builder.Build();
 
 app.UseCors(corsPolicyBuilder =>
 {
+    corsPolicyBuilder.AllowAnyMethod();
     corsPolicyBuilder.AllowAnyOrigin();
     corsPolicyBuilder.AllowAnyHeader();
 });
@@ -121,12 +128,12 @@ app.UseRequestId();
     Rest
  */
 
-var root = app.MapGroup("api");
-
-PointsController.MapEndpoints(root);
-CompetitionController.MapEndpoints(root);
-StudentController.MapEndpoints(root);
-SystemController.MapEndpoints(root);
+PointsController.MapEndpoints(app);
+CompetitionController.MapEndpoints(app);
+StudentController.MapEndpoints(app);
+TeacherController.MapEndpoints(app);
+GroupController.MapEndpoints(app);
+SystemController.MapEndpoints(app);
 
 /*
     Middlewares

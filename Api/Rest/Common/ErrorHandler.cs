@@ -29,7 +29,7 @@ public static class ErrorHandler
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
                     Type = "not-enough-permissions",
-                    Detail = "У пользователя должно быть больше прав для этого действия",
+                    Detail = "Недостаточно прав",
                 }
             },
             {
@@ -56,7 +56,7 @@ public static class ErrorHandler
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "action-from-future",
-                    Detail = "Укажите уже наступившую дату",
+                    Detail = "Нельзя ставить баллы за будущую дату",
                 }
             },
             {
@@ -64,8 +64,17 @@ public static class ErrorHandler
                 _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "date-expired",
-                    Detail = "Срок давности указанной даты истек",
+                    Type = "add-history-expired",
+                    Detail = "Возможность выставлять баллы за данную дату закрыта",
+                }
+            },
+            {
+                nameof(HistoryDeleteExpiredError),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "delete-history-expired",
+                    Detail = "Возможность удалять баллы за данную дату закрыта",
                 }
             },
             {

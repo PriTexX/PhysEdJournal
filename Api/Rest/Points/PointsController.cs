@@ -13,44 +13,44 @@ public static class PointsController
     {
         ErrorHandler.AddErrors(PointsErrors.Errors);
 
-        var pointsRouter = router.MapGroup("student/points");
+        var pointsRouter = router.MapGroup("points");
 
         pointsRouter
-            .MapPost("/other", AddPointsToStudent)
-            .AddValidation(AddPointsToStudentRequest.GetValidator())
+            .MapPost("/other", AddPoints)
+            .AddValidation(AddPointsRequest.GetValidator())
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
         pointsRouter
-            .MapPost("/standard", AddPointsForStandardToStudent)
-            .AddValidation(AddPointsForStandardToStudentRequest.GetValidator())
+            .MapPost("/standard", AddStandard)
+            .AddValidation(AddStandardRequest.GetValidator())
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
         pointsRouter
-            .MapPost("/visit", IncreaseStudentVisits)
-            .AddValidation(IncreaseStudentVisitsRequest.GetValidator())
+            .MapPost("/visit", AddVisit)
+            .AddValidation(AddVisitRequest.GetValidator())
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
         pointsRouter
-            .MapDelete("/visit", DeleteStudentVisit)
+            .MapDelete("/visit/{id:int}", DeleteVisit)
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
         pointsRouter
-            .MapDelete("/other", DeletePoints)
+            .MapDelete("/other/{id:int}", DeletePoints)
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
         pointsRouter
-            .MapDelete("/standard", DeleteStandardPoints)
+            .MapDelete("/standard/{id:int}", DeleteStandard)
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
     }
 
-    private static async Task<IResult> AddPointsToStudent(
-        [FromBody] AddPointsToStudentRequest request,
+    private static async Task<IResult> AddPoints(
+        [FromBody] AddPointsRequest request,
         [FromServices] AddPointsCommand addPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
@@ -58,32 +58,44 @@ public static class PointsController
     {
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
-        switch (request.WorkType)
+        switch (request.Type)
         {
             case WorkType.InternalTeam
             or WorkType.Activist
             or WorkType.Competition:
             {
-                await permissionValidator.ValidateTeacherPermissionsAndThrow(
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(
                     callerGuid,
                     TeacherPermissions.SecretaryAccess
                 );
+
+                if (validationResult.IsErr)
+                {
+                    return Response.Error(new NotEnoughPermissionsError());
+                }
+
                 break;
             }
 
             case WorkType.OnlineWork:
             {
-                await permissionValidator.ValidateTeacherPermissionsAndThrow(
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(
                     callerGuid,
                     TeacherPermissions.OnlineCourseAccess
                 );
+
+                if (validationResult.IsErr)
+                {
+                    return Response.Error(new NotEnoughPermissionsError());
+                }
+
                 break;
             }
         }
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.SecretaryAccess
+            TeacherPermissions.SecretaryAccess | TeacherPermissions.AdminAccess
         );
 
         var isAdminOrSecretary = validateTeacherPermissionsResult.IsOk;
@@ -94,7 +106,7 @@ public static class PointsController
             TeacherGuid = callerGuid,
             Points = request.Points,
             Date = request.Date,
-            WorkType = request.WorkType,
+            WorkType = request.Type,
             IsAdminOrSecretary = isAdminOrSecretary,
             Comment = request.Comment,
         };
@@ -104,8 +116,8 @@ public static class PointsController
         return res.Match(Response.Ok, Response.Error);
     }
 
-    private static async Task<IResult> AddPointsForStandardToStudent(
-        [FromBody] AddPointsForStandardToStudentRequest request,
+    private static async Task<IResult> AddStandard(
+        [FromBody] AddStandardRequest request,
         [FromServices] AddStandardCommand addStandardPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
@@ -126,7 +138,7 @@ public static class PointsController
             TeacherGuid = callerGuid,
             Points = request.Points,
             Date = request.Date,
-            StandardType = request.StandardType,
+            StandardType = request.Type,
             IsAdminOrSecretary = isAdminOrSecretary,
             Comment = request.Comment,
         };
@@ -135,8 +147,8 @@ public static class PointsController
         return res.Match(Response.Ok, Response.Error);
     }
 
-    private static async Task<IResult> IncreaseStudentVisits(
-        [FromBody] IncreaseStudentVisitsRequest request,
+    private static async Task<IResult> AddVisit(
+        [FromBody] AddVisitRequest request,
         [FromServices] AddVisitCommand increaseStudentVisitsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
@@ -164,8 +176,8 @@ public static class PointsController
         return res.Match(Response.Ok, Response.Error);
     }
 
-    private static async Task<IResult> DeleteStudentVisit(
-        int historyId,
+    private static async Task<IResult> DeleteVisit(
+        int id,
         [FromServices] DeleteVisitCommand deleteStudentVisitCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
@@ -183,7 +195,7 @@ public static class PointsController
         var res = await deleteStudentVisitCommand.ExecuteAsync(
             new DeleteVisitPayload
             {
-                HistoryId = historyId,
+                HistoryId = id,
                 IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
@@ -193,7 +205,7 @@ public static class PointsController
     }
 
     private static async Task<IResult> DeletePoints(
-        int historyId,
+        int id,
         [FromServices] DeletePointsCommand deletePointsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
@@ -211,7 +223,7 @@ public static class PointsController
         var res = await deletePointsCommand.ExecuteAsync(
             new DeletePointsPayload
             {
-                HistoryId = historyId,
+                HistoryId = id,
                 IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }
@@ -220,8 +232,8 @@ public static class PointsController
         return res.Match(Response.Ok, Response.Error);
     }
 
-    private static async Task<IResult> DeleteStandardPoints(
-        int historyId,
+    private static async Task<IResult> DeleteStandard(
+        int id,
         [FromServices] DeleteStandardCommand deleteStandardPointsCommand,
         [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
@@ -239,7 +251,7 @@ public static class PointsController
         var res = await deleteStandardPointsCommand.ExecuteAsync(
             new DeleteStandardPayload
             {
-                HistoryId = historyId,
+                HistoryId = id,
                 IsAdminOrSecretary = isAdmin,
                 TeacherGuid = callerGuid,
             }

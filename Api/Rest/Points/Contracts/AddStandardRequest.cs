@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Api.Rest.Points.Contracts;
 
-public class AddPointsForStandardToStudentRequest
+public class AddStandardRequest
 {
     public required string StudentGuid { get; init; }
 
@@ -12,17 +12,17 @@ public class AddPointsForStandardToStudentRequest
 
     public required DateOnly Date { get; init; }
 
-    public required StandardType StandardType { get; init; }
+    public required StandardType Type { get; init; }
 
-    public string? Comment { get; init; } = null;
+    public string? Comment { get; init; }
 
-    public static IValidator<AddPointsForStandardToStudentRequest> GetValidator()
+    public static IValidator<AddStandardRequest> GetValidator()
     {
         return new Validator();
     }
 }
 
-file sealed class Validator : AbstractValidator<AddPointsForStandardToStudentRequest>
+file sealed class Validator : AbstractValidator<AddStandardRequest>
 {
     public Validator()
     {
@@ -36,10 +36,10 @@ file sealed class Validator : AbstractValidator<AddPointsForStandardToStudentReq
             .LessThanOrEqualTo(Cfg.MaxPointsForOneStandard)
             .WithMessage($"Количество баллов не должно быть больше {Cfg.MaxPointsForOneStandard}");
 
-        RuleFor(request => request.Date).NotEmpty().WithMessage("Обязательно нужно указать дату");
+        RuleFor(request => request.Date).NotEmpty().WithMessage("Дата не может быть пустой");
 
-        RuleFor(request => request.StandardType)
+        RuleFor(request => request.Type)
             .NotNull()
-            .WithMessage("Обязательно нужно указать тип норматива");
+            .WithMessage("Тип норматива не может быть пустым");
     }
 }

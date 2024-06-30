@@ -1,7 +1,7 @@
 using Api.Rest.Common;
 using Core.Commands;
 
-namespace Api.Rest.Competition;
+namespace Api.Rest.Competition.Contracts;
 
 public static class CompetitionErrors
 {
