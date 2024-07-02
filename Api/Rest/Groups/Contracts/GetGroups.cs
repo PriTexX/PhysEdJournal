@@ -1,4 +1,4 @@
-namespace Api.Rest.Contracts;
+namespace Api.Rest.Groups.Contracts;
 
 public sealed class GroupsResponse
 {
