@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "migrations:add": "dotnet ef migrations -p DB -s Api add",
+    "migrations:run": "dotnet ef database update -p DB -s Api"
+  }
+}
