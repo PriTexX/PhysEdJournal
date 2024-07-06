@@ -47,7 +47,7 @@ const columns = [
     enableSorting: false,
   }),
 
-  columnHelper.accessor('hasDebtFromPreviousSemester', {
+  columnHelper.accessor('hasDebt', {
     header: 'Долг за семестр',
     enableSorting: true,
     cell(v) {
@@ -108,7 +108,7 @@ export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
         'visits',
         'pointsForStandards',
         'additionalPoints',
-        'hasDebtFromPreviousSemester',
+        'hasDebt',
         'course',
       ]}
       quickFilters={[
@@ -119,7 +119,7 @@ export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
         { column: 'fullName', name: 'ФИО', type: 'text' },
         { column: 'groupNumber', name: 'Группа', type: 'text' },
         {
-          column: 'hasDebtFromPreviousSemester',
+          column: 'hasDebt',
           name: 'Долг',
           type: 'boolean',
         },

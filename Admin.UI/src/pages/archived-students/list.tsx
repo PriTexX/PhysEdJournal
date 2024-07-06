@@ -1,6 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { useTeachersMap } from '@/features/use-teachers-map';
 import { JsonCell } from '@/shared/components/json-cell';
 import { DataGrid } from '@/widgets/data-grid/ui/data-grid';
 
@@ -34,6 +33,11 @@ const columns = [
 
   columnHelper.accessor('semesterName', {
     header: 'Семестер',
+    enableSorting: false,
+  }),
+
+  columnHelper.accessor('totalPoints', {
+    header: 'Баллы',
     enableSorting: false,
   }),
 

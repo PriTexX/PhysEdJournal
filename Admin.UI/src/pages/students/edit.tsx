@@ -67,7 +67,7 @@ const fields = [
     },
   }),
 
-  formHelper.createField('hasDebtFromPreviousSemester', {
+  formHelper.createField('hasDebt', {
     name: 'Долг',
     render({ control, name }) {
       return <Checkbox control={control} name={name} />;

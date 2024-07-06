@@ -25,6 +25,7 @@ export type ArchivedStudent = {
   fullName: string;
   groupNumber: string;
   visits: number;
+  totalPoints: number;
   visitsHistory: VisitsHistory[];
   standardsHistory: StandardsHistory[];
   pointsHistory: PointsHistory[];

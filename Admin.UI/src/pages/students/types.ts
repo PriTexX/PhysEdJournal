@@ -4,7 +4,7 @@ export type Student = {
   studentGuid: string;
   fullName: string;
   groupNumber: string;
-  hasDebtFromPreviousSemester: boolean;
+  hasDebt: boolean;
   hadDebtInSemester: boolean;
   archivedVisitValue: number;
   additionalPoints: number;
