@@ -42,7 +42,7 @@ public sealed class RequestIdMiddleware
     {
         context.TraceIdentifier = Guid.NewGuid().ToString();
 
-        context.Response.Headers["x-sx-request-id"] = context.TraceIdentifier;
+        context.Response.Headers["x-request-id"] = context.TraceIdentifier;
 
         using (LogContext.Push(new SerilogRequestIdEnricher(context.TraceIdentifier)))
         {
