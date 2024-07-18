@@ -18,7 +18,7 @@ public static class GroupController
         groupRouter
             .MapPost("/archive", ArchiveGroup)
             .AddValidation(ArchiveGroupRequest.GetValidator())
-            .AddPermissionsValidation(TeacherPermissions.AdminAccess)
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
         groupRouter.MapGet("/", GetGroups);
