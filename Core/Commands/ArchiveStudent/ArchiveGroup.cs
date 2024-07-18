@@ -8,7 +8,6 @@ namespace Core.Commands;
 public sealed class ArchiveGroupPayload
 {
     public required string GroupName { get; init; }
-
     public string? TeacherGuid { get; init; }
     public required bool IsAdmin { get; init; }
 }
