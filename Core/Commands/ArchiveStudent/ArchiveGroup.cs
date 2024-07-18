@@ -1,4 +1,3 @@
-using Core.Dtos;
 using DB;
 using Microsoft.EntityFrameworkCore;
 using PResult;
@@ -13,7 +12,7 @@ public sealed class ArchiveGroupPayload
 }
 
 public sealed class ArchiveGroupCommand
-    : ICommand<ArchiveGroupPayload, IEnumerable<ArchiveStudentStatusDto>>
+    : ICommand<ArchiveGroupPayload, IEnumerable<ArchiveStudentStatus>>
 {
     private readonly ApplicationContext _applicationContext;
     private readonly ArchiveStudentCommand _command;
@@ -24,7 +23,7 @@ public sealed class ArchiveGroupCommand
         _command = command;
     }
 
-    public async Task<Result<IEnumerable<ArchiveStudentStatusDto>>> ExecuteAsync(
+    public async Task<Result<IEnumerable<ArchiveStudentStatus>>> ExecuteAsync(
         ArchiveGroupPayload commandPayload
     )
     {
@@ -43,7 +42,7 @@ public sealed class ArchiveGroupCommand
             return new NoStudentsInGroupError();
         }
 
-        var students = new List<ArchiveStudentStatusDto>();
+        var students = new List<ArchiveStudentStatus>();
 
         foreach (var stud in group.Students)
         {
@@ -56,7 +55,7 @@ public sealed class ArchiveGroupCommand
 
             var result = await _command.ExecuteAsync(payload);
 
-            var studDto = new ArchiveStudentStatusDto
+            var studDto = new ArchiveStudentStatus
             {
                 IsArchived = result.IsOk,
                 Guid = stud.StudentGuid,
@@ -69,4 +68,12 @@ public sealed class ArchiveGroupCommand
 
         return students;
     }
+}
+
+public sealed class ArchiveStudentStatus
+{
+    public required bool IsArchived { get; set; }
+    public required string Guid { get; set; }
+    public required string FullName { get; set; }
+    public Exception? Error { get; set; }
 }
