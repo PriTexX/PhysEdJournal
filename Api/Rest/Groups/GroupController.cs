@@ -49,25 +49,22 @@ public static class GroupController
         return res.Match(
             rowData =>
             {
-                var response = new List<GroupResponseItem>();
-                foreach (var stud in rowData)
-                {
-                    var item = new GroupResponseItem
+                var response = rowData
+                    .Select(stud =>
                     {
-                        IsArchived = stud.IsArchived,
-                        Guid = stud.Guid,
-                        FullName = stud.FullName,
-                    };
+                        var item = new GroupResponseItem
+                        {
+                            IsArchived = stud.IsArchived,
+                            Guid = stud.Guid,
+                            FullName = stud.FullName,
+                            Error = stud.Error is not null
+                                ? ErrorHandler.HandleErrorResult(stud.Error)
+                                : null,
+                        };
 
-                    if (stud.Error is null)
-                    {
-                        continue;
-                    }
-
-                    item.Error = ErrorHandler.HandleErrorResult(stud.Error);
-
-                    response.Add(item);
-                }
+                        return item;
+                    })
+                    .ToList();
 
                 return Response.Ok(response);
             },
