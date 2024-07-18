@@ -23,7 +23,7 @@ file sealed class Validator : AbstractValidator<ArchiveGroupRequest>
     }
 }
 
-public sealed class ArchiveGroupResponse
+public sealed class GroupResponseItem
 {
     public required bool IsArchived { get; set; }
 

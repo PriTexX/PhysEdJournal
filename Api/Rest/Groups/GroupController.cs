@@ -49,10 +49,10 @@ public static class GroupController
         return res.Match(
             rowData =>
             {
-                var response = new List<ArchiveGroupResponse>();
+                var response = new List<GroupResponseItem>();
                 foreach (var stud in rowData)
                 {
-                    var item = new ArchiveGroupResponse
+                    var item = new GroupResponseItem
                     {
                         IsArchived = stud.IsArchived,
                         Guid = stud.Guid,
