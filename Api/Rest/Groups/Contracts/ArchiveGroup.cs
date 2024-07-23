@@ -19,7 +19,7 @@ file sealed class Validator : AbstractValidator<ArchiveGroupRequest>
     {
         RuleFor(request => request.GroupName)
             .NotEmpty()
-            .WithMessage("В поле должно передаваться название группы");
+            .WithMessage("Необходимо указать номер группы");
     }
 }
 
