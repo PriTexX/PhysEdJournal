@@ -1,4 +1,5 @@
 using DB;
+using DB.Tables;
 using Microsoft.EntityFrameworkCore;
 using PResult;
 
@@ -27,24 +28,17 @@ public sealed class ArchiveGroupCommand
         ArchiveGroupPayload commandPayload
     )
     {
+        var currentSemester = await _applicationContext.Semesters.SingleAsync(sem => sem.IsCurrent);
+
         var group = await _applicationContext
-            .Groups.Where(g => g.GroupName == commandPayload.GroupName)
-            .Include(g => g.Students)
-            .FirstOrDefaultAsync();
+            .Students.Where(s =>
+                s.GroupNumber == commandPayload.GroupName
+                && s.CurrentSemesterName != currentSemester.Name
+            )
+            .ToListAsync();
 
-        if (group is null)
-        {
-            return new GroupNotFoundError();
-        }
-
-        if (group.Students is null || group.Students.Count == 0)
-        {
-            return new NoStudentsInGroupError();
-        }
-
-        var students = new List<ArchiveStudentStatus>();
-
-        foreach (var stud in group.Students)
+        var tasks = new List<Task<ArchiveStudentStatus>>();
+        foreach (var stud in group)
         {
             var payload = new ArchiveStudentPayload
             {
@@ -53,20 +47,41 @@ public sealed class ArchiveGroupCommand
                 IsAdmin = commandPayload.IsAdmin,
             };
 
-            var result = await _command.ExecuteAsync(payload);
+            var task = ArchiveOneAsync(payload, stud.StudentGuid);
 
-            var studDto = new ArchiveStudentStatus
-            {
-                IsArchived = result.IsOk,
-                Guid = stud.StudentGuid,
-                FullName = stud.FullName,
-                Error = result.IsErr ? result.UnsafeError : null,
-            };
-
-            students.Add(studDto);
+            tasks.Add(task);
         }
 
-        return students;
+        return await Task.WhenAll(tasks);
+    }
+
+    private async Task<ArchiveStudentStatus> ArchiveOneAsync(
+        ArchiveStudentPayload payload,
+        string fullName
+    )
+    {
+        try
+        {
+            var result = await _command.ExecuteAsync(payload);
+
+            return new ArchiveStudentStatus
+            {
+                IsArchived = result.IsOk,
+                Guid = payload.StudentGuid,
+                FullName = fullName,
+                Error = result.IsErr ? result.UnsafeError : null,
+            };
+        }
+        catch (Exception e)
+        {
+            return new ArchiveStudentStatus
+            {
+                IsArchived = false,
+                Guid = payload.StudentGuid,
+                FullName = fullName,
+                Error = e,
+            };
+        }
     }
 }
 
