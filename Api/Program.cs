@@ -7,7 +7,6 @@ using Core.Config;
 using Core.Jobs;
 using Core.Logging;
 using DB;
-using GraphQL.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
@@ -104,12 +103,6 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 /*
-    GraphQL
- */
-
-builder.Services.AddGraphQLApi();
-
-/*
     App
  */
 
@@ -159,8 +152,6 @@ app.UseAuthorization();
 
 app.UseUserGuidLogger();
 app.MapControllers();
-
-app.UseGraphQLApi();
 
 await app.RunAsync();
 return;
