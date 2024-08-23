@@ -25,6 +25,12 @@ public static class StudentController
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
+        studentRouter
+            .MapPost("/health-group", SetHealthGroup)
+            .AddValidation(SetHealthGroupRequest.GetValidator())
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
+
         studentRouter.MapGet("/{guid}", GetStudent);
 
         studentRouter.MapGet("/", GetStudents);
@@ -237,5 +243,25 @@ public static class StudentController
         var res = await archiveStudentCommand.ExecuteAsync(archiveStudentPayload);
 
         return res.Match(_ => Response.Ok(Unit.Default), Response.Error);
+    }
+
+    private static async Task<IResult> SetHealthGroup(
+        [FromBody] SetHealthGroupRequest request,
+        [FromServices] AddHealthGroupCommand command,
+        HttpContext ctx
+    )
+    {
+        var userGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
+
+        var res = await command.ExecuteAsync(
+            new AddHealthGroupPayload
+            {
+                HealthGroup = request.HealthGroup,
+                StudentGuid = request.StudentGuid,
+                TeacherGuid = userGuid,
+            }
+        );
+
+        return res.Match(Response.Ok, Response.Error);
     }
 }
