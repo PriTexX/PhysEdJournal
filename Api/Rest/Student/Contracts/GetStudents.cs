@@ -1,3 +1,5 @@
+using DB.Tables;
+
 namespace Api.Rest.Student.Contracts;
 
 public sealed class GetStudentsRequest
@@ -18,6 +20,7 @@ public sealed class StudentResponse
     public required int StandardPoints { get; set; }
     public required int LMSPoints { get; set; }
     public required bool HasDebt { get; set; }
+    public required HealthGroupType HealthGroup { get; set; }
 }
 
 public sealed class GetStudentsResponse

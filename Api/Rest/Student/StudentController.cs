@@ -188,6 +188,7 @@ public static class StudentController
                 s.AdditionalPoints,
                 s.ArchivedVisitValue,
                 s.PointsHistory,
+                s.HealthGroup,
             })
             .Skip((paginationParameters.Page - 1) * paginationParameters.PageSize)
             .Take(paginationParameters.PageSize)
@@ -199,6 +200,7 @@ public static class StudentController
                 FullName = s.FullName,
                 GroupNumber = s.GroupNumber,
                 HasDebt = s.HasDebt,
+                HealthGroup = s.HealthGroup,
                 StandardPoints = s.PointsForStandards,
                 Visits = s.Visits,
                 TotalPoints = Cfg.CalculateTotalPoints(
