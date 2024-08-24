@@ -36,5 +36,14 @@ public static class StudentErrors
                     Detail = "Студент уже переведен",
                 }
             },
+            {
+                nameof(CuratorMismatchError),
+                _ => new ErrorResponse
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Type = "curator-mismatch",
+                    Detail = "Нужно быть куратором студента, чтобы сменить его группу здоровья",
+                }
+            },
         };
 }

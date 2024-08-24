@@ -3,6 +3,7 @@ using Api.Rest.Teacher.Contracts;
 using Core.Commands;
 using DB;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Rest;
 
@@ -20,7 +21,9 @@ public static class TeacherController
         [FromServices] ApplicationContext appCtx
     )
     {
-        var teacher = await appCtx.Teachers.FindAsync(guid);
+        var teacher = await appCtx
+            .Teachers.Include(t => t.Groups)
+            .FirstOrDefaultAsync(t => t.TeacherGuid == guid);
 
         if (teacher is null)
         {
@@ -28,9 +31,15 @@ public static class TeacherController
         }
 
         var permissions = teacher.Permissions.ToString().Split(",").Select(s => s.Trim()).ToList();
+        var groups = teacher.Groups?.Select(g => g.GroupName).ToList() ?? [];
 
         return Response.Ok(
-            new GetTeacherResponse { FullName = teacher.FullName, Permissions = permissions }
+            new GetTeacherResponse
+            {
+                FullName = teacher.FullName,
+                Groups = groups,
+                Permissions = permissions,
+            }
         );
     }
 }
