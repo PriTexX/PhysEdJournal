@@ -66,6 +66,7 @@ public static class StudentController
                 s.PointsHistory,
                 s.StandardsHistory,
                 s.VisitsHistory,
+                s.Group.Curator,
             })
             .FirstOrDefaultAsync();
 
@@ -83,6 +84,13 @@ public static class StudentController
             HadDebtInSemester = student.HadDebtInSemester,
             Course = student.Course,
             HealthGroup = student.HealthGroup,
+            Curator = student.Curator is not null
+                ? new Curator
+                {
+                    Guid = student.Curator.TeacherGuid,
+                    FullName = student.Curator.FullName,
+                }
+                : null,
 
             PointsHistory =
                 student
