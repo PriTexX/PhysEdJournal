@@ -89,7 +89,7 @@ public static class AuthenticationHandler
         return Results.Ok();
     }
 
-    private static async Task<IResult> GetSession(HttpContext ctx)
+    private static IResult GetSession(HttpContext ctx)
     {
         var name = ctx.User.FindFirstValue(ClaimTypes.Name);
         var avatar = ctx.User.FindFirstValue("avatar");
@@ -105,7 +105,7 @@ public static class AuthenticationHandler
             {
                 name,
                 avatar,
-                role
+                role,
             }
         );
     }

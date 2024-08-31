@@ -32,7 +32,7 @@ public sealed class LkAuthClient
         var req = new Dictionary<string, string>
         {
             { "ulogin", username },
-            { "upassword", password }
+            { "upassword", password },
         };
 
         var authResponse = await _httpClient.PostAsync(

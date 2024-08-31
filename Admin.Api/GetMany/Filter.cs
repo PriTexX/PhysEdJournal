@@ -75,7 +75,7 @@ public sealed class Filter
             { "gt", ">" },
             { "gte", ">=" },
             { "contains", "Contains" },
-            { "between", "Handled in code" }
+            { "between", "Handled in code" },
         };
 
     public static readonly string[] AllowedOperators = Operators.Keys.ToArray();

@@ -31,6 +31,12 @@ public static class StudentController
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
             .RequireAuthorization();
 
+        studentRouter
+            .MapPost("/specialization", SetSpecialization)
+            .AddValidation(SetSpecializationRequest.GetValidator())
+            .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
+            .RequireAuthorization();
+
         studentRouter.MapGet("/{guid}", GetStudent);
 
         studentRouter.MapGet("/", GetStudents);
@@ -63,6 +69,7 @@ public static class StudentController
                 s.PointsForStandards,
                 s.ArchivedVisitValue,
                 s.HealthGroup,
+                s.Specialization,
                 s.PointsHistory,
                 s.StandardsHistory,
                 s.VisitsHistory,
@@ -84,6 +91,7 @@ public static class StudentController
             HadDebtInSemester = student.HadDebtInSemester,
             Course = student.Course,
             HealthGroup = student.HealthGroup,
+            Specialization = student.Specialization,
             Curator = student.Curator is not null
                 ? new Curator
                 {
@@ -269,6 +277,25 @@ public static class StudentController
                 HealthGroup = request.HealthGroup,
                 StudentGuid = request.StudentGuid,
                 TeacherGuid = userGuid,
+            }
+        );
+
+        return res.Match(Response.Ok, Response.Error);
+    }
+
+    private static async Task<IResult> SetSpecialization(
+        [FromBody] SetSpecializationRequest request,
+        [FromServices] SetSpecializationCommand command,
+        HttpContext ctx
+    )
+    {
+        var userGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
+
+        var res = await command.ExecuteAsync(
+            new SetSpecializationPayload
+            {
+                StudentGuid = request.StudentGuid,
+                Specialization = request.Specialization,
             }
         );
 

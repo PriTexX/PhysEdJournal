@@ -50,6 +50,7 @@ public sealed class GetStudentResponse
     public required int Course { get; set; }
     public Curator? Curator { get; set; }
     public required HealthGroupType HealthGroup { get; set; }
+    public required SpecializationType Specialization { get; set; }
     public required List<PointsHistoryResponse> PointsHistory { get; set; }
     public required List<VisitsHistoryResponse> VisitsHistory { get; set; }
     public required List<StandardsHistoryResponse> StandardsHistory { get; set; }

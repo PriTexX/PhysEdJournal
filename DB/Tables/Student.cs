@@ -15,6 +15,23 @@ public enum HealthGroupType
     HealthLimitations,
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum SpecializationType
+{
+    None,
+    Basketball,
+    Volleyball,
+    Aerobics,
+    PowerLiftingAndCrossfit,
+    StreetLiftingAndArmLifting,
+    GeneralPhysicalTraining, // ОФП
+    GeneralPhysicalTrainingGym,
+    FootRoom,
+    SMG,
+    TableTennis,
+    NordicWalking,
+}
+
 [Table("Students")]
 public sealed class StudentEntity
 {
@@ -56,6 +73,8 @@ public sealed class StudentEntity
     public SemesterEntity? Semester { get; set; }
 
     public HealthGroupType HealthGroup { get; set; }
+
+    public SpecializationType Specialization { get; set; }
 
     [StringLength(200)]
     public string? Department { get; set; }
