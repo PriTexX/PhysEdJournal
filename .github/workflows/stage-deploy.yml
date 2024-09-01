@@ -114,7 +114,7 @@ jobs:
         run: envsubst < deploy/.env.stage.template > deploy/.env.stage.secret
 
       - name: Tar deploy folder
-        run: tar -cvf deploy.tar deploy/
+        run: tar -cf deploy.tar deploy/
 
       - name: Install OpenVPN
         run: |
@@ -124,7 +124,29 @@ jobs:
       - name: Setup VPN config
         run: echo "${{ secrets.OVPN_FILE }}" > config.ovpn
 
-      - name: Connect to VPN
+      - name: Connect to VPN 1
+        id: vpnConnectStep1
+        continue-on-error: true
+        uses: "kota65535/github-openvpn-connect-action@v2"
+        with:
+          config_file: config.ovpn
+          username: ${{secrets.OVPN_USERNAME}}
+          password: ${{secrets.OVPN_PASSWORD}}
+          
+      - name: Connect to VPN 2
+        id: vpnConnectStep2
+        if: steps.vpnConnectStep1.outcome == 'failure'
+        continue-on-error: true
+        uses: "kota65535/github-openvpn-connect-action@v2"
+        with:
+          config_file: config.ovpn
+          username: ${{secrets.OVPN_USERNAME}}
+          password: ${{secrets.OVPN_PASSWORD}}
+          
+      - name: Connect to VPN 3
+        id: vpnConnectStep3
+        if: steps.vpnConnectStep2.outcome == 'failure'
+        continue-on-error: false
         uses: "kota65535/github-openvpn-connect-action@v2"
         with:
           config_file: config.ovpn
@@ -137,6 +159,7 @@ jobs:
           host: ${{secrets.HOST}}
           username: ${{env.USERNAME}}
           password: ${{ secrets.HOST_PASSWORD }}
+          rm: true
           source: "deploy.tar"
           target: "/home/${{env.USERNAME}}/physedjournal-stage"
 
@@ -148,9 +171,8 @@ jobs:
           password: ${{ secrets.HOST_PASSWORD }}
           script: |
             cd /home/${{env.USERNAME}}/physedjournal-stage
-            tar -xf deploy.tar -C /home/${{env.USERNAME}}/physedjournal-stage
+            tar -xf deploy.tar
             cd deploy
             docker-compose -f docker-compose.stage.yml pull
             docker-compose -f docker-compose.stage.yml -p physedjournal-stage restart
             docker-compose -f docker-compose.stage.yml -p physedjournal-stage up -d
-            rm -r /home/${{env.USERNAME}}/physedjournal-stage
