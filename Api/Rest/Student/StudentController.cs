@@ -205,6 +205,7 @@ public static class StudentController
                 s.ArchivedVisitValue,
                 s.PointsHistory,
                 s.HealthGroup,
+                s.Specialization,
             })
             .Skip((paginationParameters.Page - 1) * paginationParameters.PageSize)
             .Take(paginationParameters.PageSize)
@@ -217,6 +218,7 @@ public static class StudentController
                 GroupNumber = s.GroupNumber,
                 HasDebt = s.HasDebt,
                 HealthGroup = s.HealthGroup,
+                Specialization = s.Specialization,
                 StandardPoints = s.PointsForStandards,
                 Visits = s.Visits,
                 TotalPoints = Cfg.CalculateTotalPoints(
@@ -289,8 +291,6 @@ public static class StudentController
         HttpContext ctx
     )
     {
-        var userGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
-
         var res = await command.ExecuteAsync(
             new SetSpecializationPayload
             {

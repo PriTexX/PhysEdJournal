@@ -21,6 +21,7 @@ public sealed class StudentResponse
     public required int LMSPoints { get; set; }
     public required bool HasDebt { get; set; }
     public required HealthGroupType HealthGroup { get; set; }
+    public required SpecializationType Specialization { get; set; }
 }
 
 public sealed class GetStudentsResponse
