@@ -112,7 +112,11 @@ export const SyncGroupsModal: FC<SyncGroupsModalProps> = ({
     async (file: File) => {
       const csv = await file.text();
 
-      const data = csv2json(csv) as any[];
+      const data = csv2json(csv, {
+        delimiter: { field: ';' },
+        trimFieldValues: true,
+        trimHeaderFields: true,
+      }) as any[];
 
       const parsedData: SyncGroupData[] = [];
 
