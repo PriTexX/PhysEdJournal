@@ -37,8 +37,8 @@ type SyncGroupData = {
 
 function extractCsvGroupFields(csvGroup: any): SyncGroupData | null {
   const group = csvGroup['Группа'] as string;
-  const visitValue = csvGroup['Стоимость посещения'] as number;
   const curator = csvGroup['Куратор'] as string;
+  let visitValue = csvGroup['Стоимость посещения'] as string | number;
 
   if (
     group === undefined ||
@@ -46,6 +46,10 @@ function extractCsvGroupFields(csvGroup: any): SyncGroupData | null {
     curator === undefined
   ) {
     return null;
+  }
+
+  if (typeof visitValue == 'string') {
+    visitValue = Number(visitValue.replace(',', '.')); // Parse strings like 3,5 to 3.5 number
   }
 
   return { group, visitValue, curator: curator != '' ? curator : null };
