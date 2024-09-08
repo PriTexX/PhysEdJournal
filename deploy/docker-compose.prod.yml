@@ -3,15 +3,10 @@
 services:
   physedjournal:
     image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}"
-    labels:
-      logging: "promtail"
     restart: always
     container_name: physedjournal
     env_file:
       - .env.secret
-    depends_on: 
-      loki:
-        condition: service_healthy
         
   admin-api:
     image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}-admin-api"
@@ -64,7 +59,6 @@ services:
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     depends_on: 
       - prometheus
-      - loki
   
   node_exporter:
     image: quay.io/prometheus/node-exporter:v1.5.0
