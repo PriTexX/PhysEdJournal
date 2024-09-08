@@ -40,7 +40,9 @@ public static class Logging
 
                 if (Cfg.IsProduction())
                 {
-                    loggerCfg.WriteTo.Console(new JsonFormatter());
+                    loggerCfg
+                        .WriteTo.Seq(Cfg.SeqUrl, apiKey: Cfg.SeqApiKey)
+                        .WriteTo.Console(new JsonFormatter());
                 }
                 else
                 {

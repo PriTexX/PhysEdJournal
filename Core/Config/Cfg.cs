@@ -17,6 +17,8 @@ file sealed class ExternalCfgValues
 
     [Required]
     public string RsaPublicKey { get; init; } = null!;
+
+    public string? SeqApiKey { get; init; }
 }
 
 public static class Cfg
@@ -40,6 +42,7 @@ public static class Cfg
         ConnectionString = externalCfgValues.ConnectionString;
         UserInfoServerURL = externalCfgValues.UserInfoServerURL;
         RsaPublicKey = externalCfgValues.RsaPublicKey;
+        SeqApiKey = externalCfgValues.SeqApiKey ?? string.Empty;
     }
 
     public static string Environment { get; private set; } = null!;
@@ -51,6 +54,8 @@ public static class Cfg
     public static string ConnectionString { get; private set; } = null!;
     public static string UserInfoServerURL { get; private set; } = null!;
     public static string RsaPublicKey { get; private set; } = null!;
+    public static string SeqUrl { get; private set; } = "http://seq:5341";
+    public static string SeqApiKey { get; private set; } = null!;
 
     public static int PageSizeToQueryUserInfoServer { get; private set; } = 250;
     public static int MaxPointsForStandards { get; private set; } = 30;

@@ -43,33 +43,15 @@ services:
       - prometheus-data:/prometheus
     depends_on:
       - physedjournal
-  
-  loki:
-    image: grafana/loki:2.8.0
-    container_name: loki
+
+  seq:
+    image: datalust/seq:2024.3
+    container_name: phys-seq
     restart: always
     volumes:
-      - loki-data:/loki
-      - ./loki/loki.yaml:/etc/config/loki.yaml
-    command: -config.file=/etc/config/loki.yaml
-    healthcheck:
-      test: wget -q --tries=1 -O- http://localhost:3100/ready
-      interval: 3s
-      timeout: 3s
-      retries: 10
-      
-  promtail:
-    image: grafana/promtail:2.9.0
-    container_name: promtail
-    restart: always
-    volumes:
-      - ./promtail/promtail.yaml:/etc/promtail/docker-config.yaml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/docker-config.yaml
-    depends_on: 
-      loki:
-        condition: service_healthy
+      - seq-data:/data
+    environment:
+      ACCEPT_EULA: "Y"
   
   grafana:
     image: grafana/grafana:9.5.6
@@ -122,5 +104,5 @@ volumes:
     driver: local    
   grafana-data:
     driver: local
-  loki-data:
+  seq-data:
     driver: local    
