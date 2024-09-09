@@ -108,6 +108,8 @@ builder.Services.Configure<JsonOptions>(options =>
 
 var app = builder.Build();
 
+app.UseWorker();
+
 app.UseCors(corsPolicyBuilder =>
 {
     corsPolicyBuilder.AllowAnyMethod();
