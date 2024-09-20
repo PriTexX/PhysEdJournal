@@ -69,6 +69,7 @@ public static class StudentController
                 s.PointsForStandards,
                 s.ArchivedVisitValue,
                 s.HealthGroup,
+                s.HealthGroupProvider,
                 s.Specialization,
                 s.PointsHistory,
                 s.StandardsHistory,
@@ -91,6 +92,7 @@ public static class StudentController
             HadDebtInSemester = student.HadDebtInSemester,
             Course = student.Course,
             HealthGroup = student.HealthGroup,
+            HealthGroupProvider = student.HealthGroupProvider,
             Specialization = student.Specialization,
             Curator = student.Curator is not null
                 ? new Curator
