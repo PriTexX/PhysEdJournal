@@ -1,4 +1,4 @@
-import { Heading } from '@chakra-ui/react';
+import { Box, Button, Heading, HStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Create as BaseCreate, Edit as BaseEdit } from '@refinedev/chakra-ui';
 import { CanAccess, useCan, useNavigation, useResource } from '@refinedev/core';
@@ -50,12 +50,14 @@ type EditProps<D extends BaseRecord> = {
   fields: FieldOrGroup<D>[];
   schema?: z.ZodSchema;
   type: 'edit' | 'create';
+  additionalButtons?: React.ReactElement[];
 };
 
 export function Form<D extends BaseRecord>({
   fields,
   schema,
   type,
+  additionalButtons,
 }: EditProps<D>) {
   const {
     refineCore: { formLoading, queryResult, onFinish },
@@ -108,6 +110,16 @@ export function Form<D extends BaseRecord>({
             })(event),
         }}
       >
+        {additionalButtons && (
+          <HStack mb={8} mt={4}>
+            {additionalButtons.map((b, i) => (
+              <Box display="inline-block" key={i}>
+                {b}
+              </Box>
+            ))}
+          </HStack>
+        )}
+
         <form id="form">
           {fields.map((fieldOrGroup) => {
             if (isFormGroup(fieldOrGroup)) {

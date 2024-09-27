@@ -18,5 +18,6 @@ public static class DI
         services.AddScoped<DeletePointsCommand>();
         services.AddScoped<AddHealthGroupCommand>();
         services.AddScoped<SetSpecializationCommand>();
+        services.AddScoped<ClearStudentCommand>();
     }
 }

@@ -5,11 +5,14 @@ using Core.Commands;
 using Core.Config;
 using DB;
 using DB.Tables;
+using DotEnv.Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
+
+new EnvLoader().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-Cfg.InitCoreCfg(builder);
+builder.InitCoreCfg();
 
 builder.Services.AddCors();
 
@@ -146,6 +149,7 @@ GenericCrudController<VisitsHistoryEntity, int>.MapEndpoints(
 );
 
 app.MapStaffSearchEndpoint();
+app.MapPost("/student/{id}", ClearStudentHandler.Handle);
 
 AuthenticationHandler.MapAuthentication(app);
 

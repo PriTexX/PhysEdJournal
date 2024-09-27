@@ -4,6 +4,7 @@ import { Checkbox } from '@/shared/components/checkbox';
 import { NumberInput } from '@/shared/components/number-input';
 import { createFormHelper, Form } from '@/widgets/form';
 
+import { ClearStudentButton } from './clear-student';
 import { healthGroupRus, healthGroups } from './types';
 
 import type { Student } from './types';
@@ -119,5 +120,11 @@ const fields = [
 ];
 
 export const StudentEditPage = () => {
-  return <Form fields={fields} type="edit" />;
+  return (
+    <Form
+      fields={fields}
+      type="edit"
+      additionalButtons={[<ClearStudentButton />]}
+    />
+  );
 };

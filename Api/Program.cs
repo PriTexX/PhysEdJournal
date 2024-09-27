@@ -7,11 +7,14 @@ using Core.Config;
 using Core.Jobs;
 using Core.Logging;
 using DB;
+using DotEnv.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+
+new EnvLoader().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
