@@ -32,7 +32,7 @@ public sealed class StandardsHistoryResponse
     public required string TeacherFullName { get; set; }
 }
 
-public sealed class Curator
+public sealed class TeacherResponse
 {
     public required string Guid { get; set; }
     public required string FullName { get; set; }
@@ -48,7 +48,8 @@ public sealed class GetStudentResponse
     public required double TotalPoints { get; set; }
     public required int LMSPoints { get; set; }
     public required int Course { get; set; }
-    public Curator? Curator { get; set; }
+    public TeacherResponse? Curator { get; set; }
+    public TeacherResponse? HealthGroupTeacher { get; set; }
     public required HealthGroupType HealthGroup { get; set; }
     public required SpecializationType Specialization { get; set; }
     public required List<PointsHistoryResponse> PointsHistory { get; set; }

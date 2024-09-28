@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using HotChocolate;
 
 namespace DB.Tables;
 
@@ -17,7 +16,6 @@ public enum WorkType
     Competition,
 }
 
-[GraphQLName("PointsStudentHistoryEntity")]
 [Table("PointsHistory")]
 public sealed class PointsHistoryEntity
 {

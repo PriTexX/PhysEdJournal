@@ -1,6 +1,5 @@
 using DB;
 using DB.Tables;
-using Microsoft.EntityFrameworkCore;
 using PResult;
 
 namespace Core.Commands;
@@ -12,35 +11,6 @@ public sealed class AddHealthGroupPayload
     public required HealthGroupType HealthGroup { get; init; }
 }
 
-file sealed class AddHealthGroupValidator : ICommandValidator<AddHealthGroupPayload>
-{
-    private readonly ApplicationContext _appContext;
-
-    public AddHealthGroupValidator(ApplicationContext appContext)
-    {
-        _appContext = appContext;
-    }
-
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(
-        AddHealthGroupPayload commandInput
-    )
-    {
-        var studentCuratorGuid = await _appContext
-            .Students.Where(s => s.StudentGuid == commandInput.StudentGuid)
-            .Include(s => s.Group)
-            .ThenInclude(g => g!.Curator)
-            .Select(s => s.Group!.Curator!.TeacherGuid)
-            .FirstOrDefaultAsync();
-
-        if (studentCuratorGuid != commandInput.TeacherGuid)
-        {
-            return new CuratorMismatchError();
-        }
-
-        return ValidationResult.Success;
-    }
-}
-
 public sealed class AddHealthGroupCommand : ICommand<AddHealthGroupPayload, Unit>
 {
     private readonly ApplicationContext _appContext;
@@ -50,25 +20,17 @@ public sealed class AddHealthGroupCommand : ICommand<AddHealthGroupPayload, Unit
         _appContext = appContext;
     }
 
-    public async Task<Result<Unit>> ExecuteAsync(AddHealthGroupPayload commandPayload)
+    public async Task<Result<Unit>> ExecuteAsync(AddHealthGroupPayload payload)
     {
-        var validation = await new AddHealthGroupValidator(_appContext).ValidateCommandInputAsync(
-            commandPayload
-        );
-
-        if (validation.IsFailed)
-        {
-            return validation.ValidationException;
-        }
-
-        var student = await _appContext.Students.FindAsync(commandPayload.StudentGuid);
+        var student = await _appContext.Students.FindAsync(payload.StudentGuid);
 
         if (student is null)
         {
             return new StudentNotFoundError();
         }
 
-        student.HealthGroup = commandPayload.HealthGroup;
+        student.HealthGroup = payload.HealthGroup;
+        student.HealthGroupTeacherId = payload.TeacherGuid;
 
         await _appContext.SaveChangesAsync();
 

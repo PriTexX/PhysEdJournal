@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using HotChocolate;
 
 namespace DB.Tables;
 
@@ -11,8 +10,10 @@ public enum HealthGroupType
     None,
     Basic,
     Preparatory,
-    Special,
+    SpecialA,
+    SpecialB,
     HealthLimitations,
+    Disabled,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -45,7 +46,6 @@ public sealed class StudentEntity
     [StringLength(20)]
     public required string GroupNumber { get; set; }
 
-    [GraphQLName("hasDebtFromPreviousSemester")]
     public bool HasDebt { get; set; } // Если студент не получил зачет из-за нехватки баллов
 
     public bool HadDebtInSemester { get; set; } // Если у студента был долг в семестре
@@ -74,21 +74,21 @@ public sealed class StudentEntity
 
     public HealthGroupType HealthGroup { get; set; }
 
+    [StringLength(36)]
+    public string? HealthGroupTeacherId { get; set; }
+
+    [ForeignKey("HealthGroupTeacherId")]
+    public TeacherEntity? HealthGroupTeacher { get; set; }
+
     public SpecializationType Specialization { get; set; }
 
     [StringLength(200)]
     public string? Department { get; set; }
 
     [Timestamp]
-    [GraphQLIgnore]
     public uint Version { get; set; }
 
-    [GraphQLName("PointsStudentHistory")]
     public ICollection<PointsHistoryEntity>? PointsHistory { get; set; }
-
-    [GraphQLName("VisitsStudentHistory")]
     public ICollection<VisitsHistoryEntity>? VisitsHistory { get; set; }
-
-    [GraphQLName("StandardsStudentHistory")]
     public ICollection<StandardsHistoryEntity>? StandardsHistory { get; set; }
 }

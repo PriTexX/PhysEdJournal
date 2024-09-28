@@ -49,6 +49,7 @@ public static class StudentController
     {
         var student = await appCtx
             .Students.Where(s => s.StudentGuid == guid)
+            .Include(s => s.HealthGroupTeacher)
             .Include(s => s.VisitsHistory!)
             .ThenInclude(h => h.Teacher)
             .Include(s => s.PointsHistory!)
@@ -69,12 +70,14 @@ public static class StudentController
                 s.PointsForStandards,
                 s.ArchivedVisitValue,
                 s.HealthGroup,
+                s.HealthGroupTeacher,
                 s.Specialization,
                 s.PointsHistory,
                 s.StandardsHistory,
                 s.VisitsHistory,
                 s.Group.Curator,
             })
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (student is null)
@@ -93,10 +96,17 @@ public static class StudentController
             HealthGroup = student.HealthGroup,
             Specialization = student.Specialization,
             Curator = student.Curator is not null
-                ? new Curator
+                ? new TeacherResponse
                 {
                     Guid = student.Curator.TeacherGuid,
                     FullName = student.Curator.FullName,
+                }
+                : null,
+            HealthGroupTeacher = student.HealthGroupTeacher is not null
+                ? new TeacherResponse
+                {
+                    Guid = student.HealthGroupTeacher.TeacherGuid,
+                    FullName = student.HealthGroupTeacher.FullName,
                 }
                 : null,
 

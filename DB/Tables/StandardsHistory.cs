@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using HotChocolate;
 
 namespace DB.Tables;
 
@@ -19,7 +18,6 @@ public enum StandardType
     Other,
 }
 
-[GraphQLName("StandardsStudentHistoryEntity")]
 [Table("StandardsHistory")]
 public sealed class StandardsHistoryEntity
 {

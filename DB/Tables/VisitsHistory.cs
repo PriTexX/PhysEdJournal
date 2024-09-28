@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HotChocolate;
 
 namespace DB.Tables;
 
-[GraphQLName("VisitStudentHistoryEntity")]
 [Table("VisitsHistory")]
 public sealed class VisitsHistoryEntity
 {

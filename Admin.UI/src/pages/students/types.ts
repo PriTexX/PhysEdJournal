@@ -21,16 +21,20 @@ export const healthGroups = [
   'None',
   'Basic',
   'Preparatory',
-  'Special',
+  'SpecialA',
+  'SpecialB',
   'HealthLimitations',
-];
+  'Disabled',
+] as const;
 
 export type HealthGroup = (typeof healthGroups)[number];
 
-export const healthGroupRus: Record<string, string> = {
+export const healthGroupRus: Record<HealthGroup, string> = {
   None: 'Нет',
   Basic: 'Базовая',
   Preparatory: 'Подготовительная',
-  Special: 'Специальная',
+  SpecialA: 'Специальная А',
+  SpecialB: 'Специальная Б',
   HealthLimitations: 'Ограниченная',
+  Disabled: 'Инвалид',
 };
