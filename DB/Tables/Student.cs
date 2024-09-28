@@ -11,8 +11,10 @@ public enum HealthGroupType
     None,
     Basic,
     Preparatory,
-    Special,
+    SpecialA,
+    SpecialB,
     HealthLimitations,
+    Disabled,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -73,7 +75,9 @@ public sealed class StudentEntity
     public SemesterEntity? Semester { get; set; }
 
     public HealthGroupType HealthGroup { get; set; }
-
+    
+    public TeacherEntity? HealthGroupProvider { get; set; }
+    
     public SpecializationType Specialization { get; set; }
 
     [StringLength(200)]
