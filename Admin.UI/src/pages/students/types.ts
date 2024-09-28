@@ -1,5 +1,3 @@
-import { number } from 'zod';
-
 export type Student = {
   studentGuid: string;
   fullName: string;
