@@ -111,14 +111,14 @@ builder.Services.Configure<JsonOptions>(options =>
 
 var app = builder.Build();
 
-app.UseWorker();
-
 app.UseCors(corsPolicyBuilder =>
 {
+    corsPolicyBuilder.AllowAnyHeader();
     corsPolicyBuilder.AllowAnyMethod();
     corsPolicyBuilder.AllowAnyOrigin();
-    corsPolicyBuilder.AllowAnyHeader();
 });
+
+app.UseWorker();
 
 app.UseRequestId();
 
