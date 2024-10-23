@@ -31,6 +31,7 @@ public enum SpecializationType
     SMG,
     TableTennis,
     NordicWalking,
+    InternalTeam,
 }
 
 [Table("Students")]
