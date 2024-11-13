@@ -187,16 +187,16 @@ public static class PointsController
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
         );
 
-        var isAdmin = validationResult.IsOk;
+        var isAdminOrSecretary = validationResult.IsOk;
 
         var res = await deleteStudentVisitCommand.ExecuteAsync(
             new DeleteVisitPayload
             {
                 HistoryId = id,
-                IsAdminOrSecretary = isAdmin,
+                IsAdminOrSecretary = isAdminOrSecretary,
                 TeacherGuid = callerGuid,
             }
         );
@@ -215,16 +215,16 @@ public static class PointsController
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
         );
 
-        var isAdmin = validationResult.IsOk;
+        var isAdminOrSecretary = validationResult.IsOk;
 
         var res = await deletePointsCommand.ExecuteAsync(
             new DeletePointsPayload
             {
                 HistoryId = id,
-                IsAdminOrSecretary = isAdmin,
+                IsAdminOrSecretary = isAdminOrSecretary,
                 TeacherGuid = callerGuid,
             }
         );
@@ -243,16 +243,16 @@ public static class PointsController
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
         );
 
-        var isAdmin = validationResult.IsOk;
+        var isAdminOrSecretary = validationResult.IsOk;
 
         var res = await deleteStandardPointsCommand.ExecuteAsync(
             new DeleteStandardPayload
             {
                 HistoryId = id,
-                IsAdminOrSecretary = isAdmin,
+                IsAdminOrSecretary = isAdminOrSecretary,
                 TeacherGuid = callerGuid,
             }
         );
