@@ -94,8 +94,8 @@ export const CreateTeacherModal: FC<CreateTeacherModalProps> = ({
           <FormControl mt={3}>
             <FormLabel>Права</FormLabel>
             <Select
-              onChange={(v) => setPermission(v.target.value)}
-              defaultValue={'DefaultAccess'}
+                onChange={(v) => setPermission(v.target.value)}
+                defaultValue={'DefaultAccess'}
             >
               <option key="DefaultAccess" value="DefaultAccess">
                 Обычный
@@ -105,6 +105,9 @@ export const CreateTeacherModal: FC<CreateTeacherModalProps> = ({
               </option>
               <option key="SecretaryAccess" value="SecretaryAccess">
                 Секретарь
+              </option>
+              <option key="CompetitionAccess" value="CompetitionAccess">
+                Соревнования
               </option>
             </Select>
           </FormControl>

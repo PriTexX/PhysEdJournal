@@ -25,22 +25,25 @@ const fields = [
     name: 'Права',
     render({ register }) {
       return (
-        <Select {...register({ required: true })}>
-          <option key="DefaultAccess" value="DefaultAccess">
-            Обычный
-          </option>
-          <option key="OnlineCourseAccess" value="OnlineCourseAccess">
-            СДО
-          </option>
-          <option key="SecretaryAccess" value="SecretaryAccess">
-            Секретарь
-          </option>
-        </Select>
+          <Select {...register({required: true})}>
+              <option key="DefaultAccess" value="DefaultAccess">
+                  Обычный
+              </option>
+              <option key="OnlineCourseAccess" value="OnlineCourseAccess">
+                  СДО
+              </option>
+              <option key="SecretaryAccess" value="SecretaryAccess">
+                  Секретарь
+              </option>
+              <option key="CompetitionAccess" value="CompetitionAccess">
+                  Соревнования
+              </option>
+          </Select>
       );
     },
   }),
 ];
 
 export const TeacherEditPage = () => {
-  return <Form fields={fields} type="edit" />;
+    return <Form fields={fields} type="edit" />;
 };

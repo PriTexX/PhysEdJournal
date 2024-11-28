@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -14,6 +13,7 @@ public enum TeacherPermissions
     AdminAccess = 2,
     SecretaryAccess = 4,
     OnlineCourseAccess = 8,
+    CompetitionAccess = 16,
 }
 
 [Table("Teachers")]

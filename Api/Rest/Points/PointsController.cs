@@ -60,9 +60,23 @@ public static class PointsController
 
         switch (request.Type)
         {
+            case WorkType.Competition:
+            {
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(
+                    callerGuid,
+                    TeacherPermissions.SecretaryAccess | TeacherPermissions.CompetitionAccess
+                );
+
+                if (validationResult.IsErr)
+                {
+                    return Response.Error(new NotEnoughPermissionsError());
+                }
+
+                break;
+            }
+
             case WorkType.InternalTeam
-            or WorkType.Activist
-            or WorkType.Competition:
+            or WorkType.Activist:
             {
                 var validationResult = await permissionValidator.ValidateTeacherPermissions(
                     callerGuid,
@@ -215,7 +229,9 @@ public static class PointsController
 
         var validationResult = await permissionValidator.ValidateTeacherPermissions(
             callerGuid,
-            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+            TeacherPermissions.AdminAccess
+                | TeacherPermissions.SecretaryAccess
+                | TeacherPermissions.CompetitionAccess
         );
 
         var isAdminOrSecretary = validationResult.IsOk;
