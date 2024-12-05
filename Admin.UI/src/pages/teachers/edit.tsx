@@ -2,6 +2,8 @@ import { Input, Select } from '@chakra-ui/react';
 
 import { createFormHelper, Form } from '@/widgets/form';
 
+import { MultiSelect } from './ui/MultiSelect';
+
 import type { Teacher } from './types';
 
 const formHelper = createFormHelper<Teacher>();
@@ -23,27 +25,22 @@ const fields = [
 
   formHelper.createField('permissions', {
     name: 'Права',
-    render({ register }) {
+    render(props) {
       return (
-          <Select {...register({required: true})}>
-              <option key="DefaultAccess" value="DefaultAccess">
-                  Обычный
-              </option>
-              <option key="OnlineCourseAccess" value="OnlineCourseAccess">
-                  СДО
-              </option>
-              <option key="SecretaryAccess" value="SecretaryAccess">
-                  Секретарь
-              </option>
-              <option key="CompetitionAccess" value="CompetitionAccess">
-                  Соревнования
-              </option>
-          </Select>
+        <MultiSelect
+          {...props}
+          options={[
+            { value: 'DefaultAccess', label: 'Обычный' },
+            { value: 'SecretaryAccess', label: 'Секретарь' },
+            { value: 'OnlineCourseAccess', label: 'СДО' },
+            { value: 'CompetitionAccess', label: 'Соревнования' },
+          ]}
+        />
       );
     },
   }),
 ];
 
 export const TeacherEditPage = () => {
-    return <Form fields={fields} type="edit" />;
+  return <Form fields={fields} type="edit" />;
 };
