@@ -22,6 +22,14 @@ public static class PointsController
             .RequireAuthorization();
 
         pointsRouter
+            .MapPost("/competitions", AddManyCompetitionPoints)
+            .AddPermissionsValidation(
+                TeacherPermissions.SecretaryAccess | TeacherPermissions.CompetitionAccess
+            )
+            .DisableAntiforgery()
+            .RequireAuthorization();
+
+        pointsRouter
             .MapPost("/standard", AddStandard)
             .AddValidation(AddStandardRequest.GetValidator())
             .AddPermissionsValidation(TeacherPermissions.DefaultAccess)
@@ -128,6 +136,65 @@ public static class PointsController
         var res = await addPointsCommand.ExecuteAsync(addPointsPayload);
 
         return res.Match(Response.Ok, Response.Error);
+    }
+
+    private static async Task<IResult> AddManyCompetitionPoints(
+        [FromForm] string competition,
+        [FromForm] DateOnly date,
+        [FromForm] IFormFile file,
+        [FromServices] AddManyCompetitionPointsCommand addManyCompetitionPointsCommand,
+        HttpContext ctx
+    )
+    {
+        if (Path.GetExtension(file.FileName) != ".csv")
+        {
+            return Response.Error(
+                new ErrorResponse
+                {
+                    Type = "FileExt",
+                    Detail = "Поддерживаются только файлы с расширением `.csv`",
+                    StatusCode = 400,
+                }
+            );
+        }
+
+        var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
+
+        var res = await addManyCompetitionPointsCommand.ExecuteAsync(
+            new AddManyCompetitionPointsPayload
+            {
+                Competition = competition,
+                Date = date,
+                File = file.OpenReadStream(),
+                TeacherGuid = callerGuid,
+            }
+        );
+
+        return res.Match(
+            Response.Ok,
+            (err) =>
+            {
+                if (err is not AddManyCompetitionsError compError)
+                {
+                    throw err;
+                }
+
+                var detail = new
+                {
+                    studentsWithCollisions = compError.StudentsWithNameCollisions,
+                    notFoundStudents = compError.NotFoundStudents,
+                };
+
+                return Response.Error(
+                    new ErrorResponse
+                    {
+                        Type = "ConstraintViolation",
+                        Detail = detail,
+                        StatusCode = 400,
+                    }
+                );
+            }
+        );
     }
 
     private static async Task<IResult> AddStandard(

@@ -3,5 +3,5 @@
 internal interface ICommandValidator<in TPayload>
     where TPayload : class
 {
-    public ValueTask<ValidationResult> ValidateCommandInputAsync(TPayload commandInput);
+    public ValueTask<ValidationResult> ValidateCommandInputAsync(TPayload payload);
 }

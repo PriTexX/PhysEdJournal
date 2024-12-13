@@ -6,5 +6,5 @@ public readonly struct ErrorResponse
 
     public required string Type { get; init; }
 
-    public required string Detail { get; init; }
+    public required object Detail { get; init; }
 }

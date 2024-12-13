@@ -26,18 +26,16 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(
-        AddStandardPayload commandInput
-    )
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddStandardPayload payload)
     {
-        if (commandInput.Date > DateOnly.FromDateTime(DateTime.Now))
+        if (payload.Date > DateOnly.FromDateTime(DateTime.Now))
         {
             return new ActionFromFutureError();
         }
 
         var student = await _applicationContext
             .Students.Include(s => s.Group)
-            .Where(s => s.StudentGuid == commandInput.StudentGuid)
+            .Where(s => s.StudentGuid == payload.StudentGuid)
             .FirstOrDefaultAsync();
 
         if (student is null)
@@ -62,20 +60,20 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
         }
 
         if (
-            DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber
                 > Cfg.PointsLifeDays
-            && !commandInput.IsAdminOrSecretary
+            && !payload.IsAdminOrSecretary
         )
         {
             return new DateExpiredError();
         }
 
-        if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (payload.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayError();
         }
 
-        if (commandInput.Points > Cfg.MaxPointsForOneStandard)
+        if (payload.Points > Cfg.MaxPointsForOneStandard)
         {
             return new OutOfStandardsPointsLimitError();
         }
@@ -83,13 +81,12 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
         var duplicateHistoryEntity = await _applicationContext
             .StandardsStudentsHistory.AsNoTracking()
             .Where(s =>
-                s.StudentGuid == commandInput.StudentGuid
-                && s.StandardType == commandInput.StandardType
+                s.StudentGuid == payload.StudentGuid && s.StandardType == payload.StandardType
             )
             .OrderByDescending(s => s.Points)
             .FirstOrDefaultAsync();
 
-        if (duplicateHistoryEntity is not null && commandInput.StandardType != StandardType.Other)
+        if (duplicateHistoryEntity is not null && payload.StandardType != StandardType.Other)
         {
             return new StandardExistsError();
         }

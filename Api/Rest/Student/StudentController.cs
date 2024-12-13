@@ -8,6 +8,7 @@ using DB.Tables;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PResult;
+using StudentResponse = Api.Rest.Student.Contracts.StudentResponse;
 
 namespace Api.Rest;
 

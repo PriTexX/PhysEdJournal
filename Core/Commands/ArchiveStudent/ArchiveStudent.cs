@@ -22,10 +22,12 @@ file sealed class ArchiveStudentValidator : ICommandValidator<ArchiveStudentPayl
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(ArchiveStudentPayload input)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(
+        ArchiveStudentPayload payload
+    )
     {
         var student = await this
-            ._applicationContext.Students.Where(s => s.StudentGuid == input.StudentGuid)
+            ._applicationContext.Students.Where(s => s.StudentGuid == payload.StudentGuid)
             .Include(s => s.Group)
             .FirstOrDefaultAsync();
 
@@ -44,9 +46,9 @@ file sealed class ArchiveStudentValidator : ICommandValidator<ArchiveStudentPayl
         }
 
         if (
-            input.TeacherGuid is not null
-            && !input.IsAdmin
-            && student.Group.CuratorGuid != input.TeacherGuid
+            payload.TeacherGuid is not null
+            && !payload.IsAdmin
+            && student.Group.CuratorGuid != payload.TeacherGuid
         )
         {
             return new NotCuratorError();

@@ -23,22 +23,22 @@ internal sealed class AddVisitValidator : ICommandValidator<AddVisitPayload>
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddVisitPayload commandInput)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddVisitPayload payload)
     {
-        if (commandInput.Date > DateOnly.FromDateTime(DateTime.Now))
+        if (payload.Date > DateOnly.FromDateTime(DateTime.Now))
         {
             return new ActionFromFutureError();
         }
 
-        if (commandInput.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (payload.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayError();
         }
 
         if (
-            DateOnly.FromDateTime(DateTime.Now).DayNumber - commandInput.Date.DayNumber
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber
                 > Cfg.VisitLifeDays
-            && !commandInput.IsAdminOrSecretary
+            && !payload.IsAdminOrSecretary
         )
         {
             return new DateExpiredError();
@@ -46,7 +46,7 @@ internal sealed class AddVisitValidator : ICommandValidator<AddVisitPayload>
 
         var recordCopy = await _applicationContext
             .VisitsStudentsHistory.Where(v =>
-                v.StudentGuid == commandInput.StudentGuid && v.Date == commandInput.Date
+                v.StudentGuid == payload.StudentGuid && v.Date == payload.Date
             )
             .FirstOrDefaultAsync();
 

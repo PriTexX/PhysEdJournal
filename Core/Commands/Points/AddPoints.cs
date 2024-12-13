@@ -26,28 +26,28 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
         _applicationContext = applicationContext;
     }
 
-    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsPayload input)
+    public async ValueTask<ValidationResult> ValidateCommandInputAsync(AddPointsPayload payload)
     {
-        if (input.Date > DateOnly.FromDateTime(DateTime.UtcNow))
+        if (payload.Date > DateOnly.FromDateTime(DateTime.UtcNow))
         {
             return new ActionFromFutureError();
         }
 
         var student = await _applicationContext
             .Students.Include(s => s.Group)
-            .FirstOrDefaultAsync(s => s.StudentGuid == input.StudentGuid);
+            .FirstOrDefaultAsync(s => s.StudentGuid == payload.StudentGuid);
 
         if (student is null)
         {
             return new StudentNotFoundError();
         }
 
-        if (input.WorkType == WorkType.ExternalFitness)
+        if (payload.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext
                 .PointsStudentsHistory.AsNoTracking()
                 .Where(p =>
-                    p.StudentGuid == input.StudentGuid && p.WorkType == WorkType.ExternalFitness
+                    p.StudentGuid == payload.StudentGuid && p.WorkType == WorkType.ExternalFitness
                 )
                 .FirstOrDefaultAsync();
 
@@ -56,17 +56,17 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
                 return new FitnessExistsError();
             }
 
-            if (input.Points > Cfg.MaxPointsForExternalFitness)
+            if (payload.Points > Cfg.MaxPointsForExternalFitness)
             {
                 return new PointsOutOfLimitError();
             }
         }
 
-        if (input.WorkType == WorkType.GTO)
+        if (payload.WorkType == WorkType.GTO)
         {
             var anotherGTO = await _applicationContext
                 .PointsStudentsHistory.AsNoTracking()
-                .Where(p => p.StudentGuid == input.StudentGuid && p.WorkType == WorkType.GTO)
+                .Where(p => p.StudentGuid == payload.StudentGuid && p.WorkType == WorkType.GTO)
                 .FirstOrDefaultAsync();
 
             if (anotherGTO is not null)
@@ -75,21 +75,21 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
             }
         }
 
-        if (input.WorkType == WorkType.Science && input.Points > Cfg.MaxPointsForScience)
+        if (payload.WorkType == WorkType.Science && payload.Points > Cfg.MaxPointsForScience)
         {
             return new PointsOutOfLimitError();
         }
 
         if (
-            DateOnly.FromDateTime(DateTime.Now).DayNumber - input.Date.DayNumber
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber
                 > Cfg.PointsLifeDays
-            && !input.IsAdminOrSecretary
+            && !payload.IsAdminOrSecretary
         )
         {
             return new DateExpiredError();
         }
 
-        if (input.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (payload.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
         {
             return new NonWorkingDayError();
         }
@@ -118,9 +118,9 @@ public sealed class AddPointsCommand : ICommand<AddPointsPayload, Unit>
             return validation.ValidationException;
         }
 
-        var student = await _applicationContext
-            .Students.Include(s => s.Group)
-            .FirstAsync(s => s.StudentGuid == payload.StudentGuid);
+        var student = await _applicationContext.Students.FirstAsync(s =>
+            s.StudentGuid == payload.StudentGuid
+        );
 
         var pointsStudentHistoryEntity = new PointsHistoryEntity
         {
