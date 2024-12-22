@@ -6,7 +6,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  USERNAME: pritexx
   
 jobs:
   deploy:
@@ -75,20 +74,20 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{secrets.HOST}}
-          username: ${{env.USERNAME}}
+          username: ${{ secrets.HOST_USERNAME }}
           password: ${{ secrets.HOST_PASSWORD }}
           rm: true
           source: "deploy.tar"
-          target: "/home/${{env.USERNAME}}/physedjournal"
+          target: "/home/${{secrets.HOST_USERNAME}}/physedjournal"
 
       - name: Pull and run containers
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{secrets.HOST}}
-          username: ${{ env.USERNAME }}
+          username: ${{ secrets.HOST_USERNAME }}
           password: ${{ secrets.HOST_PASSWORD }}
           script: |
-            cd /home/${{env.USERNAME}}/physedjournal
+            cd /home/${{secrets.HOST_USERNAME}}/physedjournal
             tar -xf deploy.tar
             cd deploy
             docker logout ghcr.io
