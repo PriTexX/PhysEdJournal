@@ -51,7 +51,7 @@ services:
     depends_on:
       - physedjournal
     volumes:
-      - /etc/letsencrypt:/etc/certs:ro
+      - /cert:/etc/certs:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
