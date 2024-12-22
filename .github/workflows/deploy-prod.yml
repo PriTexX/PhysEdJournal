@@ -6,7 +6,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  USERNAME: admin2
+  USERNAME: pritexx
   
 jobs:
   deploy:
@@ -92,6 +92,6 @@ jobs:
             tar -xf deploy.tar
             cd deploy
             docker logout ghcr.io
-            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose -f docker-compose.prod.yml pull
-            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose -f docker-compose.prod.yml -p physedjournal up -d
-            IMAGE_TAG=${{env.IMAGE_TAG}} docker-compose -f docker-compose.prod.yml -p physedjournal restart
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker compose -f docker-compose.prod.yml pull
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker compose -f docker-compose.prod.yml -p physedjournal up -d
+            IMAGE_TAG=${{env.IMAGE_TAG}} docker compose -f docker-compose.prod.yml -p physedjournal restart
