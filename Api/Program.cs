@@ -20,6 +20,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.InitCoreCfg();
 builder.AddLogging("Journal");
+
+Console.WriteLine($"ConnectionString: {Cfg.ConnectionString}");
+
 builder.Services.AddCoreDB(Cfg.ConnectionString);
 
 /*
