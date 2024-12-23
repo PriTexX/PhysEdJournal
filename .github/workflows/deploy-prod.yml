@@ -70,15 +70,12 @@ jobs:
           username: ${{secrets.OVPN_USERNAME}}
           password: ${{secrets.OVPN_PASSWORD}}
 
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
       - name: Copy deploy.tar
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{secrets.HOST}}
-          username: ${{ secrets.HOST_USERNAME }}
-          password: ${{ secrets.HOST_PASSWORD }}
-          rm: true
-          source: "deploy.tar"
-          target: "/home/${{secrets.HOST_USERNAME}}/physedjournal"
+        run: |
+          sshpass -p "${{ secrets.HOST_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar ${{ secrets.HOST_USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.HOST_USERNAME }}/physedjournal
 
       - name: Pull and run containers
         uses: appleboy/ssh-action@v0.1.7
