@@ -35,14 +35,6 @@ public static class Cfg
             .Configuration.GetSection(ExternalCfgValues.SectionName)
             .Get<ExternalCfgValues>();
 
-        Console.WriteLine(
-            $"""
-            ConnectionString: {externalCfgValues?.ConnectionString ?? "empty"}
-            SeqApiKey: {externalCfgValues?.SeqApiKey ?? "empty"}
-            Userinfo: {externalCfgValues?.UserInfoServerURL ?? "empty"}
-            """
-        );
-
         ArgumentNullException.ThrowIfNull(externalCfgValues);
 
         Environment = builder.Environment.EnvironmentName;
