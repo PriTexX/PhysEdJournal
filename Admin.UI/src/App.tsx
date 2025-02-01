@@ -100,6 +100,7 @@ const resources: ResourceProps[] = [
   {
     name: 'semesters',
     list: '/semesters',
+    create: '/semesters/create',
     meta: {
       label: 'Семестры',
     },
