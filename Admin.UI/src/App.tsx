@@ -34,7 +34,11 @@ import {
 import { GroupEditPage, GroupListPage } from './pages/groups';
 import { LoginPage } from './pages/login';
 import { PointsListPage } from './pages/points';
-import { SemesterCreatePage, SemesterListPage } from './pages/semesters';
+import {
+  SemesterCreatePage,
+  SemesterEditPage,
+  SemesterListPage,
+} from './pages/semesters';
 import { StandardsListPage } from './pages/standards';
 import { StudentEditPage, StudentListPage } from './pages/students';
 import { TeacherEditPage, TeacherListPage } from './pages/teachers';
@@ -100,6 +104,7 @@ const resources: ResourceProps[] = [
   {
     name: 'semesters',
     list: '/semesters',
+    edit: '/semesters/:id',
     create: '/semesters/create',
     meta: {
       label: 'Семестры',
@@ -236,6 +241,7 @@ function App() {
                             path="create"
                             element={<SemesterCreatePage />}
                           />
+                          <Route path=":id" element={<SemesterEditPage />} />
                         </Route>
                         <Route path="/standards">
                           <Route index element={<StandardsListPage />} />

@@ -102,6 +102,7 @@ GenericCrudController<SemesterEntity, string>.MapEndpoints(
         Name = "semesters",
         Validator = Semester.Validator,
         IsCreatable = true,
+        IsEditable = true,
     }
 );
 
