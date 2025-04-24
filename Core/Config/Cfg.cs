@@ -65,7 +65,7 @@ public static class Cfg
     public static int MaxPointsAmount { get; private set; } = 50;
     public static int MaxPointsForExternalFitness { get; private set; } = 10;
     public static int MaxPointsForScience { get; private set; } = 30;
-    public static int MinTotalPointsToAddStandards { get; private set; } = 20;
+    public static int MinTotalPointsToAddStandards { get; private set; } = 40;
     public static int MaxPointsForOneStandard { get; private set; } = 10;
     public static int VisitLifeDays { get; private set; } = 30;
     public static int DaysToDeleteVisit { get; private set; } = 30;
