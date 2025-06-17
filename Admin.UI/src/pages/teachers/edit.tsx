@@ -32,7 +32,8 @@ const fields = [
           options={[
             { value: 'DefaultAccess', label: 'Обычный' },
             { value: 'SecretaryAccess', label: 'Секретарь' },
-            { value: 'OnlineCourseAccess', label: 'СДО' },
+            { value: 'OnlineCourseAccess', label: 'СДО' }, 
+            { value: 'CompetitionAccess', label: 'Соревнования' },
             { value: 'AdminAccess', label: 'Админ' },
             { value: 'ScienceAccess', label: 'Наука' },
             { value: 'GTOAccess', label: 'ГТО' },
