@@ -45,14 +45,12 @@ public sealed class PermissionValidator
             );
         }
 
-        var hasEnough = HasEnoughPermissions(teacher.Permissions, requiredPermissions);
-
-        if (!hasEnough)
+        if (!HasEnoughPermissions(teacher.Permissions, requiredPermissions))
         {
             return new NotEnoughPermissionsError();
         }
 
-        return hasEnough;
+        return true;
     }
 
     private static bool HasEnoughPermissions(
@@ -60,6 +58,11 @@ public sealed class PermissionValidator
         TeacherPermissions requiredPermissions
     )
     {
+        if (permissions.HasFlag(TeacherPermissions.Disabled))
+        {
+            return false;
+        }
+
         if (requiredPermissions == TeacherPermissions.DefaultAccess)
         {
             return true;

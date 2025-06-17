@@ -42,6 +42,14 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
             return new StudentNotFoundError();
         }
 
+        if (
+            payload.WorkType is WorkType.Science or WorkType.GTO
+            && payload.Date != DateOnly.FromDateTime(DateTime.UtcNow)
+        )
+        {
+            return new DateExpiredError();
+        }
+
         if (payload.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext
@@ -80,11 +88,19 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
             return new PointsOutOfLimitError();
         }
 
+        var daysPastFromNow =
+            DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber;
+
         if (
-            DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber
-                > Cfg.PointsLifeDays
+            payload.WorkType == WorkType.OnlineWork
+            && daysPastFromNow > Cfg.OnlineWorkPointsLifeDays
             && !payload.IsAdminOrSecretary
         )
+        {
+            return new DateExpiredError();
+        }
+
+        if (daysPastFromNow > Cfg.PointsLifeDays && !payload.IsAdminOrSecretary)
         {
             return new DateExpiredError();
         }

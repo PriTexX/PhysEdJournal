@@ -37,7 +37,7 @@ internal sealed class AddVisitValidator : ICommandValidator<AddVisitPayload>
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber
-                > Cfg.VisitLifeDays
+                > Cfg.VisitAndStandardsLifeDays
             && !payload.IsAdminOrSecretary
         )
         {

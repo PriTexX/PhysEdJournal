@@ -3,6 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace Api;
 
+// Как-то получилось, что фронт привязался на такой всратый формат даты,
+// так что теперь его нужно поддерживать и конвертировать в разные форматы на вход и на выход.
 public class DateOnlyConverter : JsonConverter<DateOnly>
 {
     public override DateOnly Read(

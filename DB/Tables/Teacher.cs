@@ -14,6 +14,9 @@ public enum TeacherPermissions
     SecretaryAccess = 4,
     OnlineCourseAccess = 8,
     CompetitionAccess = 16,
+    ScienceAccess = 32,
+    GTOAccess = 64,
+    Disabled = 128,
 }
 
 [Table("Teachers")]

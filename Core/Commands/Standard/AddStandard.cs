@@ -61,7 +61,7 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
 
         if (
             DateOnly.FromDateTime(DateTime.Now).DayNumber - payload.Date.DayNumber
-                > Cfg.PointsLifeDays
+                > Cfg.VisitAndStandardsLifeDays
             && !payload.IsAdminOrSecretary
         )
         {

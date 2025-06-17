@@ -33,7 +33,10 @@ const fields = [
             { value: 'DefaultAccess', label: 'Обычный' },
             { value: 'SecretaryAccess', label: 'Секретарь' },
             { value: 'OnlineCourseAccess', label: 'СДО' },
-            { value: 'CompetitionAccess', label: 'Соревнования' },
+            { value: 'AdminAccess', label: 'Админ' },
+            { value: 'ScienceAccess', label: 'Наука' },
+            { value: 'GTOAccess', label: 'ГТО' },
+            { value: 'Disabled', label: 'Выключен (не может выставлять баллы)' },
           ]}
         />
       );

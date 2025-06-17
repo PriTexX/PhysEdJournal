@@ -113,6 +113,36 @@ public static class PointsController
 
                 break;
             }
+
+            case WorkType.Science:
+            {
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(
+                    callerGuid,
+                    TeacherPermissions.ScienceAccess
+                );
+
+                if (validationResult.IsErr)
+                {
+                    return Response.Error(new NotEnoughPermissionsError());
+                }
+
+                break;
+            }
+
+            case WorkType.GTO:
+            {
+                var validationResult = await permissionValidator.ValidateTeacherPermissions(
+                    callerGuid,
+                    TeacherPermissions.GTOAccess
+                );
+
+                if (validationResult.IsErr)
+                {
+                    return Response.Error(new NotEnoughPermissionsError());
+                }
+
+                break;
+            }
         }
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(

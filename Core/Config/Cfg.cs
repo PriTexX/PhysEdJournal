@@ -61,13 +61,14 @@ public static class Cfg
     public static int MaxPointsForStandards { get; private set; } = 30;
     public static int DaysToDeletePoints { get; private set; } = 30;
     public static int PointsLifeDays { get; private set; } = 60;
+    public static int OnlineWorkPointsLifeDays { get; private set; } = 7;
     public static int RequiredPointsAmount { get; private set; } = 50;
     public static int MaxPointsAmount { get; private set; } = 50;
     public static int MaxPointsForExternalFitness { get; private set; } = 10;
     public static int MaxPointsForScience { get; private set; } = 30;
     public static int MinTotalPointsToAddStandards { get; private set; } = 40;
     public static int MaxPointsForOneStandard { get; private set; } = 5;
-    public static int VisitLifeDays { get; private set; } = 30;
+    public static int VisitAndStandardsLifeDays { get; private set; } = 7;
     public static int DaysToDeleteVisit { get; private set; } = 30;
 
     public static double CalculateTotalPoints(
