@@ -118,6 +118,7 @@ export const StudentListPage: React.FC<IResourceComponentsProps> = () => {
       filters={[
         { column: 'fullName', name: 'ФИО', type: 'text' },
         { column: 'groupNumber', name: 'Группа', type: 'text' },
+        { column: 'currentSemesterName', name: 'Семестер', type: 'text' },
         {
           column: 'hasDebt',
           name: 'Долг',

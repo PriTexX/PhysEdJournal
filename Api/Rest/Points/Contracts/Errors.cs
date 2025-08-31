@@ -29,7 +29,7 @@ public static class PointsErrors
             },
             {
                 nameof(StandardExistsError),
-                _ => new ErrorResponse()
+                _ => new ErrorResponse
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Type = "standard-duplicate",

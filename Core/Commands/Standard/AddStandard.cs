@@ -73,9 +73,15 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
             return new NonWorkingDayError();
         }
 
-        if (payload.Points > Cfg.MaxPointsForOneStandard)
+        if (
+            payload.Points > Cfg.MaxPointsForOneStandard
+            || (
+                student.Course > 1
+                && payload.Points > Cfg.MaxPointsForOneStandardForCoursesHigherThan1
+            )
+        )
         {
-            return new OutOfStandardsPointsLimitError();
+            return new PointsOutOfLimitError();
         }
 
         var duplicateHistoryEntity = await _applicationContext
