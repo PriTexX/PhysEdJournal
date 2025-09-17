@@ -105,7 +105,7 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
             return new DateExpiredError();
         }
 
-        if (payload.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (payload.Date.DayOfWeek is DayOfWeek.Sunday)
         {
             return new NonWorkingDayError();
         }

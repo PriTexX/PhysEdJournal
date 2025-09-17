@@ -30,7 +30,7 @@ internal sealed class AddVisitValidator : ICommandValidator<AddVisitPayload>
             return new ActionFromFutureError();
         }
 
-        if (payload.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (payload.Date.DayOfWeek is DayOfWeek.Sunday)
         {
             return new NonWorkingDayError();
         }

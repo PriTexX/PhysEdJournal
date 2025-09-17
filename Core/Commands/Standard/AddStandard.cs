@@ -74,7 +74,7 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
             return new DateExpiredError();
         }
 
-        if (payload.Date.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Monday)
+        if (payload.Date.DayOfWeek is DayOfWeek.Sunday)
         {
             return new NonWorkingDayError();
         }

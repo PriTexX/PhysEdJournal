@@ -114,7 +114,7 @@ const fields = [
   formHelper.createField('currentSemesterName', {
     name: 'Текущий семестр',
     render({ register }) {
-      return <Input disabled {...register()} />;
+      return <Input {...register()} />;
     },
   }),
 ];
