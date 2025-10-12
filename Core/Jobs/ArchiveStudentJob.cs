@@ -37,24 +37,30 @@ public sealed class ArchiveStudentJob : IInvocable
             var students = await _applicationContext
                 .Students.Include(s => s.Group)
                 .Where(s => s.HasDebt)
+                .AsNoTracking()
                 .ToListAsync();
 
-            totalStudents = students.Count;
-            foreach (var stud in students)
+            foreach (var student in students.Where(StudentRequiresArchiving))
             {
-                if (!StudentRequiresArchiving(stud))
-                {
-                    continue;
-                }
+                totalStudents += 1;
 
                 var archivePayload = new ArchiveStudentPayload
                 {
-                    StudentGuid = stud.StudentGuid,
+                    StudentGuid = student.StudentGuid,
                     IsAdmin = true,
                 };
 
                 try
                 {
+                    // Dirty hack to prevent different command runs
+                    // from affecting each other.
+                    //
+                    // If archiving of one student fails, its changes
+                    // will still be tracked in the context and same
+                    // queries will be run with the next student
+                    // causing same error again.
+                    _applicationContext.ChangeTracker.Clear();
+
                     var result = await _command.ExecuteAsync(archivePayload);
 
                     if (result.IsErr)
