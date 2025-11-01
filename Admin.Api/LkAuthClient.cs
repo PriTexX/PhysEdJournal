@@ -49,7 +49,7 @@ public sealed class LkAuthClient
             await authResponse.Content.ReadAsStreamAsync()
         );
 
-        var userResponse = await _httpClient.GetAsync(
+        var appDataResponse = await _httpClient.GetAsync(
             $"old/lk_api.php/?getAppData&token={authInfo.Token}"
         );
 
@@ -58,26 +58,26 @@ public sealed class LkAuthClient
         );
 
         if (
-            userResponse.StatusCode != HttpStatusCode.OK
+            appDataResponse.StatusCode != HttpStatusCode.OK
             || avatarResponse.StatusCode != HttpStatusCode.OK
         )
         {
             throw new Exception("Unknown HTTP error");
         }
 
-        var userInfo = await JsonSerializer.DeserializeAsync<LKUserResponse>(
-            await userResponse.Content.ReadAsStreamAsync()
+        var appInfo = await JsonSerializer.DeserializeAsync<LKUserResponse>(
+            await appDataResponse.Content.ReadAsStreamAsync()
         );
 
-        var avatarInfo = await JsonSerializer.DeserializeAsync<LKUserAvatarResponse>(
+        var userInfo = await JsonSerializer.DeserializeAsync<LKUserAvatarResponse>(
             await avatarResponse.Content.ReadAsStreamAsync()
         );
 
         return new AuthResponse
         {
-            FullName = $"{userInfo.Surname} {userInfo.Name} {userInfo.Patronymic}".Trim(),
-            PersonGuid = userInfo.PersonGuid,
-            PictureUrl = avatarInfo.User.AvatarUrl,
+            FullName = $"{userInfo.User.Surname} {userInfo.User.Name} {userInfo.User.Patronymic}".Trim(),
+            PersonGuid = appInfo.PersonGuid,
+            PictureUrl = userInfo.User.AvatarUrl,
         };
     }
 }
@@ -92,15 +92,6 @@ file struct LKUserResponse
 {
     [JsonPropertyName("guid_person")]
     public required string PersonGuid { get; init; }
-
-    [JsonPropertyName("surname")]
-    public required string Surname { get; init; }
-
-    [JsonPropertyName("patronymic")]
-    public required string Patronymic { get; init; }
-
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
 }
 
 file struct LKUserAvatarResponse
@@ -113,4 +104,13 @@ file struct User
 {
     [JsonPropertyName("avatar")]
     public required string AvatarUrl { get; init; }
+    
+    [JsonPropertyName("surname")]
+    public required string Surname { get; init; }
+
+    [JsonPropertyName("patronymic")]
+    public required string Patronymic { get; init; }
+
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
 }
