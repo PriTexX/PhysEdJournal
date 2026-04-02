@@ -25,7 +25,7 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsPayload, Unit>
 
     public async Task<Result<Unit>> ExecuteAsync(DeletePointsPayload payload)
     {
-        var history = await _applicationContext.PointsStudentsHistory.FirstOrDefaultAsync(s =>
+        var history = await _applicationContext.PointsHistory.FirstOrDefaultAsync(s =>
             s.Id == payload.HistoryId
         );
 
@@ -53,7 +53,7 @@ public sealed class DeletePointsCommand : ICommand<DeletePointsPayload, Unit>
         }
 
         student.AdditionalPoints -= history.Points;
-        _applicationContext.PointsStudentsHistory.Remove(history);
+        _applicationContext.PointsHistory.Remove(history);
         _applicationContext.Students.Update(student);
 
         try

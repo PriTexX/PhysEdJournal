@@ -1,3 +1,4 @@
+using Core.Commands.SyncStudents;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Api.StaffSearch;
@@ -27,15 +28,15 @@ public static class StaffSearchEndpoint
 
     private static async Task<IResult> SearchStaff(
         string filter,
-        [FromServices] StaffHttpClient client
+        [FromServices] StudentsEmployeesClient client
     )
     {
-        var staff = await client.GetStaffByFilterAsync(filter);
+        var employees = await client.GetEmployeesAsync(100, 0, filter);
 
-        var staffResponseModel = staff.Employees.Items.Select(e => new EmployeeResponse
+        var staffResponseModel = employees.Select(e => new EmployeeResponse
         {
+            Guid = e.Id,
             FullName = e.FullName,
-            Guid = e.Guid,
         });
 
         var response = new SearchStaffResponse { Employees = staffResponseModel };

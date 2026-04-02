@@ -1,6 +1,7 @@
 using Coravel.Invocable;
 using Core.Commands;
 using Core.Commands.SyncStudents;
+using Serilog;
 
 namespace Core.Jobs;
 
@@ -13,8 +14,15 @@ public sealed class SyncStudentsJob : IInvocable
         _syncStudentsCommand = syncStudentsCommand;
     }
 
-    public Task Invoke()
+    public async Task Invoke()
     {
-        return _syncStudentsCommand.ExecuteAsync(EmptyPayload.Empty);
+        try
+        {
+            await _syncStudentsCommand.ExecuteAsync(EmptyPayload.Empty);
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Failed StudentSync command");
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Core.Commands.SyncStudents;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Commands;
@@ -6,6 +7,8 @@ public static class DI
 {
     public static void AddCommands(this IServiceCollection services)
     {
+        services.AddScoped<StudentsEmployeesClient>();
+
         services.AddScoped<AddPointsCommand>();
         services.AddScoped<AddVisitCommand>();
         services.AddScoped<AddStandardCommand>();

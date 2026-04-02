@@ -32,7 +32,8 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
         await using var scope = _serviceScopeFactory.CreateAsyncScope();
         await using var applicationContext =
             scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-        using var client = new UserInfoClient(Cfg.UserInfoServerURL);
+
+        var client = scope.ServiceProvider.GetRequiredService<StudentsEmployeesClient>();
 
         _logger.LogInformation($"Starting {nameof(SyncStudentsCommand)}");
 
@@ -50,21 +51,18 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
         while (true)
         {
-            var actualStudents = await client.GetStudentsAsync(
-                Cfg.PageSizeToQueryUserInfoServer,
-                offset
-            );
+            var actualStudents = await client.GetStudentsAsync(Cfg.PageSizeToQueryStudents, offset);
 
             if (actualStudents.Count == 0)
             {
                 break;
             }
 
-            offset += Cfg.PageSizeToQueryUserInfoServer;
+            offset += Cfg.PageSizeToQueryStudents;
 
             _logger.LogInformation(
                 "Received {chunkNum} chunk of students from `userinfo`",
-                offset / Cfg.PageSizeToQueryUserInfoServer
+                offset / Cfg.PageSizeToQueryStudents
             );
 
             var studentsGuids = actualStudents.Select(s => s.Guid).ToList();

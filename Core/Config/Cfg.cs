@@ -57,7 +57,7 @@ public static class Cfg
     public static string SeqUrl { get; private set; } = "http://seq:5341";
     public static string SeqApiKey { get; private set; } = null!;
 
-    public static int PageSizeToQueryUserInfoServer { get; private set; } = 250;
+    public static int PageSizeToQueryStudents { get; private set; } = 1000;
     public static int MaxPointsForStandards { get; private set; } = 30;
     public static int DaysToDeletePoints { get; private set; } = 30;
     public static int PointsLifeDays { get; private set; } = 60;

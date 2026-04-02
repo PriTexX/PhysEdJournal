@@ -45,7 +45,7 @@ internal sealed class AddVisitValidator : ICommandValidator<AddVisitPayload>
         }
 
         var recordCopy = await _applicationContext
-            .VisitsStudentsHistory.Where(v =>
+            .VisitsHistory.Where(v =>
                 v.StudentGuid == payload.StudentGuid && v.Date == payload.Date
             )
             .FirstOrDefaultAsync();
@@ -97,7 +97,7 @@ public sealed class AddVisitCommand : ICommand<AddVisitPayload, Unit>
             TeacherGuid = commandPayload.TeacherGuid,
         };
 
-        _applicationContext.VisitsStudentsHistory.Add(record);
+        _applicationContext.VisitsHistory.Add(record);
         _applicationContext.Students.Update(student);
 
         try

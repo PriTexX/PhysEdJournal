@@ -97,6 +97,7 @@ if (Cfg.IsDevelopment())
     Utils
  */
 
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddCors();
 builder.Services.AddEndpointsApiExplorer();

@@ -91,7 +91,7 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
         }
 
         var duplicateHistoryEntity = await _applicationContext
-            .StandardsStudentsHistory.AsNoTracking()
+            .StandardsHistory.AsNoTracking()
             .Where(s =>
                 s.StudentGuid == payload.StudentGuid && s.StandardType == payload.StandardType
             )
@@ -153,7 +153,7 @@ public sealed class AddStandardCommand : ICommand<AddStandardPayload, Unit>
 
         student.PointsForStandards = adjustedStudentPointsAmount;
 
-        _applicationContext.StandardsStudentsHistory.Add(standardsStudentHistoryEntity);
+        _applicationContext.StandardsHistory.Add(standardsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
 
         try

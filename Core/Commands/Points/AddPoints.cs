@@ -53,7 +53,7 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
         if (payload.WorkType == WorkType.ExternalFitness)
         {
             var anotherFitness = await _applicationContext
-                .PointsStudentsHistory.AsNoTracking()
+                .PointsHistory.AsNoTracking()
                 .Where(p =>
                     p.StudentGuid == payload.StudentGuid && p.WorkType == WorkType.ExternalFitness
                 )
@@ -73,7 +73,7 @@ internal sealed class AddPointsValidator : ICommandValidator<AddPointsPayload>
         if (payload.WorkType == WorkType.GTO)
         {
             var anotherGTO = await _applicationContext
-                .PointsStudentsHistory.AsNoTracking()
+                .PointsHistory.AsNoTracking()
                 .Where(p => p.StudentGuid == payload.StudentGuid && p.WorkType == WorkType.GTO)
                 .FirstOrDefaultAsync();
 
@@ -150,7 +150,7 @@ public sealed class AddPointsCommand : ICommand<AddPointsPayload, Unit>
 
         student.AdditionalPoints += pointsStudentHistoryEntity.Points;
 
-        _applicationContext.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
+        _applicationContext.PointsHistory.Add(pointsStudentHistoryEntity);
         _applicationContext.Students.Update(student);
 
         try

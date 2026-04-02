@@ -25,7 +25,7 @@ public sealed class DeleteVisitCommand : ICommand<DeleteVisitPayload, Unit>
 
     public async Task<Result<Unit>> ExecuteAsync(DeleteVisitPayload payload)
     {
-        var history = await _applicationContext.VisitsStudentsHistory.FirstOrDefaultAsync(s =>
+        var history = await _applicationContext.VisitsHistory.FirstOrDefaultAsync(s =>
             s.Id == payload.HistoryId
         );
 
@@ -54,7 +54,7 @@ public sealed class DeleteVisitCommand : ICommand<DeleteVisitPayload, Unit>
 
         student.Visits--;
 
-        _applicationContext.VisitsStudentsHistory.Remove(history);
+        _applicationContext.VisitsHistory.Remove(history);
         _applicationContext.Students.Update(student);
 
         try

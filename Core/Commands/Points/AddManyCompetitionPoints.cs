@@ -156,7 +156,7 @@ public sealed class AddManyCompetitionPointsCommand
 
             dbStudent.AdditionalPoints += pointsStudentHistoryEntity.Points;
 
-            _appCtx.PointsStudentsHistory.Add(pointsStudentHistoryEntity);
+            _appCtx.PointsHistory.Add(pointsStudentHistoryEntity);
             _appCtx.Students.Update(dbStudent);
         }
 

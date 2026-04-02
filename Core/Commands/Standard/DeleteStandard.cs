@@ -25,7 +25,7 @@ public sealed class DeleteStandardCommand : ICommand<DeleteStandardPayload, Unit
 
     public async Task<Result<Unit>> ExecuteAsync(DeleteStandardPayload commandPayload)
     {
-        var history = await _applicationContext.StandardsStudentsHistory.FirstOrDefaultAsync(s =>
+        var history = await _applicationContext.StandardsHistory.FirstOrDefaultAsync(s =>
             s.Id == commandPayload.HistoryId
         );
 
@@ -53,7 +53,7 @@ public sealed class DeleteStandardCommand : ICommand<DeleteStandardPayload, Unit
         }
 
         var totalPointsForStandards = await _applicationContext
-            .StandardsStudentsHistory.Where(h => h.StudentGuid == student.StudentGuid)
+            .StandardsHistory.Where(h => h.StudentGuid == student.StudentGuid)
             .SumAsync(h => h.Points);
 
         var pointsForStandard = totalPointsForStandards - history.Points;
@@ -64,7 +64,7 @@ public sealed class DeleteStandardCommand : ICommand<DeleteStandardPayload, Unit
 
         student.PointsForStandards = limitedPoints;
 
-        _applicationContext.StandardsStudentsHistory.Remove(history);
+        _applicationContext.StandardsHistory.Remove(history);
 
         _applicationContext.Students.Update(student);
 
