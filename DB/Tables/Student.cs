@@ -14,6 +14,7 @@ public enum HealthGroupType
     SpecialB,
     HealthLimitations,
     Disabled,
+    Released,
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

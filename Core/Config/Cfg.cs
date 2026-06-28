@@ -13,9 +13,6 @@ file sealed class ExternalCfgValues
     public string ConnectionString { get; init; } = null!;
 
     [Required]
-    public string UserInfoServerURL { get; init; } = null!;
-
-    [Required]
     public string RsaPublicKey { get; init; } = null!;
 
     public string? SeqApiKey { get; init; }
@@ -40,7 +37,6 @@ public static class Cfg
         Environment = builder.Environment.EnvironmentName;
 
         ConnectionString = externalCfgValues.ConnectionString;
-        UserInfoServerURL = externalCfgValues.UserInfoServerURL;
         RsaPublicKey = externalCfgValues.RsaPublicKey;
         SeqApiKey = externalCfgValues.SeqApiKey ?? string.Empty;
     }
@@ -52,7 +48,6 @@ public static class Cfg
     public static bool IsDevelopment() => !IsProduction();
 
     public static string ConnectionString { get; private set; } = null!;
-    public static string UserInfoServerURL { get; private set; } = null!;
     public static string RsaPublicKey { get; private set; } = null!;
     public static string SeqUrl { get; private set; } = "http://seq:5341";
     public static string SeqApiKey { get; private set; } = null!;

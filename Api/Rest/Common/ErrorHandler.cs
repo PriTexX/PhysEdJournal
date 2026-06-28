@@ -95,16 +95,6 @@ public static class ErrorHandler
                     Detail = "Нельзя менять чужие данные",
                 }
             },
-            {
-                nameof(OrderByQueryStructureError),
-                _ => new ErrorResponse
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Type = "order-by-query",
-                    Detail =
-                        "Запрос на сортировку это список параметров через запятую. Параметр на сортировку состоит из единого слова, а так же может иметь модификатор asc или desc.",
-                }
-            },
         };
 
     private static readonly ErrorResponse DefaultErrorResponse =

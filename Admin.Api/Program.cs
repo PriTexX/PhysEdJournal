@@ -38,8 +38,6 @@ builder.Services.AddHttpClient<LkAuthClient>(c =>
 builder.Services.AddCoreDB(Cfg.ConnectionString);
 builder.Services.AddCommands();
 
-builder.Services.AddSingleton<StaffHttpClient>();
-
 var app = builder.Build();
 
 app.UseCors(o =>

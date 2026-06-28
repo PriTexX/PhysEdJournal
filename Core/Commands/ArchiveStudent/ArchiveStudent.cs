@@ -138,7 +138,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
                         TeacherGuid = h.TeacherGuid,
                         Points = visitValue,
                     })
-                    .ToList() ?? new List<ArchivedHistory>(),
+                    .ToList() ?? [],
             PointsHistory =
                 student
                     .PointsHistory?.Select(h => new ArchivedPointsHistory
@@ -150,7 +150,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
                         WorkType = h.WorkType,
                         Comment = h.Comment,
                     })
-                    .ToList() ?? new List<ArchivedPointsHistory>(),
+                    .ToList() ?? [],
             StandardsHistory =
                 student
                     .StandardsHistory?.Select(h => new ArchivedStandardsHistory
@@ -162,7 +162,7 @@ public sealed class ArchiveStudentCommand : ICommand<ArchiveStudentPayload, Arch
                         StandardType = h.StandardType,
                         Comment = h.Comment,
                     })
-                    .ToList() ?? new List<ArchivedStandardsHistory>(),
+                    .ToList() ?? [],
         };
 
         _applicationContext.ArchivedStudents.Add(archivedStudent);
