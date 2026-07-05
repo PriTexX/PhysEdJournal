@@ -57,6 +57,11 @@ public static class PointsController
             .RequireAuthorization();
     }
 
+    private static bool CheckIfItIsEndOfSummer()
+    {
+        return DateTimeOffset.UtcNow < new DateTimeOffset(2026, 08, 31, 0, 0, 0, TimeSpan.Zero);
+    }
+
     private static async Task<IResult> AddPoints(
         [FromBody] AddPointsRequest request,
         [FromServices] AddPointsCommand addPointsCommand,
@@ -64,6 +69,11 @@ public static class PointsController
         HttpContext ctx
     )
     {
+        if (CheckIfItIsEndOfSummer())
+        {
+            return ApiDisabled.DisableForTime();
+        }
+
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         switch (request.Type)
@@ -176,6 +186,11 @@ public static class PointsController
         HttpContext ctx
     )
     {
+        if (CheckIfItIsEndOfSummer())
+        {
+            return ApiDisabled.DisableForTime();
+        }
+
         if (Path.GetExtension(file.FileName) != ".csv")
         {
             return Response.Error(
@@ -234,6 +249,11 @@ public static class PointsController
         HttpContext ctx
     )
     {
+        if (CheckIfItIsEndOfSummer())
+        {
+            return ApiDisabled.DisableForTime();
+        }
+
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
@@ -265,6 +285,11 @@ public static class PointsController
         HttpContext ctx
     )
     {
+        if (CheckIfItIsEndOfSummer())
+        {
+            return ApiDisabled.DisableForTime();
+        }
+
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
