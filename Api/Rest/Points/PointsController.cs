@@ -57,8 +57,24 @@ public static class PointsController
             .RequireAuthorization();
     }
 
-    private static bool CheckIfItIsEndOfSummer()
+    private static async Task<bool> CheckIfUserIsNotAllowedToUseApi(
+        PermissionValidator permissionValidator,
+        HttpContext ctx
+    )
     {
+        var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
+
+        var isAdminOrSecretary = await permissionValidator.ValidateTeacherPermissions(
+            callerGuid,
+            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
+        );
+
+        // Allow for admins and secreataries
+        if (isAdminOrSecretary.IsOk)
+        {
+            return false;
+        }
+
         return DateTimeOffset.UtcNow < new DateTimeOffset(2026, 08, 31, 0, 0, 0, TimeSpan.Zero);
     }
 
@@ -69,7 +85,7 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (CheckIfItIsEndOfSummer())
+        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
         {
             return ApiDisabled.DisableForTime();
         }
@@ -183,10 +199,11 @@ public static class PointsController
         [FromForm] DateOnly date,
         [FromForm] IFormFile file,
         [FromServices] AddManyCompetitionPointsCommand addManyCompetitionPointsCommand,
+        [FromServices] PermissionValidator permissionValidator,
         HttpContext ctx
     )
     {
-        if (CheckIfItIsEndOfSummer())
+        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
         {
             return ApiDisabled.DisableForTime();
         }
@@ -249,7 +266,7 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (CheckIfItIsEndOfSummer())
+        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
         {
             return ApiDisabled.DisableForTime();
         }
@@ -285,7 +302,7 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (CheckIfItIsEndOfSummer())
+        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
         {
             return ApiDisabled.DisableForTime();
         }
