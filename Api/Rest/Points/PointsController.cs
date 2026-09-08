@@ -57,27 +57,6 @@ public static class PointsController
             .RequireAuthorization();
     }
 
-    private static async Task<bool> CheckIfUserIsNotAllowedToUseApi(
-        PermissionValidator permissionValidator,
-        HttpContext ctx
-    )
-    {
-        var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
-
-        var isAdminOrSecretary = await permissionValidator.ValidateTeacherPermissions(
-            callerGuid,
-            TeacherPermissions.AdminAccess | TeacherPermissions.SecretaryAccess
-        );
-
-        // Allow for admins and secreataries
-        if (isAdminOrSecretary.IsOk)
-        {
-            return false;
-        }
-
-        return DateTimeOffset.UtcNow < new DateTimeOffset(2026, 08, 31, 0, 0, 0, TimeSpan.Zero);
-    }
-
     private static async Task<IResult> AddPoints(
         [FromBody] AddPointsRequest request,
         [FromServices] AddPointsCommand addPointsCommand,
@@ -85,11 +64,6 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
-        {
-            return ApiDisabled.DisableForTime();
-        }
-
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         switch (request.Type)
@@ -203,11 +177,6 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
-        {
-            return ApiDisabled.DisableForTime();
-        }
-
         if (Path.GetExtension(file.FileName) != ".csv")
         {
             return Response.Error(
@@ -266,11 +235,6 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
-        {
-            return ApiDisabled.DisableForTime();
-        }
-
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
@@ -302,11 +266,6 @@ public static class PointsController
         HttpContext ctx
     )
     {
-        if (await CheckIfUserIsNotAllowedToUseApi(permissionValidator, ctx))
-        {
-            return ApiDisabled.DisableForTime();
-        }
-
         var callerGuid = ctx.User.Claims.First(c => c.Type == "IndividualGuid").Value;
 
         var validateTeacherPermissionsResult = await permissionValidator.ValidateTeacherPermissions(
