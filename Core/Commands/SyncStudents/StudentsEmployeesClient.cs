@@ -3,7 +3,7 @@ using Serilog;
 
 namespace Core.Commands.SyncStudents;
 
-file sealed class StudentEducation
+internal sealed class StudentEducation
 {
     public required string Group { get; set; }
     public required string Department { get; set; }
@@ -76,13 +76,18 @@ public sealed class StudentsEmployeesClient
         var res = await response.Content.ReadFromJsonAsync<StudentsRes>();
 
         var students = res!
-            .Data.Where(s => s.Educations.Any(e => e.IsStudying && e.Group != string.Empty))
+            .Data.Where(s =>
+                s.Educations.Any(e =>
+                    e.IsStudying && e.Group != string.Empty && StudentHasPELessons(e)
+                )
+            )
             .Select(s =>
             {
                 var education = s
-                    .Educations.Where(e => e.IsStudying && e.Group != string.Empty)
-                    .OrderBy(e => e.DegreeLevel == "Очная" ? 1 : 0)
-                    .ThenByDescending(e => e.StartYear)
+                    .Educations.Where(e =>
+                        e.IsStudying && e.Group != string.Empty && StudentHasPELessons(e)
+                    )
+                    .OrderByDescending(e => e.StartYear)
                     .First();
 
                 return new Student
@@ -129,5 +134,11 @@ public sealed class StudentsEmployeesClient
         var res = await response.Content.ReadFromJsonAsync<EmployeesRes>();
 
         return res!.Data;
+    }
+
+    private bool StudentHasPELessons(StudentEducation s)
+    {
+        // Only 2X1 and 2X9 groups have PE lessons
+        return s.Group[2] == '1' || s.Group[2] == '9';
     }
 }

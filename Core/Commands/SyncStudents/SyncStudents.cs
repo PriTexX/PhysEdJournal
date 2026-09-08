@@ -71,7 +71,7 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
                 .Students.Where(s => studentsGuids.Contains(s.StudentGuid))
                 .ToDictionaryAsync(s => s.StudentGuid);
 
-            foreach (var student in actualStudents.Where(StudentHasPELessons))
+            foreach (var student in actualStudents)
             {
                 existingStudentsGuids.Add(student.Guid);
 
@@ -125,11 +125,5 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
         _logger.LogInformation($"Finished {nameof(SyncStudentsCommand)}");
 
         return Unit.Default;
-    }
-
-    private bool StudentHasPELessons(Student s)
-    {
-        // Only 2X1 and 2X9 groups have PE lessons
-        return s.Group[2] == '1' || s.Group[2] == '9';
     }
 }
