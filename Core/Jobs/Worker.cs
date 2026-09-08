@@ -19,7 +19,7 @@ public static class Worker
         app.Services.UseScheduler(scheduler =>
         {
             scheduler.Schedule<ArchiveStudentJob>().DailyAtHour(3);
-            scheduler.Schedule<SyncStudentsJob>().DailyAtHour(4).RunOnceAtStart();
+            scheduler.Schedule<SyncStudentsJob>().DailyAtHour(4);
         });
     }
 }
