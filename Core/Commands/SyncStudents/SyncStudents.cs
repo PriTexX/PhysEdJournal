@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PResult;
+using Serilog;
 
 namespace Core.Commands;
 
@@ -113,9 +114,18 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
                         }
                     );
                 }
-            }
 
-            await applicationContext.SaveChangesAsync();
+                try
+                {
+                    await applicationContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Failed to sync student: {studentGuid}", student.Guid);
+
+                    applicationContext.ChangeTracker.Clear();
+                }
+            }
         }
 
         await applicationContext
