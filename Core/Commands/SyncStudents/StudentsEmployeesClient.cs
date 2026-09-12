@@ -3,7 +3,7 @@ using Serilog;
 
 namespace Core.Commands.SyncStudents;
 
-internal sealed class StudentEducation
+public sealed class StudentEducation
 {
     public required string Group { get; set; }
     public required string Department { get; set; }
@@ -13,7 +13,7 @@ internal sealed class StudentEducation
     public required bool IsStudying { get; set; }
 }
 
-file sealed class ResponseStudent
+public sealed class ResponseStudent
 {
     public required string Id { get; set; }
     public required string FullName { get; set; }
@@ -37,15 +37,6 @@ file sealed class EmployeesRes
     public required List<Employee> Data { get; init; }
 }
 
-public sealed class Student
-{
-    public required string Guid { get; set; }
-    public required string FullName { get; set; }
-    public required string Group { get; set; }
-    public required string Department { get; set; }
-    public required int Course { get; set; }
-}
-
 public sealed class StudentsEmployeesClient
 {
     private readonly HttpClient _httpClient;
@@ -57,7 +48,7 @@ public sealed class StudentsEmployeesClient
         _httpClient.BaseAddress = new Uri("https://api.mospolytech.ru");
     }
 
-    public async Task<List<Student>> GetStudentsAsync(int limit, int offset)
+    public async Task<List<ResponseStudent>> GetStudentsAsync(int limit, int offset)
     {
         var response = await _httpClient.PostAsync(
             "lk/students/all",
@@ -75,33 +66,7 @@ public sealed class StudentsEmployeesClient
 
         var res = await response.Content.ReadFromJsonAsync<StudentsRes>();
 
-        var students = res!
-            .Data.Where(s =>
-                s.Educations.Any(e =>
-                    e.IsStudying && e.Group != string.Empty && StudentHasPELessons(e)
-                )
-            )
-            .Select(s =>
-            {
-                var education = s
-                    .Educations.Where(e =>
-                        e.IsStudying && e.Group != string.Empty && StudentHasPELessons(e)
-                    )
-                    .OrderByDescending(e => e.StartYear)
-                    .First();
-
-                return new Student
-                {
-                    Guid = s.Id,
-                    FullName = s.FullName,
-                    Group = education.Group,
-                    Course = education.Course,
-                    Department = education.Department,
-                };
-            })
-            .ToList();
-
-        return students;
+        return res!.Data;
     }
 
     public async Task<List<Employee>> GetEmployeesAsync(
@@ -134,11 +99,5 @@ public sealed class StudentsEmployeesClient
         var res = await response.Content.ReadFromJsonAsync<EmployeesRes>();
 
         return res!.Data;
-    }
-
-    private bool StudentHasPELessons(StudentEducation s)
-    {
-        // Only 2X1 and 2X9 groups have PE lessons
-        return s.Group[2] == '1' || s.Group[2] == '9';
     }
 }

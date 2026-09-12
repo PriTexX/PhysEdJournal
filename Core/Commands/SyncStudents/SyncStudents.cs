@@ -10,6 +10,15 @@ using Serilog;
 
 namespace Core.Commands;
 
+file sealed class Student
+{
+    public required string Guid { get; set; }
+    public required string FullName { get; set; }
+    public required string Group { get; set; }
+    public required string Department { get; set; }
+    public required int Course { get; set; }
+}
+
 public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -52,9 +61,9 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
 
         while (true)
         {
-            var actualStudents = await client.GetStudentsAsync(Cfg.PageSizeToQueryStudents, offset);
+            var studentsChunk = await client.GetStudentsAsync(Cfg.PageSizeToQueryStudents, offset);
 
-            if (actualStudents.Count == 0)
+            if (studentsChunk.Count == 0)
             {
                 break;
             }
@@ -66,64 +75,94 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
                 offset / Cfg.PageSizeToQueryStudents
             );
 
+            var actualStudents = studentsChunk
+                .Where(s =>
+                    s.Educations.Any(e =>
+                        e.IsStudying && e.Group != string.Empty && StudentHasPELessons(e)
+                    )
+                )
+                .Select(s =>
+                {
+                    var education = s
+                        .Educations.Where(e =>
+                            e.IsStudying && e.Group != string.Empty && StudentHasPELessons(e)
+                        )
+                        .OrderByDescending(e => e.StartYear)
+                        .First();
+
+                    return new Student
+                    {
+                        Guid = s.Id,
+                        FullName = s.FullName,
+                        Group = education.Group,
+                        Course = education.Course,
+                        Department = education.Department,
+                    };
+                })
+                .ToList();
+
             var studentsGuids = actualStudents.Select(s => s.Guid).ToList();
 
             var dbStudents = await applicationContext
-                .Students.Where(s => studentsGuids.Contains(s.StudentGuid))
+                .Students.AsNoTracking()
+                .Where(s => studentsGuids.Contains(s.StudentGuid))
                 .ToDictionaryAsync(s => s.StudentGuid);
 
             foreach (var student in actualStudents)
             {
-                existingStudentsGuids.Add(student.Guid);
-
-                if (!dbGroups.ContainsKey(student.Group))
-                {
-                    _logger.LogInformation("Adding new group: {groupName}", student.Group);
-
-                    dbGroups.Add(student.Group, true);
-                    applicationContext.Groups.Add(
-                        new GroupEntity { GroupName = student.Group, VisitValue = 2.0, }
-                    );
-                }
-
-                if (dbStudents.TryGetValue(student.Guid, out var dbStudent))
-                {
-                    dbStudent.FullName = student.FullName;
-                    dbStudent.GroupNumber = student.Group;
-                    dbStudent.StudentGuid = student.Guid;
-                    dbStudent.Department = student.Department;
-                    dbStudent.Course = student.Course;
-                    dbStudent.IsActive = true;
-
-                    applicationContext.Students.Update(dbStudent);
-                }
-                else
-                {
-                    _logger.LogInformation("Adding new student: {studentGuid}", student.Guid);
-
-                    applicationContext.Students.Add(
-                        new StudentEntity
-                        {
-                            FullName = student.FullName,
-                            GroupNumber = student.Group,
-                            StudentGuid = student.Guid,
-                            CurrentSemesterName = currentSemesterName,
-                            Department = student.Department,
-                            Course = student.Course,
-                            IsActive = true,
-                        }
-                    );
-                }
-
                 try
                 {
-                    await applicationContext.SaveChangesAsync();
+                    applicationContext.ChangeTracker.Clear();
+
+                    existingStudentsGuids.Add(student.Guid);
+
+                    if (!dbGroups.ContainsKey(student.Group))
+                    {
+                        _logger.LogInformation("Adding new group: {groupName}", student.Group);
+
+                        dbGroups.Add(student.Group, true);
+                        applicationContext.Groups.Add(
+                            new GroupEntity { GroupName = student.Group, VisitValue = 2.0, }
+                        );
+
+                        await applicationContext.SaveChangesAsync();
+                    }
+
+                    if (dbStudents.TryGetValue(student.Guid, out var dbStudent))
+                    {
+                        await applicationContext
+                            .Students.Where(s => s.StudentGuid == student.Guid)
+                            .ExecuteUpdateAsync(p =>
+                                p.SetProperty(s => s.FullName, student.FullName)
+                                    .SetProperty(s => s.GroupNumber, student.Group)
+                                    .SetProperty(s => s.Department, student.Department)
+                                    .SetProperty(s => s.Course, student.Course)
+                                    .SetProperty(s => s.IsActive, true)
+                            );
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Adding new student: {studentGuid}", student.Guid);
+
+                        applicationContext.Students.Add(
+                            new StudentEntity
+                            {
+                                FullName = student.FullName,
+                                GroupNumber = student.Group,
+                                StudentGuid = student.Guid,
+                                CurrentSemesterName = currentSemesterName,
+                                Department = student.Department,
+                                Course = student.Course,
+                                IsActive = true,
+                            }
+                        );
+
+                        await applicationContext.SaveChangesAsync();
+                    }
                 }
                 catch (Exception e)
                 {
                     Log.Error(e, "Failed to sync student: {studentGuid}", student.Guid);
-
-                    applicationContext.ChangeTracker.Clear();
                 }
             }
         }
@@ -135,5 +174,11 @@ public class SyncStudentsCommand : ICommand<EmptyPayload, Unit>
         _logger.LogInformation($"Finished {nameof(SyncStudentsCommand)}");
 
         return Unit.Default;
+    }
+
+    private bool StudentHasPELessons(StudentEducation s)
+    {
+        // Only 2X1 and 2X9 groups have PE lessons
+        return s.Group[2] == '1' || s.Group[2] == '9';
     }
 }
