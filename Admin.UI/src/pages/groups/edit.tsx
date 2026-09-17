@@ -1,5 +1,6 @@
 import { Input, Select } from '@chakra-ui/react';
 
+import { NumberInput } from '@/shared/components/number-input';
 import { createFormHelper, Form } from '@/widgets/form';
 
 import type { Group } from './types';
@@ -16,26 +17,8 @@ const fields = [
 
   formHelper.createField('visitValue', {
     name: 'Стоимость посещения',
-    render({ register }) {
-      return (
-        <Select {...register({ required: true })}>
-          <option key={0} value={2.0}>
-            2.0
-          </option>
-          <option key={0} value={2.5}>
-            2.5
-          </option>
-          <option key={0} value={3.0}>
-            3.0
-          </option>
-          <option key={0} value={3.5}>
-            3.5
-          </option>
-          <option key={0} value={4.0}>
-            4.0
-          </option>
-        </Select>
-      );
+    render({ control, name }) {
+      return <NumberInput control={control} name={name} returnType="number" />;
     },
   }),
 

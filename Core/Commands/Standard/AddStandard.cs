@@ -55,11 +55,8 @@ internal sealed class AddStandardValidator : ICommandValidator<AddStandardPayloa
         );
 
         if (
-            totalPoints < Cfg.MinTotalPointsToAddStandards
-            || (
-                student.Course > 1
-                && totalPoints < Cfg.MinTotalPointsToAddStandardsForCoursesHigherThan1
-            )
+            (student.Course == 1 && student.Visits < Cfg.MinVisitsFor1CourseToAddStandards)
+            || (student.Course > 1 && totalPoints < Cfg.MinTotalPointsToAddStandards)
         )
         {
             return new NotEnoughPointsForStandardsError();
