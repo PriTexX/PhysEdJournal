@@ -7,14 +7,14 @@ services:
     container_name: physedjournal
     env_file:
       - .env.secret
-        
+
   admin-api:
     image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}-admin-api"
     restart: always
     container_name: phys-admin-api
     env_file:
       - .env.secret
-        
+
   admin-ui:
     image: "ghcr.io/pritexx/physedjournal:${IMAGE_TAG}-admin-ui"
     restart: always
@@ -30,7 +30,7 @@ services:
       - seq-data:/data
     environment:
       ACCEPT_EULA: "Y"
-  
+
   grafana:
     image: grafana/grafana:9.5.6
     volumes:
@@ -40,7 +40,7 @@ services:
     environment:
       GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/physedjournal/grafana/"
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-  
+
   nginx:
     image: nginx:1.23
     container_name: nginx
@@ -51,11 +51,11 @@ services:
     depends_on:
       - physedjournal
     volumes:
-      - /cert:/cert:ro
+      - /ssl/mospolytech:/cert:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   grafana-data:
     driver: local
   seq-data:
-    driver: local    
+    driver: local
