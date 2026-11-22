@@ -32,7 +32,7 @@ builder
 builder.Services.AddAuthorization();
 
 builder.Services.AddHttpClient<LkAuthClient>(c =>
-    c.BaseAddress = new Uri("https://e.mospolytech.ru/")
+    c.BaseAddress = new Uri("https://old-e.mospolytech.ru/")
 );
 
 builder.Services.AddCoreDB(Cfg.ConnectionString);

@@ -36,7 +36,7 @@ public sealed class LkAuthClient
         };
 
         var authResponse = await _httpClient.PostAsync(
-            "old/lk_api.php",
+            "lk_api.php",
             new FormUrlEncodedContent(req)
         );
 
@@ -50,11 +50,11 @@ public sealed class LkAuthClient
         );
 
         var appDataResponse = await _httpClient.GetAsync(
-            $"old/lk_api.php/?getAppData&token={authInfo.Token}"
+            $"lk_api.php/?getAppData&token={authInfo.Token}"
         );
 
         var avatarResponse = await _httpClient.GetAsync(
-            $"old/lk_api.php/?getUser&token={authInfo.Token}"
+            $"lk_api.php/?getUser&token={authInfo.Token}"
         );
 
         if (
@@ -75,7 +75,8 @@ public sealed class LkAuthClient
 
         return new AuthResponse
         {
-            FullName = $"{userInfo.User.Surname} {userInfo.User.Name} {userInfo.User.Patronymic}".Trim(),
+            FullName =
+                $"{userInfo.User.Surname} {userInfo.User.Name} {userInfo.User.Patronymic}".Trim(),
             PersonGuid = appInfo.PersonGuid,
             PictureUrl = userInfo.User.AvatarUrl,
         };
@@ -104,7 +105,7 @@ file struct User
 {
     [JsonPropertyName("avatar")]
     public required string AvatarUrl { get; init; }
-    
+
     [JsonPropertyName("surname")]
     public required string Surname { get; init; }
 
