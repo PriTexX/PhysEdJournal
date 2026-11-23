@@ -49,25 +49,14 @@ public sealed class LkAuthClient
             await authResponse.Content.ReadAsStreamAsync()
         );
 
-        var appDataResponse = await _httpClient.GetAsync(
-            $"lk_api.php/?getAppData&token={authInfo.Token}"
-        );
-
         var avatarResponse = await _httpClient.GetAsync(
-            $"lk_api.php/?getUser&token={authInfo.Token}"
+            $"lk_api.php?getUser=&token={authInfo.Token}"
         );
 
-        if (
-            appDataResponse.StatusCode != HttpStatusCode.OK
-            || avatarResponse.StatusCode != HttpStatusCode.OK
-        )
+        if (avatarResponse.StatusCode != HttpStatusCode.OK)
         {
             throw new Exception("Unknown HTTP error");
         }
-
-        var appInfo = await JsonSerializer.DeserializeAsync<LKUserResponse>(
-            await appDataResponse.Content.ReadAsStreamAsync()
-        );
 
         var userInfo = await JsonSerializer.DeserializeAsync<LKUserAvatarResponse>(
             await avatarResponse.Content.ReadAsStreamAsync()
@@ -77,7 +66,7 @@ public sealed class LkAuthClient
         {
             FullName =
                 $"{userInfo.User.Surname} {userInfo.User.Name} {userInfo.User.Patronymic}".Trim(),
-            PersonGuid = appInfo.PersonGuid,
+            PersonGuid = authInfo.Guid,
             PictureUrl = userInfo.User.AvatarUrl,
         };
     }
@@ -87,6 +76,9 @@ file struct LKAuthResponse
 {
     [JsonPropertyName("token")]
     public required string Token { get; init; }
+
+    [JsonPropertyName("guid")]
+    public required string Guid { get; init; }
 }
 
 file struct LKUserResponse
